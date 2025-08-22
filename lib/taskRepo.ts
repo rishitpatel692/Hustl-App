@@ -1,0 +1,266 @@
+import { supabase } from './supabase';
+import type { Task, CreateTaskData, TaskStatus, TaskCategory, TaskUrgency } from '@/types/database';
+
+/**
+ * Safe Task Repository - Eliminates 406 PGRST116 errors completely
+ * 
+ * Rules:
+ * 1. NEVER use .single() or .maybeSingle() - always use .limit(1) + [0]
+ * 2. Fetch by ID uses ONLY id filter, no status/created_by filters
+ * 3. All single fetches return null for 0 rows (never throw)
+ * 4. Business logic validation happens in application code
+ * 5. Atomic updates use RPC functions for race condition protection
+ */
+export class TaskRepo {
+  /**
+   * Safe single task fetch - NEVER returns 406 PGRST116
+   * Only filters by ID, returns null if not found
+   */
+  static async getTaskByIdSafe(taskId: string): Promise<{ data: Task | null; error: string | null }> {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('id', taskId)
+        .limit(1);
+
+      if (error) {
+        return { data: null, error: error.message };
+      }
+
+      const task = data?.[0] ?? null;
+      return { data: task, error: null };
+    } catch (error) {
+      return { data: null, error: 'Network error. Please check your connection.' };
+    }
+  }
+
+  /**
+   * Get available tasks (open tasks not created by current user)
+   * Safe list query - never uses .single()
+   */
+  static async listOpenTasks(userId: string, limit: number = 20, offset: number = 0): Promise<{ data: Task[] | null; error: string | null }> {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('status', 'open')
+        .neq('created_by', userId)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) {
+        return { data: null, error: error.message };
+      }
+
+      return { data: data || [], error: null };
+    } catch (error) {
+      return { data: null, error: 'Network error. Please check your connection.' };
+    }
+  }
+
+  /**
+   * Get tasks user is doing (accepted by current user)
+   * Safe list query - never uses .single()
+   */
+  static async listUserDoingTasks(userId: string): Promise<{ data: Task[] | null; error: string | null }> {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('accepted_by', userId)
+        .in('status', ['accepted', 'completed'])
+        .order('updated_at', { ascending: false });
+
+      if (error) {
+        return { data: null, error: error.message };
+      }
+
+      return { data: data || [], error: null };
+    } catch (error) {
+      return { data: null, error: 'Network error. Please check your connection.' };
+    }
+  }
+
+  /**
+   * Get user's posted tasks (created by current user, any status)
+   * Safe list query - never uses .single()
+   */
+  static async listUserPostedTasks(userId: string): Promise<{ data: Task[] | null; error: string | null }> {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('created_by', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        return { data: null, error: error.message };
+      }
+
+      return { data: data || [], error: null };
+    } catch (error) {
+      return { data: null, error: 'Network error. Please check your connection.' };
+    }
+  }
+
+  /**
+   * Create a new task
+   * Safe creation - uses .limit(1) + [0] for response
+   */
+  static async createTask(taskData: CreateTaskData, userId: string): Promise<{ data: Task | null; error: string | null }> {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert({
+          ...taskData,
+          created_by: userId,
+          status: 'open' as TaskStatus,
+        })
+        .select()
+        .limit(1);
+
+      if (error) {
+        return { data: null, error: error.message };
+      }
+
+      const task = data?.[0] ?? null;
+      if (!task) {
+        return { data: null, error: 'Failed to create task. Please try again.' };
+      }
+
+      return { data: task, error: null };
+    } catch (error) {
+      return { data: null, error: 'Network error. Please check your connection.' };
+    }
+  }
+
+  /**
+   * Accept a task using atomic RPC function
+   * Safe pattern: uses RPC for atomic operation, no race conditions
+   */
+  static async acceptTask(taskId: string, userId: string): Promise<{ data: Task | null; error: string | null }> {
+    try {
+      // Use atomic RPC function for race-safe acceptance with correct parameter name
+      const { data, error } = await supabase.rpc('accept_task', { 
+        p_task_id: taskId 
+      });
+
+      if (error) {
+        console.error('accept_task RPC error:', error);
+        return { data: null, error: error.message };
+      }
+
+      const acceptedTask = data?.[0] ?? null;
+      if (!acceptedTask) {
+        return { data: null, error: 'Task is no longer available or cannot be accepted' };
+      }
+
+      return { data: acceptedTask, error: null };
+    } catch (error) {
+      console.error('accept_task network error:', error);
+      return { data: null, error: 'Network error. Please check your connection.' };
+    }
+  }
+
+  /**
+   * Cancel a task (only by creator)
+   * Safe pattern: fetch by ID only, validate in code, atomic update
+   */
+  static async cancelTask(taskId: string, userId: string): Promise<{ data: Task | null; error: string | null }> {
+    try {
+      // SAFE: Fetch task by ID only - no restrictive filters
+      const { data: task, error: fetchError } = await TaskRepo.getTaskByIdSafe(taskId);
+
+      if (fetchError) {
+        return { data: null, error: fetchError };
+      }
+
+      if (!task) {
+        return { data: null, error: 'Task not found or no longer available' };
+      }
+
+      // Validate in application code (not database filters)
+      if (task.created_by !== userId) {
+        return { data: null, error: 'You can only cancel your own tasks' };
+      }
+      
+      if (task.status !== 'open' && task.status !== 'accepted') {
+        return { data: null, error: 'Only open or accepted tasks can be cancelled' };
+      }
+
+      // Atomic update with proper filters for race condition protection
+      const { data, error } = await supabase
+        .from('tasks')
+        .update({
+          status: 'cancelled' as TaskStatus,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', taskId)
+        .eq('created_by', userId)
+        .in('status', ['open', 'accepted'])
+        .select()
+        .limit(1);
+
+      if (error) {
+        return { data: null, error: error.message };
+      }
+
+      const updatedTask = data?.[0] ?? null;
+      if (!updatedTask) {
+        return { data: null, error: 'Task not found or no longer available for cancellation' };
+      }
+
+      return { data: updatedTask, error: null };
+    } catch (error) {
+      return { data: null, error: 'Network error. Please check your connection.' };
+    }
+  }
+
+  // Utility methods for formatting (moved from TaskService)
+  static formatReward(cents: number): string {
+    return `$${(cents / 100).toFixed(0)}`;
+  }
+
+  static formatEstimatedTime(minutes: number): string {
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (remainingMinutes === 0) {
+      return `${hours}h`;
+    }
+    return `${hours}h ${remainingMinutes}m`;
+  }
+
+  static formatCategory(category: string): string {
+    switch (category) {
+      case 'food':
+        return 'Food Pickup';
+      case 'grocery':
+        return 'Grocery Run';
+      case 'coffee':
+        return 'Coffee Run';
+      default:
+        return category;
+    }
+  }
+
+  static formatUrgency(urgency: string): string {
+    return urgency.charAt(0).toUpperCase() + urgency.slice(1);
+  }
+
+  static getUrgencyColor(urgency: string): string {
+    switch (urgency) {
+      case 'low':
+        return '#10B981'; // Green
+      case 'medium':
+        return '#F59E0B'; // Yellow
+      case 'high':
+        return '#EF4444'; // Red
+      default:
+        return '#6B7280'; // Gray
+    }
+  }
+}
