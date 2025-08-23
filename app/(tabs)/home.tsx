@@ -10,7 +10,9 @@ import Animated, {
   withRepeat, 
   withTiming, 
   withSequence,
-  interpolate
+  interpolate,
+  withDelay,
+  withSpring
 } from 'react-native-reanimated';
 import { Colors } from '@constants/Colors';
 import GlobalHeader from '@components/GlobalHeader';
@@ -19,49 +21,37 @@ const categories = [
   {
     id: 'car',
     title: 'Car Rides',
-    icon: <Car size={28} color={Colors.white} strokeWidth={2.5} />,
-    backgroundColor: '#3B82F6', // Glowing blue
-    gradientColors: ['#60A5FA', '#3B82F6', '#2563EB'],
+    backgroundColor: '#3B82F6',
     image: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
   {
     id: 'food',
     title: 'Food Pickup',
-    icon: <Pizza size={28} color={Colors.white} strokeWidth={2.5} />,
-    backgroundColor: '#FF5A1F', // Orange
-    gradientColors: ['#FB923C', '#FF5A1F', '#E63A0B'],
+    backgroundColor: '#FA4616',
     image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
   {
     id: 'workout',
     title: 'Workout Partner',
-    icon: <Dumbbell size={28} color={Colors.white} strokeWidth={2.5} />,
-    backgroundColor: '#10B981', // Green
-    gradientColors: ['#34D399', '#10B981', '#059669'],
+    backgroundColor: '#10B981',
     image: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
   {
     id: 'coffee',
     title: 'Coffee Runs',
-    icon: <Coffee size={28} color={Colors.white} strokeWidth={2.5} />,
-    backgroundColor: '#8B4513', // Brown
-    gradientColors: ['#A0522D', '#8B4513', '#654321'],
+    backgroundColor: '#8B4513',
     image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
   {
     id: 'study',
     title: 'Study Partner',
-    icon: <BookOpen size={28} color={Colors.white} strokeWidth={2.5} />,
-    backgroundColor: '#8B5CF6', // Purple
-    gradientColors: ['#A78BFA', '#8B5CF6', '#7C3AED'],
+    backgroundColor: '#8B5CF6',
     image: 'https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
   {
     id: 'custom',
     title: 'Custom Task',
-    icon: <Plus size={28} color={Colors.primary} strokeWidth={2.5} />,
-    backgroundColor: '#F8FAFC', // Light gray
-    gradientColors: ['#F8FAFC', '#F1F5F9', '#E2E8F0'],
+    backgroundColor: '#6B7280',
     image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
 ];
@@ -95,7 +85,7 @@ const AnimatedReferralsBanner = () => {
   }, []);
 
   const animatedGlowStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(glowAnimation.value, [0, 1], [0.3, 0.8]);
+    const opacity = interpolate(glowAnimation.value, [0, 1], [0.2, 0.6]);
     return {
       shadowOpacity: opacity,
     };
@@ -155,11 +145,21 @@ const AnimatedReferralsBanner = () => {
 };
 
 // Animated Category Card Component
-const CategoryCard = ({ category, onPress }: { category: any; onPress: () => void }) => {
-  const scaleAnimation = useSharedValue(1);
+const CategoryCard = ({ category, index, onPress }: { category: any; index: number; onPress: () => void }) => {
+  const scaleAnimation = useSharedValue(0.8);
+  const opacityAnimation = useSharedValue(0);
+
+  // Staggered entrance animation
+  React.useEffect(() => {
+    const delay = index * 100;
+    
+    opacityAnimation.value = withDelay(delay, withTiming(1, { duration: 600 }));
+    scaleAnimation.value = withDelay(delay, withSpring(1, { damping: 15, stiffness: 300 }));
+  }, [index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scaleAnimation.value }],
+    opacity: opacityAnimation.value,
   }));
 
   const handlePressIn = () => {
@@ -194,17 +194,15 @@ const CategoryCard = ({ category, onPress }: { category: any; onPress: () => voi
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.9}
-        style={[styles.categoryButton, { backgroundColor: category.backgroundColor }]}
+        style={styles.categoryButton}
       >
         <Image
           source={{ uri: category.image }}
           style={styles.categoryImage}
           resizeMode="cover"
         />
-        <View style={styles.categoryOverlay}>
-          <View style={styles.categoryIconContainer}>
-            {category.icon}
-          </View>
+        <View style={styles.categoryOverlay} />
+        <View style={styles.categoryContent}>
           <Text style={styles.categoryTitle}>{category.title}</Text>
         </View>
       </TouchableOpacity>
@@ -242,10 +240,11 @@ export default function HomeScreen() {
           <Text style={styles.categoriesSubtitle}>Choose what you need help with</Text>
           
           <View style={styles.categoriesGrid}>
-            {categories.map((category) => (
+            {categories.map((category, index) => (
               <CategoryCard
                 key={category.id}
                 category={category}
+                index={index}
                 onPress={() => handleCategoryPress(category.id)}
               />
             ))}
@@ -259,7 +258,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#0A0F1C', // Deep navy background
   },
   content: {
     flex: 1,
@@ -274,18 +273,20 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 32,
     borderRadius: 20,
-    backgroundColor: '#3B82F6',
-    shadowColor: '#3B82F6',
+    shadowColor: '#0021A5',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
     shadowRadius: 16,
     elevation: 12,
+    overflow: 'hidden',
   },
   referralContent: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 24,
     gap: 20,
+    background: 'linear-gradient(135deg, #0021A5 0%, #0A0F1C 100%)',
+    backgroundColor: '#0021A5', // Fallback for React Native
   },
   referralTextContainer: {
     flex: 1,
@@ -294,16 +295,16 @@ const styles = StyleSheet.create({
   referralTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.white,
+    color: '#F1F5F9', // Light gray-white
     lineHeight: 24,
   },
   referralSubtitle: {
     fontSize: 14,
-    color: Colors.white + 'E6', // 90% opacity
+    color: '#A0A7B3', // Lighter gray
     lineHeight: 20,
   },
   inviteButton: {
-    backgroundColor: Colors.white,
+    backgroundColor: '#FA4616', // UF Orange
     borderRadius: 24,
     paddingHorizontal: 24,
     paddingVertical: 12,
@@ -312,14 +313,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 4,
   },
   inviteButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#3B82F6',
+    color: '#F1F5F9',
   },
 
   // Categories Section
@@ -329,12 +330,13 @@ const styles = StyleSheet.create({
   categoriesTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: Colors.semantic.headingText,
+    color: '#F1F5F9', // White text
     marginBottom: 8,
+    letterSpacing: 0.5,
   },
   categoriesSubtitle: {
     fontSize: 16,
-    color: Colors.semantic.tabInactive,
+    color: '#A0A7B3', // Light gray
     marginBottom: 24,
   },
   categoriesGrid: {
@@ -344,21 +346,21 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   
-  // Category Cards
+  // Category Cards - Reference Design Style
   categoryCard: {
     width: '47%',
     marginBottom: 16,
   },
   categoryButton: {
-    height: 160,
-    borderRadius: 20,
+    height: 140,
+    borderRadius: 16,
     overflow: 'hidden',
     position: 'relative',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
     shadowRadius: 12,
-    elevation: 6,
+    elevation: 8,
   },
   categoryImage: {
     position: 'absolute',
@@ -375,29 +377,22 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
+    background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Fallback for React Native
   },
-  categoryIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-    backdropFilter: 'blur(10px)',
+  categoryContent: {
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    right: 16,
   },
   categoryTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: Colors.white,
-    textAlign: 'center',
+    color: '#F1F5F9', // White text
     lineHeight: 20,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowRadius: 3,
   },
 });

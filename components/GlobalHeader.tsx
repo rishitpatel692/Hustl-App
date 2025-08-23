@@ -136,9 +136,9 @@ export default function GlobalHeader({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.semantic.screen,
+    backgroundColor: '#0A0F1C', // Dark background
     borderBottomWidth: 1,
-    borderBottomColor: Colors.semantic.divider,
+    borderBottomColor: '#1F2937', // Darker border for dark theme
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -190,12 +190,12 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.white,
+    color: '#F1F5F9',
   },
   guestAvatarText: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.white,
+    color: '#F1F5F9',
   },
   logo: {
     width: 28,
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: Colors.semantic.headingText,
+    color: '#F1F5F9', // Light text
     textAlign: 'center',
     flex: 1,
   },
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.muted,
+    backgroundColor: '#1F2937', // Dark button background
     justifyContent: 'center',
     alignItems: 'center',
   },

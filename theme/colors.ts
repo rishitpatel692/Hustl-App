@@ -6,21 +6,21 @@
 
 export const Colors = {
   // Primary / UF Blue
-  primary: '#002B7F',
+  primary: '#0021A5', // Updated UF Blue
   primaryDark: '#001F5C',
   primaryLight: '#0038FF',
 
   // Secondary / UF Orange  
-  secondary: '#FF4D23',
+  secondary: '#FA4616', // Updated UF Orange
   secondaryLight: '#FF5A1F',
   secondaryDark: '#E63A0B',
 
   // Surfaces & Text
   white: '#FFFFFF',
-  bg: '#FFFFFF',
+  bg: '#0A0F1C', // Dark navy background
   muted: '#F5F5F5',
   border: '#E5E7EB',
-  text: '#0F2557',
+  text: '#F1F5F9', // Light text for dark theme
   textHover: '#0A1B3D',
 
   // Status / Badges
@@ -41,23 +41,23 @@ export const Colors = {
   // Semantic color mappings for components
   semantic: {
     // Buttons
-    primaryButton: '#002B7F',
+    primaryButton: '#0021A5',
     primaryButtonPressed: '#001F5C',
     primaryButtonFocus: '#0038FF',
     
-    secondaryButton: '#FF4D23',
+    secondaryButton: '#FA4616',
     secondaryButtonPressed: '#E63A0B',
     secondaryButtonAccent: '#FF5A1F',
 
     // Surfaces
-    screen: '#FFFFFF',
+    screen: '#0A0F1C', // Dark background
     card: '#FFFFFF',
     cardBorder: '#E5E7EB',
     
     // Text
-    bodyText: '#0F2557',
-    headingText: '#0F2557',
-    interactiveText: '#0F2557',
+    bodyText: '#F1F5F9', // Light text
+    headingText: '#F1F5F9', // Light text
+    interactiveText: '#F1F5F9', // Light text
     interactiveTextPressed: '#0A1B3D',
     
     // Inputs
@@ -85,7 +85,7 @@ export const Colors = {
     
     // Navigation
     tabInactive: '#9CA3AF', // Derived from border
-    tabActive: '#002B7F',
+    tabActive: '#0021A5',
     fabBackground: '#FF4D23',
     fabIcon: '#FFFFFF',
     

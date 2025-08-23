@@ -68,7 +68,7 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: Colors.semantic.screen,
+            backgroundColor: '#0A0F1C', // Dark background
             borderTopColor: Colors.semantic.divider,
             borderTopWidth: 1,
             height: 80 + insets.bottom,
@@ -79,8 +79,8 @@ export default function TabLayout() {
             left: 0,
             right: 0,
           },
-          tabBarActiveTintColor: '#3B82F6', // Lighter glowing blue
-          tabBarInactiveTintColor: '#9CA3AF', // Neutral gray
+          tabBarActiveTintColor: '#FA4616', // UF Orange for active
+          tabBarInactiveTintColor: '#A0A7B3', // Light gray for inactive
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '600',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colors.secondary, // UF Orange
+    backgroundColor: '#FA4616', // UF Orange
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
