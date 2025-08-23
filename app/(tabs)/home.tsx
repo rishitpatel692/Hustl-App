@@ -19,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@constants/Colors';
 import GlobalHeader from '@components/GlobalHeader';
 import TaskSelectButton from '@components/TaskSelectButton';
+import TaskSelectButton from '@components/TaskSelectButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -346,6 +347,13 @@ const CategoryCard = ({
           loading={isSelecting}
           taskTitle={category.title}
         />
+        
+        {/* Select Task Button */}
+        <TaskSelectButton
+          onPress={onSelectTask}
+          loading={isSelecting}
+          taskTitle={category.title}
+        />
       </TouchableOpacity>
     </Animated.View>
   );
@@ -355,6 +363,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [selectingTaskId, setSelectingTaskId] = useState<string | null>(null);
+  const [selectingTaskId, setSelectingTaskId] = useState<string | null>(null);
 
   const handleCategoryPress = (categoryId: string) => {
     // Navigate to Post Task with category prefill
@@ -362,6 +371,23 @@ export default function HomeScreen() {
       pathname: '/(tabs)/post',
       params: { category: categoryId }
     });
+  };
+
+  const handleSelectTask = async (categoryId: string) => {
+    if (selectingTaskId) return;
+    
+    setSelectingTaskId(categoryId);
+    
+    // Simulate task selection process
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Navigate to Post Task with category prefill
+    router.push({
+      pathname: '/(tabs)/post',
+      params: { category: categoryId }
+    });
+    
+    setSelectingTaskId(null);
   };
 
   const handleSelectTask = async (categoryId: string) => {
@@ -408,6 +434,8 @@ export default function HomeScreen() {
                 category={category}
                 index={index}
                 onPress={() => handleCategoryPress(category.id)}
+                onSelectTask={() => handleSelectTask(category.id)}
+                isSelecting={selectingTaskId === category.id}
                 onSelectTask={() => handleSelectTask(category.id)}
                 isSelecting={selectingTaskId === category.id}
               />
