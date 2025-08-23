@@ -19,32 +19,109 @@ import { Colors } from '@/theme/colors';
 
 const { width, height } = Dimensions.get('window');
 
-// Floating elements animation
-const FloatingElement = ({ delay, children }: { delay: number; children: React.ReactNode }) => {
-  const translateY = useSharedValue(0);
-  const opacity = useSharedValue(0);
+// Glowing logo animation
+const GlowingLogo = () => {
+  const glowOpacity = useSharedValue(0.3);
+  const shimmerPosition = useSharedValue(-1);
 
   useEffect(() => {
-    opacity.value = withDelay(delay, withTiming(1, { duration: 800 }));
-    translateY.value = withDelay(
-      delay + 500,
-      withRepeat(
-        withSequence(
-          withTiming(-8, { duration: 2000, easing: Easing.inOut(Easing.sin) }),
-          withTiming(8, { duration: 2000, easing: Easing.inOut(Easing.sin) })
-        ),
-        -1,
-        true
-      )
+    // Gentle glow pulse
+    glowOpacity.value = withRepeat(
+      withSequence(
+        withTiming(0.6, { duration: 2000, easing: Easing.inOut(Easing.sin) }),
+        withTiming(0.3, { duration: 2000, easing: Easing.inOut(Easing.sin) })
+      ),
+      -1,
+      true
     );
-  }, [delay]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-    opacity: opacity.value,
+    // Subtle shimmer sweep
+    shimmerPosition.value = withRepeat(
+      withTiming(1, { duration: 4000, easing: Easing.linear }),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedGlowStyle = useAnimatedStyle(() => ({
+    shadowOpacity: glowOpacity.value,
   }));
 
-  return <Animated.View style={animatedStyle}>{children}</Animated.View>;
+  const animatedShimmerStyle = useAnimatedStyle(() => {
+    const translateX = interpolate(shimmerPosition.value, [0, 1], [-120, 120]);
+    return {
+      transform: [{ translateX }],
+    };
+  });
+
+  return (
+    <Animated.View style={[styles.logoContainer, animatedGlowStyle]}>
+      <View style={styles.logoWrapper}>
+        <Image
+          source={require('../../src/assets/images/image.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Animated.View style={[styles.shimmerOverlay, animatedShimmerStyle]} />
+      </View>
+    </Animated.View>
+  );
+};
+
+// University carousel component
+const UniversityCarousel = () => {
+  const scrollX = useSharedValue(0);
+  const universities = [
+    { id: 'uf', name: 'UF', logo: require('../../src/assets/images/Florida_Gators_gator_logo.png') },
+    { id: 'ucf', name: 'UCF', logo: require('../../src/assets/images/141-1415685_ucf-university-of-central-florida-logo.jpg') },
+    { id: 'usf', name: 'USF', logo: require('../../src/assets/images/UniversityOfSouthFlorida-logo-350x350.jpg') },
+    { id: 'fsu', name: 'FSU', logo: require('../../src/assets/images/Florida_State_Seminoles_logo.png') },
+  ];
+
+  useEffect(() => {
+    // Auto-scroll carousel
+    scrollX.value = withRepeat(
+      withTiming(universities.length * 100, { 
+        duration: 8000, 
+        easing: Easing.linear 
+      }),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const translateX = interpolate(
+      scrollX.value % (universities.length * 100),
+      [0, universities.length * 100],
+      [0, -universities.length * 100]
+    );
+    return {
+      transform: [{ translateX }],
+    };
+  });
+
+  return (
+    <View style={styles.carouselContainer}>
+      <View style={styles.carouselTrack}>
+        <Animated.View style={[styles.carouselContent, animatedStyle]}>
+          {/* Render universities twice for seamless loop */}
+          {[...universities, ...universities].map((university, index) => (
+            <View key={`${university.id}-${index}`} style={styles.universityItem}>
+              <View style={styles.universityLogoContainer}>
+                <Image
+                  source={university.logo}
+                  style={styles.universityLogo}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text style={styles.universityName}>{university.name}</Text>
+            </View>
+          ))}
+        </Animated.View>
+      </View>
+    </View>
+  );
 };
 
 // Pulsing button animation
@@ -168,13 +245,7 @@ export default function WelcomeScreen() {
       >
         {/* Logo Section */}
         <Animated.View style={[styles.logoSection, animatedLogoStyle]}>
-          <FloatingElement delay={1200}>
-            <Image
-              source={require('../../src/assets/images/image.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </FloatingElement>
+          <GlowingLogo />
         </Animated.View>
 
         {/* Welcome Text */}
@@ -188,53 +259,9 @@ export default function WelcomeScreen() {
           </Text>
         </Animated.View>
 
-        {/* University Preview */}
-        <Animated.View style={[styles.universityPreview, animatedContentStyle]}>
-          <View style={styles.universityRow}>
-            <FloatingElement delay={1600}>
-              <View style={styles.universityItem}>
-                <Image
-                  source={require('../../src/assets/images/Florida_Gators_gator_logo.png')}
-                  style={styles.universityLogo}
-                  resizeMode="contain"
-                />
-                <Text style={styles.universityName}>UF</Text>
-              </View>
-            </FloatingElement>
-            
-            <FloatingElement delay={1800}>
-              <View style={styles.universityItem}>
-                <Image
-                  source={require('../../src/assets/images/141-1415685_ucf-university-of-central-florida-logo.jpg')}
-                  style={styles.universityLogo}
-                  resizeMode="contain"
-                />
-                <Text style={styles.universityName}>UCF</Text>
-              </View>
-            </FloatingElement>
-            
-            <FloatingElement delay={2000}>
-              <View style={styles.universityItem}>
-                <Image
-                  source={require('../../src/assets/images/UniversityOfSouthFlorida-logo-350x350.jpg')}
-                  style={styles.universityLogo}
-                  resizeMode="contain"
-                />
-                <Text style={styles.universityName}>USF</Text>
-              </View>
-            </FloatingElement>
-            
-            <FloatingElement delay={2200}>
-              <View style={styles.universityItem}>
-                <Image
-                  source={require('../../src/assets/images/Florida_State_Seminoles_logo.png')}
-                  style={styles.universityLogo}
-                  resizeMode="contain"
-                />
-                <Text style={styles.universityName}>FSU</Text>
-              </View>
-            </FloatingElement>
-          </View>
+        {/* University Carousel */}
+        <Animated.View style={[styles.universitySection, animatedContentStyle]}>
+          <UniversityCarousel />
           
           <View style={styles.moreUniversities}>
             <View style={styles.moreDots}>
@@ -242,7 +269,7 @@ export default function WelcomeScreen() {
               <View style={styles.dot} />
               <View style={styles.dot} />
             </View>
-            <Text style={styles.moreText}>and more coming soon</Text>
+            <Text style={styles.moreText}>Your campus could be next 🚀</Text>
           </View>
         </Animated.View>
       </ScrollView>
@@ -254,7 +281,7 @@ export default function WelcomeScreen() {
           style={styles.primaryButtonContainer}
         >
           <LinearGradient
-            colors={['#FA4616', '#0047FF']}
+            colors={['#FA4616', '#0021A5']}
             start={{ x: 0, y: 0.5 }}
             end={{ x: 1, y: 0.5 }}
             style={styles.primaryButton}
@@ -316,11 +343,32 @@ const styles = StyleSheet.create({
     paddingTop: height * 0.08,
     paddingBottom: 40,
   },
+  logoContainer: {
+    shadowColor: '#FA4616',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 12,
+  },
+  logoWrapper: {
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: width * 0.15,
+  },
   logo: {
     width: width * 0.3,
     height: width * 0.3,
     maxWidth: 120,
     maxHeight: 120,
+  },
+  shimmerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: -120,
+    width: 120,
+    height: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    transform: [{ skewX: '-20deg' }],
   },
   welcomeSection: {
     alignItems: 'center',
@@ -359,31 +407,50 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  universityPreview: {
+  universitySection: {
     alignItems: 'center',
     marginBottom: 40,
   },
-  universityRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 24,
+  carouselContainer: {
+    height: 100,
     marginBottom: 20,
+    overflow: 'hidden',
+  },
+  carouselTrack: {
+    width: width,
+    height: 100,
+    overflow: 'hidden',
+  },
+  carouselContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 100,
   },
   universityItem: {
     alignItems: 'center',
+    justifyContent: 'center',
+    width: 100,
+    height: 100,
     gap: 8,
   },
-  universityLogo: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  universityLogoContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: Colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
+    overflow: 'hidden',
+  },
+  universityLogo: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
   universityName: {
     fontSize: 12,
