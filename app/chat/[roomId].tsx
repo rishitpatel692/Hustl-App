@@ -9,7 +9,6 @@ import { ChatService } from '@lib/chat';
 import { supabase } from '@/lib/supabase';
 import type { ChatMessage } from '@src/types/chat';
 import UserProfileSheet from '@/components/UserProfileSheet';
-import UserProfileSheet from '@components/UserProfileSheet';
 
 export default function ChatScreen() {
   const router = useRouter();

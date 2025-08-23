@@ -363,7 +363,6 @@ export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [selectingTaskId, setSelectingTaskId] = useState<string | null>(null);
-  const [selectingTaskId, setSelectingTaskId] = useState<string | null>(null);
 
   const handleCategoryPress = (categoryId: string) => {
     // Navigate to Post Task with category prefill
