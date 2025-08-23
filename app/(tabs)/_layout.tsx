@@ -71,9 +71,9 @@ export default function TabLayout() {
             backgroundColor: '#FFFFFF',
             borderTopColor: '#E5E7EB',
             borderTopWidth: 1,
-            height: 80 + insets.bottom,
+            height: 85 + insets.bottom,
             paddingBottom: insets.bottom,
-            paddingTop: 10,
+            paddingTop: 8,
             position: 'absolute',
             bottom: 0,
             left: 0,
@@ -89,7 +89,7 @@ export default function TabLayout() {
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '600',
-            marginTop: 4,
+            marginTop: 6,
           },
         }}
       >
@@ -153,25 +153,26 @@ const styles = StyleSheet.create({
   postTaskTabContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 10,
-    paddingBottom: 4,
+    justifyContent: 'flex-start',
+    paddingTop: 8,
+    paddingBottom: 8,
   },
   postTaskButton: {
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
+    justifyContent: 'flex-start',
+    gap: 6,
+    height: '100%',
   },
   postTaskIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     overflow: 'hidden',
     shadowColor: '#FA4616',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 12,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   postTaskGradient: {
     width: '100%',
@@ -182,6 +183,6 @@ const styles = StyleSheet.create({
   postTaskLabel: {
     fontSize: 12,
     fontWeight: '600',
-    marginTop: 4,
+    textAlign: 'center',
   },
 });
