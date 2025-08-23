@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Search, Bell } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
 import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
+import ProfileSidebar from './ProfileSidebar';
 
 interface GlobalHeaderProps {
   showSearch?: boolean;
@@ -21,14 +23,28 @@ export default function GlobalHeader({
   const insets = useSafeAreaInsets();
   const { user, isGuest } = useAuth();
 
+  const [showProfileSidebar, setShowProfileSidebar] = React.useState(false);
+
+  const triggerHaptics = () => {
+    if (Platform.OS !== 'web') {
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      } catch (error) {
+        // Haptics not available, continue silently
+      }
+    }
+  };
+
   const handleProfilePress = () => {
+    triggerHaptics();
+    
     if (isGuest) {
-      // Navigate to auth for guests
       router.push('/(onboarding)/auth');
       return;
     }
-    // Push Profile screen onto the root stack (tab bar stays visible)
-    router.push('/profile');
+    
+    // Open sidebar for authenticated users
+    setShowProfileSidebar(true);
   };
 
   const handleProfileLongPress = () => {
@@ -84,6 +100,12 @@ export default function GlobalHeader({
           </View>
         </View>
       </View>
+      
+      {/* Profile Sidebar */}
+      <ProfileSidebar
+        visible={showProfileSidebar}
+        onClose={() => setShowProfileSidebar(false)}
+      />
     );
   }
 
