@@ -1,12 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, User, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { ProfileRepo } from '@/lib/profileRepo';
+import type { UserProfile } from '@/types/database';
 
 interface AuthUser {
   id: string;
   email: string;
   displayName: string;
   university?: string;
+  profile?: UserProfile;
 }
 
 interface AuthContextType {
@@ -27,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   // Initialize auth state and listen for changes
   useEffect(() => {
@@ -34,7 +38,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
-        setUser(mapSupabaseUser(session.user));
+        loadUserWithProfile(session.user);
+      } else {
+        setUser(null);
+        setUserProfile(null);
       }
       setIsLoading(false);
     });
@@ -44,9 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (event, session) => {
         setSession(session);
         if (session?.user) {
-          setUser(mapSupabaseUser(session.user));
+          loadUserWithProfile(session.user);
         } else {
           setUser(null);
+          setUserProfile(null);
         }
         setIsLoading(false);
       }
@@ -54,6 +62,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Load user with profile data
+  const loadUserWithProfile = async (supabaseUser: User) => {
+    const authUser = mapSupabaseUser(supabaseUser);
+    setUser(authUser);
+
+    // Load profile data
+    try {
+      const { data: profile } = await ProfileRepo.getProfile(supabaseUser.id);
+      setUserProfile(profile);
+      
+      // Update auth user with profile data
+      if (profile) {
+        setUser(prev => prev ? {
+          ...prev,
+          displayName: profile.full_name || profile.username || prev.displayName,
+          university: profile.university || prev.university,
+          profile
+        } : null);
+      }
+    } catch (error) {
+      console.warn('Failed to load user profile:', error);
+    }
+  };
 
   // Map Supabase user to our AuthUser format
   const mapSupabaseUser = (supabaseUser: User): AuthUser => ({

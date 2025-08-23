@@ -62,6 +62,17 @@ export interface UpdateTaskStatusData {
   photoUrl?: string;
 }
 
+export interface UserProfile {
+  id: string;
+  username: string | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  major: string | null;
+  university: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TaskReview {
   id: string;
   task_id: string;
