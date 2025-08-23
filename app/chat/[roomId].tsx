@@ -238,6 +238,7 @@ export default function ChatScreen() {
               <Text style={styles.seenText}>Seen</Text>
             )}
           </View>
+        </View>
       </View>
     );
   };
@@ -320,14 +321,6 @@ export default function ChatScreen() {
           <Send size={20} color={Colors.white} strokeWidth={2} />
         </TouchableOpacity>
       </View>
-
-      {/* User Profile Sheet */}
-      <UserProfileSheet
-        visible={showUserProfileSheet}
-        onClose={() => setShowUserProfileSheet(false)}
-        userId={otherUserId}
-        currentChatRoomId={roomId}
-      />
 
       {/* User Profile Sheet */}
       <UserProfileSheet
