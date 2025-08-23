@@ -179,6 +179,11 @@ export default function ChatScreen() {
     // Analytics
     console.log('chat_profile_opened', { otherUserId, roomId });
     
+    if (!otherUserId) return;
+    
+    // Analytics
+    console.log('chat_profile_opened', { otherUserId, roomId });
+    
     setShowProfile(true);
   }, [otherUserId, roomId]);
 
