@@ -2,24 +2,16 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { usePathname } from 'expo-router';
 import { Chrome as Home, List, MessageCircle, Gift, Zap } from 'lucide-react-native';
-import { TouchableOpacity, View, StyleSheet, Platform } from 'react-native';
+import { TouchableOpacity, View, StyleSheet, Platform, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// Lightning FAB Component
-const LightningFAB = () => {
+// Post Task Tab Button Component
+const PostTaskButton = ({ focused }: { focused: boolean }) => {
   const router = useRouter();
-  const pathname = usePathname();
-  const insets = useSafeAreaInsets();
-
-  // Hide FAB on create screens
-  const isCreateScreen = pathname === '/(tabs)/post';
-  if (isCreateScreen) {
-    return null;
-  }
 
   const handlePress = () => {
     if (Platform.OS !== 'web') {
@@ -32,37 +24,37 @@ const LightningFAB = () => {
     router.push('/(tabs)/post');
   };
 
-  const handleLongPress = () => {
-    if (Platform.OS !== 'web') {
-      try {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      } catch (error) {
-        // Haptics not available, continue silently
-      }
-    }
-    // Optional: show tooltip
-  };
-
   return (
-    <View style={[styles.fabContainer, { bottom: insets.bottom + 25 }]}>
-      <View style={styles.fabShadow}>
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={handlePress}
-          onLongPress={handleLongPress}
-          activeOpacity={0.8}
-          accessibilityLabel="Post a task"
-          accessibilityHint="Opens the create task screen"
-          accessibilityRole="button"
+    <TouchableOpacity
+      style={styles.postTaskButton}
+      onPress={handlePress}
+      activeOpacity={0.8}
+      accessibilityLabel="Post Task"
+      accessibilityRole="button"
+    >
+      <View style={styles.postTaskIconContainer}>
+        <LinearGradient
+          colors={['#FF5A1F', '#FA4616']}
+          style={styles.postTaskGradient}
         >
-          <LinearGradient
-            colors={['#FF5A1F', '#FA4616']}
-            style={styles.fabGradient}
-          >
-            <Zap size={24} color={Colors.white} strokeWidth={2.5} fill={Colors.white} />
-          </LinearGradient>
-        </TouchableOpacity>
+          <Zap size={24} color={Colors.white} strokeWidth={2.5} fill={Colors.white} />
+        </LinearGradient>
       </View>
+      <Text style={[
+        styles.postTaskLabel,
+        { color: focused ? '#FA4616' : '#6B7280' }
+      ]}>
+        Post Task
+      </Text>
+    </TouchableOpacity>
+  );
+};
+
+// Custom tab bar button for Post Task
+const PostTaskTabButton = (props: any) => {
+  return (
+    <View style={styles.postTaskTabContainer}>
+      <PostTaskButton focused={props.accessibilityState?.selected || false} />
     </View>
   );
 };
@@ -127,8 +119,8 @@ export default function TabLayout() {
         <Tabs.Screen
           name="post"
           options={{
-            title: '',
-            tabBarButton: () => null, // Hide the tab button, FAB replaces it
+            title: 'Post Task',
+            tabBarButton: PostTaskTabButton,
           }}
         />
         <Tabs.Screen
@@ -150,9 +142,6 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-      
-      {/* Lightning FAB */}
-      <LightningFAB />
     </View>
   );
 }
@@ -161,30 +150,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  fabContainer: {
-    position: 'absolute',
-    left: '50%',
-    marginLeft: -28, // Half of FAB width (56/2)
-    zIndex: 1000,
+  postTaskTabContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 10,
+    paddingBottom: 4,
   },
-  fabShadow: {
+  postTaskButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  postTaskIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    overflow: 'hidden',
     shadowColor: '#FA4616',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
     shadowRadius: 16,
     elevation: 12,
-    borderRadius: 28,
   },
-  fab: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    overflow: 'hidden',
-  },
-  fabGradient: {
+  postTaskGradient: {
     width: '100%',
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  postTaskLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 4,
   },
 });
