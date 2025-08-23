@@ -61,3 +61,56 @@ export interface UpdateTaskStatusData {
   note?: string;
   photoUrl?: string;
 }
+
+export interface TaskReview {
+  id: string;
+  task_id: string;
+  rater_id: string;
+  ratee_id: string;
+  stars: number;
+  comment: string;
+  tags: string[];
+  created_at: string;
+  edited_at: string | null;
+  is_hidden: boolean;
+  task?: {
+    id: string;
+    title: string;
+    category: TaskCategory;
+  };
+  rater?: {
+    id: string;
+    full_name: string | null;
+    username: string | null;
+    avatar_url: string | null;
+  };
+}
+
+export interface UserRatingAggregate {
+  user_id: string;
+  average_rating: number;
+  ratings_count: number;
+  ratings_breakdown: {
+    '1': number;
+    '2': number;
+    '3': number;
+    '4': number;
+    '5': number;
+  };
+  recent_reviews: TaskReview[];
+  updated_at: string;
+}
+
+export interface CreateReviewData {
+  taskId: string;
+  stars: number;
+  comment?: string;
+  tags?: string[];
+}
+
+export interface EditReviewData {
+  reviewId: string;
+  stars: number;
+  comment?: string;
+  tags?: string[];
+}

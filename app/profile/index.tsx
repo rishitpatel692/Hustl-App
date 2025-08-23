@@ -13,6 +13,11 @@ const menuItems = [
     route: '/profile/edit'
   },
   { 
+    icon: <Star size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
+    title: 'Reviews',
+    route: `/profile/reviews?userId=${user?.id || ''}`
+  },
+  { 
     icon: <FileText size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
     title: 'My Tasks',
     route: '/profile/my-tasks'

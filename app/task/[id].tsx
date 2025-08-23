@@ -5,6 +5,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Clock, MapPin, Store, User, Camera, Check, ChevronDown } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
+import { ReviewRepo } from '@/lib/reviewRepo';
+import { TaskReview } from '@/types/database';
+import ReviewSheet from '@/components/ReviewSheet';
+import StarRating from '@/components/StarRating';
 import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { TaskRepo } from '@/lib/taskRepo';
@@ -36,6 +40,9 @@ export default function TaskDetailScreen() {
   const [deliveryNote, setDeliveryNote] = useState('');
   const [deliveryPhoto, setDeliveryPhoto] = useState<string | null>(null);
   const [showDeliveryForm, setShowDeliveryForm] = useState(false);
+  const [taskReview, setTaskReview] = useState<TaskReview | null>(null);
+  const [showReviewSheet, setShowReviewSheet] = useState(false);
+  const [canReview, setCanReview] = useState(false);
   
   // Toast state
   const [toast, setToast] = useState<{ visible: boolean; message: string; type: 'success' | 'error' }>({
@@ -46,6 +53,7 @@ export default function TaskDetailScreen() {
 
   useEffect(() => {
     loadTaskDetails();
+    checkReviewEligibility();
   }, [taskId]);
 
   const loadTaskDetails = async () => {
@@ -87,6 +95,14 @@ export default function TaskDetailScreen() {
       if (historyError) {
         console.warn('Failed to load status history:', historyError);
       }
+      
+      // Load existing review if any
+      if (taskData.status === 'completed') {
+        const { data: reviewData } = await ReviewRepo.getTaskReview(taskId);
+        if (reviewData) {
+          setTaskReview(reviewData);
+        }
+      }
     } catch (error) {
       setToast({
         visible: true,
@@ -95,6 +111,17 @@ export default function TaskDetailScreen() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const checkReviewEligibility = async () => {
+    if (!taskId || !user) return;
+    
+    try {
+      const { canReview: eligible } = await ReviewRepo.canReviewTask(taskId);
+      setCanReview(eligible);
+    } catch (error) {
+      console.warn('Failed to check review eligibility:', error);
     }
   };
 
@@ -171,6 +198,7 @@ export default function TaskDetailScreen() {
       // Reload to get fresh data
       setTimeout(() => {
         loadTaskDetails();
+        checkReviewEligibility();
       }, 1000);
       
     } catch (error) {
@@ -195,6 +223,18 @@ export default function TaskDetailScreen() {
 
   const handleDeliverySubmit = () => {
     handleStatusUpdate('delivered', deliveryNote, deliveryPhoto);
+  };
+
+  const handleReviewSubmitted = () => {
+    setToast({
+      visible: true,
+      message: 'Review submitted successfully!',
+      type: 'success'
+    });
+    
+    // Reload task details to get the new review
+    loadTaskDetails();
+    checkReviewEligibility();
   };
 
   const handleTakePhoto = async () => {
@@ -281,6 +321,8 @@ export default function TaskDetailScreen() {
   const canUpdateStatus = user && task.accepted_by === user.id && task.status === 'accepted';
   const nextStatus = task.current_status ? TaskRepo.getNextStatus(task.current_status) : null;
   const showStatusUpdate = canUpdateStatus && nextStatus;
+  const isTaskPoster = user && task.created_by === user.id;
+  const showReviewButton = canReview && isTaskPoster && task.status === 'completed';
 
   return (
     <>
@@ -416,6 +458,55 @@ export default function TaskDetailScreen() {
             </View>
           </View>
           
+          {/* Review Section */}
+          {task.status === 'completed' && (
+            <View style={styles.reviewCard}>
+              <Text style={styles.sectionTitle}>Review</Text>
+              
+              {taskReview ? (
+                <View style={styles.reviewDisplay}>
+                  <View style={styles.reviewHeader}>
+                    <StarRating rating={taskReview.stars} size={18} />
+                    <Text style={styles.reviewDate}>
+                      {new Date(taskReview.created_at).toLocaleDateString()}
+                    </Text>
+                  </View>
+                  
+                  {taskReview.tags && taskReview.tags.length > 0 && (
+                    <View style={styles.reviewTags}>
+                      {taskReview.tags.map((tag, index) => (
+                        <View key={index} style={styles.reviewTag}>
+                          <Text style={styles.reviewTagText}>{tag}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                  
+                  {taskReview.comment && (
+                    <Text style={styles.reviewComment}>"{taskReview.comment}"</Text>
+                  )}
+                  
+                  {taskReview.edited_at && (
+                    <Text style={styles.reviewEdited}>
+                      Edited {new Date(taskReview.edited_at).toLocaleDateString()}
+                    </Text>
+                  )}
+                </View>
+              ) : showReviewButton ? (
+                <TouchableOpacity
+                  style={styles.reviewButton}
+                  onPress={() => setShowReviewSheet(true)}
+                >
+                  <Text style={styles.reviewButtonText}>Leave a Review</Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={styles.noReviewText}>
+                  {isTaskPoster ? 'Review period has ended' : 'No review yet'}
+                </Text>
+              )}
+            </View>
+          )}
+          
           {/* Status History */}
           {statusHistory.length > 0 && (
             <View style={styles.historyCard}>
@@ -507,6 +598,14 @@ export default function TaskDetailScreen() {
           </View>
         </View>
       )}
+
+      {/* Review Sheet */}
+      <ReviewSheet
+        visible={showReviewSheet}
+        onClose={() => setShowReviewSheet(false)}
+        task={task}
+        onReviewSubmitted={handleReviewSubmitted}
+      />
 
       <Toast
         visible={toast.visible}
@@ -862,5 +961,74 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.white,
+  },
+  reviewCard: {
+    backgroundColor: Colors.semantic.card,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: Colors.semantic.cardBorder,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  reviewDisplay: {
+    gap: 12,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  reviewDate: {
+    fontSize: 12,
+    color: Colors.semantic.tabInactive,
+  },
+  reviewTags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  reviewTag: {
+    backgroundColor: Colors.muted,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  reviewTagText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: Colors.semantic.bodyText,
+  },
+  reviewComment: {
+    fontSize: 14,
+    color: Colors.semantic.bodyText,
+    fontStyle: 'italic',
+    lineHeight: 20,
+  },
+  reviewEdited: {
+    fontSize: 12,
+    color: Colors.semantic.tabInactive,
+    fontStyle: 'italic',
+  },
+  reviewButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  reviewButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  noReviewText: {
+    fontSize: 14,
+    color: Colors.semantic.tabInactive,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
