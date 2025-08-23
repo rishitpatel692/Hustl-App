@@ -44,7 +44,7 @@ export default function SplashScreen() {
       
       // Navigate after fade out
       setTimeout(() => {
-        router.replace('/(onboarding)/university-selection');
+       router.replace('/(onboarding)/welcome');
       }, 300);
     }, 2200);
 
