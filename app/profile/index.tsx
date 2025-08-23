@@ -13,11 +13,6 @@ const menuItems = [
     route: '/profile/edit'
   },
   { 
-    icon: <Star size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
-    title: 'Reviews',
-    route: `/profile/reviews?userId=${user?.id || ''}`
-  },
-  { 
     icon: <FileText size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
     title: 'My Tasks',
     route: '/profile/my-tasks'
@@ -48,6 +43,45 @@ export default function ProfileScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
+
+  // Create menu items with user context
+  const getMenuItems = () => [
+    { 
+      icon: <User size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
+      title: 'Profile Information',
+      route: '/profile/edit'
+    },
+    { 
+      icon: <Star size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
+      title: 'Reviews',
+      route: `/profile/reviews?userId=${user?.id || ''}`
+    },
+    { 
+      icon: <FileText size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
+      title: 'My Tasks',
+      route: '/profile/my-tasks'
+    },
+    { 
+      icon: <History size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
+      title: 'Task History',
+      route: '/profile/task-history'
+    },
+    { 
+      icon: <MessageSquare size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
+      title: 'Messages',
+      route: '/(tabs)/chats'
+    },
+    { 
+      icon: <Settings size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
+      title: 'Settings',
+      route: '/profile/settings'
+    },
+    { 
+      icon: <HelpCircle size={20} color={Colors.semantic.bodyText} strokeWidth={2} />, 
+      title: 'Help & Support',
+      route: '/profile/help'
+    },
+  ];
 
   const handleMenuPress = (route: string) => {
     router.push(route as any);
@@ -118,11 +152,11 @@ export default function ProfileScreen() {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.menuSection}>
-          {menuItems.slice(0, 4).map(renderMenuItem)}
+          {getMenuItems().slice(0, 4).map(renderMenuItem)}
         </View>
 
         <View style={styles.menuSection}>
-          {menuItems.slice(4).map((item, index) => renderMenuItem(item, index + 4))}
+          {getMenuItems().slice(4).map((item, index) => renderMenuItem(item, index + 4))}
         </View>
 
         <View style={styles.menuSection}>
