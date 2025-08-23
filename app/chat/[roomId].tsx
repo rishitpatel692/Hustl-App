@@ -173,14 +173,14 @@ export default function ChatScreen() {
     router.back();
   };
 
-  const handleProfilePress = () => {
+  const handleProfilePress = useCallback(() => {
     if (!otherUserId) return;
     
     // Analytics
     console.log('chat_profile_opened', { otherUserId, roomId });
     
     setShowProfile(true);
-  }, []);
+  }, [otherUserId, roomId]);
 
   const formatTime = (timestamp: string): string => {
     const date = new Date(timestamp);
