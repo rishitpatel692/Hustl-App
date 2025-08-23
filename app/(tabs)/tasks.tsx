@@ -10,10 +10,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TaskRepo } from '@/lib/taskRepo';
 import { ChatService } from '@/lib/chat';
 import { openGoogleMapsNavigation } from '@/lib/navigation';
+import { ReviewRepo } from '@/lib/reviewRepo';
 import { Task, TaskCurrentStatus } from '@/types/database';
 import GlobalHeader from '@/components/GlobalHeader';
 import Toast from '@/components/Toast';
 import TasksMap, { TaskPin } from '@/components/TasksMap';
+import ReviewSheet from '@/components/ReviewSheet';
 
 type TabType = 'available' | 'doing' | 'posts';
 type ViewMode = 'map' | 'list';
@@ -48,6 +50,10 @@ export default function TasksScreen() {
     message: '',
     type: 'success'
   });
+
+  // Review state
+  const [showReviewSheet, setShowReviewSheet] = useState(false);
+  const [taskToReview, setTaskToReview] = useState<Task | null>(null);
 
   // Request location permission on mount
   useEffect(() => {
@@ -258,6 +264,16 @@ export default function TasksScreen() {
     setToast(prev => ({ ...prev, visible: false }));
   };
 
+  const handleReviewSubmitted = () => {
+    setShowReviewSheet(false);
+    setTaskToReview(null);
+    setToast({
+      visible: true,
+      message: 'Review submitted successfully!',
+      type: 'success'
+    });
+  };
+
   const addNewTaskToPosts = useCallback((newTask: Task) => {
     setPostedTasks(prev => [newTask, ...prev]);
   }, []);
@@ -277,7 +293,7 @@ export default function TasksScreen() {
       (task.created_by === user.id || task.accepted_by === user.id);
     const canUpdateStatus = activeTab === 'doing' && user && task.accepted_by === user.id && task.status === 'accepted';
     const showStatusUpdate = canUpdateStatus && task.current_status && task.current_status !== 'completed';
-  const canReview = activeTab === 'posts' && user && task.created_by === user.id && task.status === 'completed';
+    const canReview = activeTab === 'posts' && user && task.created_by === user.id && task.status === 'completed';
 
     return (
       <View key={task.id} style={styles.taskCard}>
@@ -403,7 +419,10 @@ export default function TasksScreen() {
             {canReview && (
               <TouchableOpacity 
                 style={styles.reviewButton}
-                onPress={() => router.push(`/task/${task.id}`)}
+                onPress={() => {
+                  setTaskToReview(task);
+                  setShowReviewSheet(true);
+                }}
               >
                 <Text style={styles.reviewButtonText}>Review</Text>
               </TouchableOpacity>
@@ -594,6 +613,17 @@ export default function TasksScreen() {
         message={toast.message}
         type={toast.type}
         onHide={hideToast}
+      />
+
+      {/* Review Sheet */}
+      <ReviewSheet
+        visible={showReviewSheet}
+        onClose={() => {
+          setShowReviewSheet(false);
+          setTaskToReview(null);
+        }}
+        task={taskToReview}
+        onReviewSubmitted={handleReviewSubmitted}
       />
     </>
   );
