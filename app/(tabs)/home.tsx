@@ -388,23 +388,6 @@ export default function HomeScreen() {
     
     setSelectingTaskId(null);
   };
-
-  const handleSelectTask = async (categoryId: string) => {
-    if (selectingTaskId) return;
-    
-    setSelectingTaskId(categoryId);
-    
-    // Simulate task selection process
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Navigate to Post Task with category prefill
-    router.push({
-      pathname: '/(tabs)/post',
-      params: { category: categoryId }
-    });
-    
-    setSelectingTaskId(null);
-  };
   return (
     <View style={styles.container}>
       {/* Subtle Floating Particles */}
