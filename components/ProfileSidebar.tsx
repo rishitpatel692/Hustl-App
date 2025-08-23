@@ -12,22 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { 
-  X, 
-  User, 
-  Star, 
-  FileText, 
-  History, 
-  MessageSquare, 
-  Gift, 
-  Settings, 
-  HelpCircle, 
-  MessageCircle, 
-  LogOut,
-  ChevronRight,
-  Shield,
-  CreditCard
-} from 'lucide-react-native';
+import { X, User, Star, FileText, History, MessageSquare, Gift, Settings, CircleHelp as HelpCircle, MessageCircle, LogOut, ChevronRight, Shield, CreditCard } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Animated, { 
   useSharedValue, 
