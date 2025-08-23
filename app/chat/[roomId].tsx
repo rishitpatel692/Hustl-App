@@ -198,10 +198,6 @@ export default function ChatScreen() {
     return messageTime <= otherLastReadAt;
   };
 
-  const handleProfilePress = () => {
-    setShowUserProfileSheet(true);
-  };
-
   const getInitials = (name: string | null): string => {
     if (!name) return 'U';
     return name
