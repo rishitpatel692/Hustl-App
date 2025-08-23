@@ -18,6 +18,7 @@ import Animated, {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@constants/Colors';
 import GlobalHeader from '@components/GlobalHeader';
+import TaskSelectButton from '@components/TaskSelectButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -247,7 +248,19 @@ const AnimatedReferralsBanner = () => {
 };
 
 // Enhanced Category Card with Better Animations
-const CategoryCard = ({ category, index, onPress }: { category: any; index: number; onPress: () => void }) => {
+const CategoryCard = ({ 
+  category, 
+  index, 
+  onPress, 
+  onSelectTask,
+  isSelecting 
+}: { 
+  category: any; 
+  index: number; 
+  onPress: () => void;
+  onSelectTask: () => void;
+  isSelecting: boolean;
+}) => {
   const scaleAnimation = useSharedValue(0.8);
   const opacityAnimation = useSharedValue(0);
   const translateY = useSharedValue(30);
@@ -326,6 +339,13 @@ const CategoryCard = ({ category, index, onPress }: { category: any; index: numb
         <View style={styles.categoryContent}>
           <Text style={styles.categoryTitle}>{category.title}</Text>
         </View>
+        
+        {/* Select Task Button */}
+        <TaskSelectButton
+          onPress={onSelectTask}
+          loading={isSelecting}
+          taskTitle={category.title}
+        />
       </TouchableOpacity>
     </Animated.View>
   );
@@ -334,6 +354,7 @@ const CategoryCard = ({ category, index, onPress }: { category: any; index: numb
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [selectingTaskId, setSelectingTaskId] = useState<string | null>(null);
 
   const handleCategoryPress = (categoryId: string) => {
     // Navigate to Post Task with category prefill
@@ -343,6 +364,22 @@ export default function HomeScreen() {
     });
   };
 
+  const handleSelectTask = async (categoryId: string) => {
+    if (selectingTaskId) return;
+    
+    setSelectingTaskId(categoryId);
+    
+    // Simulate task selection process
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Navigate to Post Task with category prefill
+    router.push({
+      pathname: '/(tabs)/post',
+      params: { category: categoryId }
+    });
+    
+    setSelectingTaskId(null);
+  };
   return (
     <View style={styles.container}>
       {/* Subtle Floating Particles */}
@@ -371,6 +408,8 @@ export default function HomeScreen() {
                 category={category}
                 index={index}
                 onPress={() => handleCategoryPress(category.id)}
+                onSelectTask={() => handleSelectTask(category.id)}
+                isSelecting={selectingTaskId === category.id}
               />
             ))}
           </View>
@@ -519,7 +558,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   categoryButton: {
-    height: 160,
+    height: 200, // Increased height to accommodate button
     borderRadius: 16,
     overflow: 'hidden',
     position: 'relative',
@@ -529,20 +568,20 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 44, // Leave space for button
     width: '100%',
-    height: '100%',
+    height: 156, // Adjusted height
   },
   categoryOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 44, // Leave space for button
   },
   categoryContent: {
     position: 'absolute',
-    bottom: 16,
+    bottom: 52, // Moved up to accommodate button
     left: 16,
     right: 16,
   },
