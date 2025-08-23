@@ -238,7 +238,6 @@ export default function ChatScreen() {
               <Text style={styles.seenText}>Seen</Text>
             )}
           </View>
-        </TouchableOpacity>
       </View>
     );
   };
