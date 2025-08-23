@@ -5,6 +5,7 @@ import { Chrome as Home, List, MessageCircle, Gift, Zap } from 'lucide-react-nat
 import { TouchableOpacity, View, StyleSheet, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -44,17 +45,24 @@ const LightningFAB = () => {
 
   return (
     <View style={[styles.fabContainer, { bottom: insets.bottom + 25 }]}>
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={handlePress}
-        onLongPress={handleLongPress}
-        activeOpacity={0.8}
-        accessibilityLabel="Post a task"
-        accessibilityHint="Opens the create task screen"
-        accessibilityRole="button"
-      >
-        <Zap size={24} color={Colors.white} strokeWidth={2.5} fill={Colors.white} />
-      </TouchableOpacity>
+      <View style={styles.fabShadow}>
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={handlePress}
+          onLongPress={handleLongPress}
+          activeOpacity={0.8}
+          accessibilityLabel="Post a task"
+          accessibilityHint="Opens the create task screen"
+          accessibilityRole="button"
+        >
+          <LinearGradient
+            colors={['#FF5A1F', '#FA4616']}
+            style={styles.fabGradient}
+          >
+            <Zap size={24} color={Colors.white} strokeWidth={2.5} fill={Colors.white} />
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -68,8 +76,8 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: '#0A0F1C', // Dark background
-            borderTopColor: Colors.semantic.divider,
+            backgroundColor: 'transparent',
+            borderTopColor: 'rgba(255, 255, 255, 0.1)',
             borderTopWidth: 1,
             height: 80 + insets.bottom,
             paddingBottom: insets.bottom,
@@ -78,6 +86,14 @@ export default function TabLayout() {
             bottom: 0,
             left: 0,
             right: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          tabBarBackground: () => (
+            <LinearGradient
+              colors={['#0047FF', '#0021A5']}
+              style={{ flex: 1 }}
+            />
           },
           tabBarActiveTintColor: '#FA4616', // UF Orange for active
           tabBarInactiveTintColor: '#A0A7B3', // Light gray for inactive
@@ -154,17 +170,24 @@ const styles = StyleSheet.create({
     marginLeft: -28, // Half of FAB width (56/2)
     zIndex: 1000,
   },
+  fabShadow: {
+    shadowColor: '#FA4616',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 12,
+    borderRadius: 28,
+  },
   fab: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#FA4616', // UF Orange
+    overflow: 'hidden',
+  },
+  fabGradient: {
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
 });

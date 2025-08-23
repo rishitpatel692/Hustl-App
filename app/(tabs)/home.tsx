@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Car, Coffee, Dumbbell, BookOpen, Pizza, Plus } from 'lucide-react-native';
@@ -12,10 +12,14 @@ import Animated, {
   withSequence,
   interpolate,
   withDelay,
-  withSpring
+  withSpring,
+  Easing
 } from 'react-native-reanimated';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@constants/Colors';
 import GlobalHeader from '@components/GlobalHeader';
+
+const { width, height } = Dimensions.get('window');
 
 const categories = [
   {
@@ -56,18 +60,89 @@ const categories = [
   },
 ];
 
-// Animated Referral Banner Component
+// Floating Particles Component
+const FloatingParticles = () => {
+  const particles = Array.from({ length: 12 }, (_, i) => {
+    const translateY = useSharedValue(height + 50);
+    const translateX = useSharedValue(Math.random() * width);
+    const opacity = useSharedValue(0);
+    const scale = useSharedValue(0.5 + Math.random() * 0.5);
+
+    React.useEffect(() => {
+      const startAnimation = () => {
+        const delay = i * 800 + Math.random() * 2000;
+        const duration = 8000 + Math.random() * 4000;
+        
+        translateY.value = withDelay(
+          delay,
+          withRepeat(
+            withTiming(-100, { duration, easing: Easing.linear }),
+            -1,
+            false
+          )
+        );
+        
+        opacity.value = withDelay(
+          delay,
+          withRepeat(
+            withSequence(
+              withTiming(0.1 + Math.random() * 0.15, { duration: duration * 0.1 }),
+              withTiming(0.1 + Math.random() * 0.15, { duration: duration * 0.8 }),
+              withTiming(0, { duration: duration * 0.1 })
+            ),
+            -1,
+            false
+          )
+        );
+      };
+
+      startAnimation();
+    }, []);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [
+        { translateX: translateX.value },
+        { translateY: translateY.value },
+        { scale: scale.value }
+      ],
+      opacity: opacity.value,
+    }));
+
+    return (
+      <Animated.View
+        key={i}
+        style={[
+          styles.particle,
+          {
+            width: 4 + Math.random() * 8,
+            height: 4 + Math.random() * 8,
+          },
+          animatedStyle
+        ]}
+      />
+    );
+  });
+
+  return (
+    <View style={styles.particlesContainer}>
+      {particles}
+    </View>
+  );
+};
+
+// Enhanced Referral Banner with Gradient and Glow
 const AnimatedReferralsBanner = () => {
   const router = useRouter();
   const glowAnimation = useSharedValue(0);
   const pulseAnimation = useSharedValue(1);
+  const shimmerAnimation = useSharedValue(-1);
 
   React.useEffect(() => {
     // Glow animation
     glowAnimation.value = withRepeat(
       withSequence(
-        withTiming(1, { duration: 2000 }),
-        withTiming(0, { duration: 2000 })
+        withTiming(1, { duration: 2500 }),
+        withTiming(0, { duration: 2500 })
       ),
       -1,
       true
@@ -76,24 +151,38 @@ const AnimatedReferralsBanner = () => {
     // Pulse animation for button
     pulseAnimation.value = withRepeat(
       withSequence(
-        withTiming(1.05, { duration: 1000 }),
-        withTiming(1, { duration: 1000 })
+        withTiming(1.02, { duration: 1500 }),
+        withTiming(1, { duration: 1500 })
       ),
       -1,
       true
     );
+
+    // Shimmer animation
+    shimmerAnimation.value = withRepeat(
+      withTiming(1, { duration: 3000, easing: Easing.linear }),
+      -1,
+      false
+    );
   }, []);
 
   const animatedGlowStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(glowAnimation.value, [0, 1], [0.2, 0.6]);
+    const shadowOpacity = interpolate(glowAnimation.value, [0, 1], [0.3, 0.7]);
     return {
-      shadowOpacity: opacity,
+      shadowOpacity,
     };
   });
 
   const animatedPulseStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pulseAnimation.value }],
   }));
+
+  const animatedShimmerStyle = useAnimatedStyle(() => {
+    const translateX = interpolate(shimmerAnimation.value, [0, 1], [-100, 300]);
+    return {
+      transform: [{ translateX }],
+    };
+  });
 
   const handleInvitePress = () => {
     if (Platform.OS !== 'web') {
@@ -103,8 +192,7 @@ const AnimatedReferralsBanner = () => {
         // Haptics not available, continue silently
       }
     }
-    // TODO: Open share sheet
-    console.log('Invite pressed');
+    router.push('/(tabs)/referrals');
   };
 
   const handleBannerPress = () => {
@@ -121,59 +209,72 @@ const AnimatedReferralsBanner = () => {
   return (
     <Animated.View style={[styles.referralCard, animatedGlowStyle]}>
       <TouchableOpacity onPress={handleBannerPress} activeOpacity={0.95}>
-        <View style={styles.referralContent}>
-          <View style={styles.referralTextContainer}>
-            <Text style={styles.referralTitle}>Get $10 for every referral!</Text>
-            <Text style={styles.referralSubtitle}>
-              Invite friends and earn credits when they complete their first task.
-            </Text>
+        <LinearGradient
+          colors={['#0047FF', '#0021A5']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.referralGradient}
+        >
+          <View style={styles.referralContent}>
+            <View style={styles.referralTextContainer}>
+              <Text style={styles.referralTitle}>Get $10 for every referral!</Text>
+              <Text style={styles.referralSubtitle}>
+                Invite friends and earn credits when they complete their first task.
+              </Text>
+            </View>
+            
+            <Animated.View style={animatedPulseStyle}>
+              <TouchableOpacity 
+                style={styles.inviteButton} 
+                onPress={handleInvitePress}
+                activeOpacity={0.8}
+              >
+                <Animated.View style={[styles.shimmerOverlay, animatedShimmerStyle]} />
+                <Text style={styles.inviteButtonText}>Invite</Text>
+              </TouchableOpacity>
+            </Animated.View>
           </View>
-          
-          <Animated.View style={animatedPulseStyle}>
-            <TouchableOpacity 
-              style={styles.inviteButton} 
-              onPress={handleInvitePress}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.inviteButtonText}>Invite</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
+        </LinearGradient>
       </TouchableOpacity>
     </Animated.View>
   );
 };
 
-// Animated Category Card Component
+// Enhanced Category Card with Better Animations
 const CategoryCard = ({ category, index, onPress }: { category: any; index: number; onPress: () => void }) => {
   const scaleAnimation = useSharedValue(0.8);
   const opacityAnimation = useSharedValue(0);
+  const translateY = useSharedValue(20);
 
   // Staggered entrance animation
   React.useEffect(() => {
-    const delay = index * 100;
+    const delay = index * 150;
     
-    opacityAnimation.value = withDelay(delay, withTiming(1, { duration: 600 }));
+    opacityAnimation.value = withDelay(delay, withTiming(1, { duration: 800 }));
     scaleAnimation.value = withDelay(delay, withSpring(1, { damping: 15, stiffness: 300 }));
+    translateY.value = withDelay(delay, withSpring(0, { damping: 15, stiffness: 300 }));
   }, [index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scaleAnimation.value }],
+    transform: [
+      { scale: scaleAnimation.value },
+      { translateY: translateY.value }
+    ],
     opacity: opacityAnimation.value,
   }));
 
   const handlePressIn = () => {
-    scaleAnimation.value = withTiming(0.95, { duration: 100 });
+    scaleAnimation.value = withTiming(0.95, { duration: 150 });
   };
 
   const handlePressOut = () => {
-    scaleAnimation.value = withTiming(1, { duration: 100 });
+    scaleAnimation.value = withSpring(1, { damping: 15 });
   };
 
   const handlePress = () => {
     scaleAnimation.value = withSequence(
       withTiming(1.05, { duration: 100 }),
-      withTiming(1, { duration: 100 })
+      withSpring(1, { damping: 15 })
     );
     
     if (Platform.OS !== 'web') {
@@ -201,7 +302,10 @@ const CategoryCard = ({ category, index, onPress }: { category: any; index: numb
           style={styles.categoryImage}
           resizeMode="cover"
         />
-        <View style={styles.categoryOverlay} />
+        <LinearGradient
+          colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']}
+          style={styles.categoryOverlay}
+        />
         <View style={styles.categoryContent}>
           <Text style={styles.categoryTitle}>{category.title}</Text>
         </View>
@@ -212,6 +316,7 @@ const CategoryCard = ({ category, index, onPress }: { category: any; index: numb
 
 export default function HomeScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const handleCategoryPress = (categoryId: string) => {
     // Navigate to Post Task with category prefill
@@ -223,6 +328,14 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+        colors={['#0021A5', '#0047FF']}
+        style={styles.backgroundGradient}
+      />
+      
+      {/* Floating Particles */}
+      <FloatingParticles />
+      
       <GlobalHeader />
 
       <ScrollView 
@@ -231,7 +344,7 @@ export default function HomeScreen() {
         bounces={true}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Animated Referral Banner */}
+        {/* Enhanced Referral Banner */}
         <AnimatedReferralsBanner />
 
         {/* Task Categories Section */}
@@ -258,35 +371,61 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0F1C', // Deep navy background
+    position: 'relative',
+  },
+  backgroundGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  particlesContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    pointerEvents: 'none',
+    zIndex: 1,
+  },
+  particle: {
+    position: 'absolute',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 50,
+    opacity: 0.1,
   },
   content: {
     flex: 1,
+    zIndex: 2,
   },
   scrollContent: {
     paddingBottom: 120, // Extra space for tab bar
   },
   
-  // Animated Referral Card
+  // Enhanced Referral Card
   referralCard: {
     marginHorizontal: 20,
     marginTop: 16,
     marginBottom: 32,
     borderRadius: 20,
-    shadowColor: '#0021A5',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 12,
+    shadowColor: '#0047FF',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 15,
     overflow: 'hidden',
+  },
+  referralGradient: {
+    borderRadius: 20,
   },
   referralContent: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 24,
     gap: 20,
-    background: 'linear-gradient(135deg, #0021A5 0%, #0A0F1C 100%)',
-    backgroundColor: '#0021A5', // Fallback for React Native
   },
   referralTextContainer: {
     flex: 1,
@@ -295,49 +434,72 @@ const styles = StyleSheet.create({
   referralTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#F1F5F9', // Light gray-white
+    color: '#F1F5F9',
     lineHeight: 24,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   referralSubtitle: {
     fontSize: 14,
-    color: '#A0A7B3', // Lighter gray
+    color: '#E2E8F0',
     lineHeight: 20,
+    opacity: 0.9,
   },
   inviteButton: {
-    backgroundColor: '#FA4616', // UF Orange
+    backgroundColor: '#FA4616',
     borderRadius: 24,
     paddingHorizontal: 24,
     paddingVertical: 12,
     minHeight: 48,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowColor: '#FA4616',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  shimmerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: -100,
+    width: 100,
+    height: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    transform: [{ skewX: '-20deg' }],
   },
   inviteButtonText: {
     fontSize: 16,
     fontWeight: '700',
     color: '#F1F5F9',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 
   // Categories Section
   categoriesSection: {
     paddingHorizontal: 20,
+    zIndex: 3,
   },
   categoriesTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
-    color: '#F1F5F9', // White text
+    color: '#F1F5F9',
     marginBottom: 8,
     letterSpacing: 0.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   categoriesSubtitle: {
     fontSize: 16,
-    color: '#A0A7B3', // Light gray
+    color: '#E2E8F0',
     marginBottom: 24,
+    opacity: 0.9,
   },
   categoriesGrid: {
     flexDirection: 'row',
@@ -346,21 +508,21 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   
-  // Category Cards - Reference Design Style
+  // Enhanced Category Cards
   categoryCard: {
     width: '47%',
     marginBottom: 16,
   },
   categoryButton: {
-    height: 140,
+    height: 160,
     borderRadius: 16,
     overflow: 'hidden',
     position: 'relative',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 12,
   },
   categoryImage: {
     position: 'absolute',
@@ -377,8 +539,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.7) 100%)',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Fallback for React Native
   },
   categoryContent: {
     position: 'absolute',
@@ -387,12 +547,12 @@ const styles = StyleSheet.create({
     right: 16,
   },
   categoryTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#F1F5F9', // White text
-    lineHeight: 20,
+    color: '#F1F5F9',
+    lineHeight: 22,
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
 });

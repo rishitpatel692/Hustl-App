@@ -17,7 +17,7 @@ export const Colors = {
 
   // Surfaces & Text
   white: '#FFFFFF',
-  bg: '#0A0F1C', // Dark navy background
+  bg: '#0021A5', // Vibrant UF Blue background
   muted: '#F5F5F5',
   border: '#E5E7EB',
   text: '#F1F5F9', // Light text for dark theme
@@ -50,7 +50,7 @@ export const Colors = {
     secondaryButtonAccent: '#FF5A1F',
 
     // Surfaces
-    screen: '#0A0F1C', // Dark background
+    screen: '#0021A5', // Vibrant blue background
     card: '#FFFFFF',
     cardBorder: '#E5E7EB',
     

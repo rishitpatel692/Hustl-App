@@ -136,14 +136,9 @@ export default function GlobalHeader({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#0A0F1C', // Dark background
+    backgroundColor: 'transparent',
     borderBottomWidth: 1,
-    borderBottomColor: '#1F2937', // Darker border for dark theme
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
   content: {
     flexDirection: 'row',
@@ -219,8 +214,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1F2937', // Dark button background
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
+    backdropFilter: 'blur(10px)',
   },
 });
