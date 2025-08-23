@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share, Platform, Clipboard } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share, Platform } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Copy, Share2, Gift, Users, DollarSign, Award, ExternalLink } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import GlobalHeader from '@/components/GlobalHeader';
@@ -71,21 +73,18 @@ export default function ReferralsScreen() {
   const handleInviteFriends = async () => {
     triggerHaptics();
 
-    if (isGuest || !user) {
-      // TODO: Show auth prompt
-      return;
-    }
-
     try {
-      const message = `Join me on Hustl! Get tasks done around campus and earn money. Use my referral link: ${referralLink}`;
-      
-      await Share.share({
-        message,
-        url: referralLink,
-        title: 'Join Hustl - Campus Task App',
+      await Clipboard.setStringAsync(referralLink);
+      setToast({
+        visible: true,
+        message: 'Referral link copied!'
       });
     } catch (error) {
-      console.error('Error sharing referral link:', error);
+      console.error('Error copying to clipboard:', error);
+      setToast({
+        visible: true,
+        message: 'Failed to copy link'
+      });
     }
   };
 
@@ -166,15 +165,26 @@ export default function ReferralsScreen() {
           </View>
 
           {/* Invite Button */}
-          <TouchableOpacity 
-            style={styles.inviteButton} 
-            onPress={handleInviteFriends}
-            accessibilityLabel="Invite friends"
-            accessibilityRole="button"
-          >
-            <Share2 size={20} color={Colors.white} strokeWidth={2} />
-            <Text style={styles.inviteButtonText}>Invite Friends</Text>
-          </TouchableOpacity>
+          <View style={styles.inviteButtonContainer}>
+            <TouchableOpacity 
+              style={styles.inviteButton} 
+              onPress={handleInviteFriends}
+              accessibilityLabel="Copy referral link"
+              accessibilityRole="button"
+              activeOpacity={0.9}
+            >
+              <LinearGradient
+                colors={['#0047FF', '#0021A5', '#FA4616']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                locations={[0, 0.7, 1]}
+                style={styles.inviteButtonGradient}
+              >
+                <Copy size={20} color={Colors.white} strokeWidth={2} />
+                <Text style={styles.inviteButtonText}>Copy Invite Link</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
 
           {/* How It Works */}
           <View style={styles.section}>
@@ -346,25 +356,35 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   inviteButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#0047FF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  inviteButtonContainer: {
+    marginHorizontal: 24,
+    marginBottom: 32,
+  },
+  inviteButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.semantic.primaryButton,
-    borderRadius: 12,
     paddingVertical: 16,
-    marginHorizontal: 24,
-    marginBottom: 32,
-    gap: 8,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    paddingHorizontal: 24,
+    gap: 12,
+    minHeight: 56,
   },
   inviteButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
     color: Colors.white,
+    letterSpacing: 0.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   stepsContainer: {
     gap: 16,

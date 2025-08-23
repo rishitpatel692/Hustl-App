@@ -183,7 +183,9 @@ const AnimatedReferralsBanner = () => {
 
   const handleInvitePress = () => {
     if (Platform.OS !== 'web') {
-      try {
+    
+    // Navigate to referrals tab with smooth transition
+    router.push('/(tabs)/referrals');
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       } catch (error) {
         // Haptics not available, continue silently
