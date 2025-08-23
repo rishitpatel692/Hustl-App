@@ -5,7 +5,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { SupabaseProvider } from '@/contexts/SupabaseContext';
-import AuthGate from '@/components/AuthGate';
+import AuthGate from '@src/components/AuthGate';
 
 export default function RootLayout() {
   useFrameworkReady();
