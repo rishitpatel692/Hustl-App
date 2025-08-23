@@ -72,29 +72,85 @@ export default function GlobalHeader({
 
   if (isGuest) {
     return (
+      <>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+          <View style={styles.content}>
+            <TouchableOpacity
+              style={styles.guestProfileChip}
+              onPress={handleProfilePress}
+              accessibilityLabel="Sign in"
+              accessibilityRole="button"
+            >
+              <View style={styles.guestAvatar}>
+                <Text style={styles.guestAvatarText}>?</Text>
+              </View>
+            </TouchableOpacity>
+            
+            <Image
+              source={require('../src/assets/images/image.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            
+            <View style={styles.rightSection}>
+              {showSearch && (
+                <TouchableOpacity style={styles.iconButton} onPress={handleSearchPress}>
+                  <Search size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+        
+        {/* Profile Sidebar */}
+        <ProfileSidebar
+          visible={showProfileSidebar}
+          onClose={() => setShowProfileSidebar(false)}
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.content}>
-          <TouchableOpacity
-            style={styles.guestProfileChip}
-            onPress={handleProfilePress}
-            accessibilityLabel="Sign in"
-            accessibilityRole="button"
-          >
-            <View style={styles.guestAvatar}>
-              <Text style={styles.guestAvatarText}>?</Text>
-            </View>
-          </TouchableOpacity>
-          
-          <Image
-            source={require('../src/assets/images/image.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          
+          <View style={styles.leftSection}>
+            <TouchableOpacity
+              style={styles.profileChip}
+              onPress={handleProfilePress}
+              onLongPress={handleProfileLongPress}
+              accessibilityLabel="Profile"
+              accessibilityRole="button"
+            >
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>
+                  {user ? getInitials(user.displayName) : 'U'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+            
+            <Image
+              source={require('../src/assets/images/image.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
+
+          {title && (
+            <Text style={styles.title}>{title}</Text>
+          )}
+
           <View style={styles.rightSection}>
             {showSearch && (
               <TouchableOpacity style={styles.iconButton} onPress={handleSearchPress}>
                 <Search size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
+              </TouchableOpacity>
+            )}
+            
+            {showNotifications && (
+              <TouchableOpacity style={styles.iconButton} onPress={handleNotificationsPress}>
+                <Bell size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               </TouchableOpacity>
             )}
           </View>
@@ -106,24 +162,9 @@ export default function GlobalHeader({
         visible={showProfileSidebar}
         onClose={() => setShowProfileSidebar(false)}
       />
-    );
-  }
-
-  return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.content}>
-        <View style={styles.leftSection}>
-          <TouchableOpacity
-            style={styles.profileChip}
-            onPress={handleProfilePress}
-            onLongPress={handleProfileLongPress}
-            accessibilityLabel="Profile"
-            accessibilityRole="button"
-          >
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {user ? getInitials(user.displayName) : 'U'}
-              </Text>
+    </>
+  );
+}
             </View>
           </TouchableOpacity>
           
