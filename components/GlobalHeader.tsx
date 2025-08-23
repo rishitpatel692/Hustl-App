@@ -21,7 +21,7 @@ export default function GlobalHeader({
 }: GlobalHeaderProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
 
   const [showProfileSidebar, setShowProfileSidebar] = React.useState(false);
 
@@ -38,11 +38,17 @@ export default function GlobalHeader({
   const handleProfilePress = () => {
     triggerHaptics();
     
-    // Open sidebar
+    if (isGuest) {
+      router.push('/(onboarding)/auth');
+      return;
+    }
+    
+    // Open sidebar for authenticated users
     setShowProfileSidebar(true);
   };
 
   const handleProfileLongPress = () => {
+    if (isGuest) return;
     // TODO: Implement quick menu
     console.log('Profile long press - show quick menu');
   };
@@ -63,6 +69,47 @@ export default function GlobalHeader({
       .toUpperCase()
       .slice(0, 2);
   };
+
+  if (isGuest) {
+    return (
+      <>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
+          <View style={styles.content}>
+            <TouchableOpacity
+              style={styles.guestProfileChip}
+              onPress={handleProfilePress}
+              accessibilityLabel="Sign in"
+              accessibilityRole="button"
+            >
+              <View style={styles.guestAvatar}>
+                <Text style={styles.guestAvatarText}>?</Text>
+              </View>
+            </TouchableOpacity>
+            
+            <Image
+              source={require('../src/assets/images/image.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            
+            <View style={styles.rightSection}>
+              {showSearch && (
+                <TouchableOpacity style={styles.iconButton} onPress={handleSearchPress}>
+                  <Search size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+        
+        {/* Profile Sidebar */}
+        <ProfileSidebar
+          visible={showProfileSidebar}
+          onClose={() => setShowProfileSidebar(false)}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -150,6 +197,12 @@ const styles = StyleSheet.create({
     borderColor: Colors.primaryLight,
     padding: 2,
   },
+  guestProfileChip: {
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: Colors.semantic.tabInactive,
+    padding: 2,
+  },
   avatar: {
     width: 32,
     height: 32,
@@ -158,10 +211,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  guestAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.semantic.tabInactive,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   avatarText: {
     fontSize: 12,
     fontWeight: '700',
     color: '#FFFFFF',
+  },
+  guestAvatarText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#F1F5F9',
   },
   logo: {
     width: 28,
@@ -170,7 +236,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: Colors.semantic.headingText,
+    color: '#111827', // Dark text for white background
     textAlign: 'center',
     flex: 1,
   },
@@ -185,7 +251,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.muted,
+    backgroundColor: '#F5F5F5',
     justifyContent: 'center',
     alignItems: 'center',
   },

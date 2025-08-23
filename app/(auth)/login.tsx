@@ -1,56 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react-native';
-import { Colors } from '@/theme/colors';
-import { useAuth } from '@/contexts/AuthContext';
+import { Colors } from '@constants/Colors';
 
 export default function LoginScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { login, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
 
-  const handleLogin = async () => {
-    // Clear previous errors
-    setError('');
-
-    // Basic validation
-    if (!email.trim()) {
-      setError('Please enter your email address.');
-      return;
-    }
-
-    if (!password.trim()) {
-      setError('Please enter your password.');
-      return;
-    }
-
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long.');
-      return;
-    }
-
-    try {
-      console.log('auth_sign_in_started');
-      const result = await login(email, password);
-
-      if (result.error) {
-        console.log('auth_sign_in_failed', { error: result.error });
-        setError(result.error);
-        return;
-      }
-
-      console.log('auth_sign_in_success');
-      router.replace('/(tabs)/home');
-    } catch (error) {
-      console.log('auth_sign_in_failed', { error: 'Network error' });
-      setError('Something went wrong. Please try again.');
-    }
+  const handleLogin = () => {
+    // TODO: Implement Supabase login
+    console.log('Login:', { email, password });
+    router.replace('/(tabs)/home');
   };
 
   const handleBack = () => {
@@ -58,10 +23,12 @@ export default function LoginScreen() {
   };
 
   const handleSignUp = () => {
-    router.replace('/(auth)/signup');
+    router.push('/(auth)/signup');
   };
 
-  const isFormValid = email.trim() && password.trim() && password.length >= 8;
+  const handleSkip = () => {
+    router.replace('/(tabs)/home');
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -75,7 +42,9 @@ export default function LoginScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <View style={styles.placeholder} />
+          <TouchableOpacity onPress={handleSkip}>
+            <Text style={styles.skipText}>Skip</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -84,13 +53,6 @@ export default function LoginScreen() {
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to your account</Text>
         </View>
-
-        {/* Error Message */}
-        {error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        ) : null}
 
         <View style={styles.form}>
           <View style={styles.inputContainer}>
@@ -103,7 +65,6 @@ export default function LoginScreen() {
               placeholderTextColor={Colors.semantic.tabInactive}
               keyboardType="email-address"
               autoCapitalize="none"
-              editable={!isLoading}
             />
           </View>
 
@@ -118,12 +79,10 @@ export default function LoginScreen() {
                 placeholderTextColor={Colors.semantic.tabInactive}
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
-                editable={!isLoading}
               />
               <TouchableOpacity
                 style={styles.eyeButton}
                 onPress={() => setShowPassword(!showPassword)}
-                disabled={isLoading}
               >
                 {showPassword ? (
                   <EyeOff size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
@@ -136,36 +95,13 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              styles.loginButton,
-              (!isFormValid || isLoading) && styles.disabledButton
-            ]}
-            onPress={handleLogin}
-            disabled={!isFormValid || isLoading}
-          >
-            <Text style={[
-              styles.loginButtonText,
-              (!isFormValid || isLoading) && styles.disabledButtonText
-            ]}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </Text>
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.loginButtonText}>Sign In</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.signUpButton}
-            onPress={handleSignUp}
-            disabled={isLoading}
-          >
+          <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
             <Text style={styles.signUpButtonText}>Don't have an account? Sign up</Text>
           </TouchableOpacity>
-        </View>
-
-        {/* Legal Footer */}
-        <View style={styles.legalFooter}>
-          <Text style={styles.copyrightText}>
-            © 2025 HUSTLU LLC. All Rights Reserved.
-          </Text>
         </View>
       </View>
     </View>
@@ -199,8 +135,10 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
   },
-  placeholder: {
-    width: 40,
+  skipText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
   },
   content: {
     flex: 1,
@@ -219,20 +157,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: Colors.semantic.tabInactive,
-  },
-  errorContainer: {
-    backgroundColor: '#FEF2F2',
-    borderWidth: 1,
-    borderColor: '#FECACA',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-  },
-  errorText: {
-    fontSize: 14,
-    color: Colors.semantic.errorAlert,
-    textAlign: 'center',
-    lineHeight: 20,
   },
   form: {
     gap: 20,
@@ -286,12 +210,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.white,
   },
-  disabledButton: {
-    backgroundColor: Colors.muted,
-  },
-  disabledButtonText: {
-    color: Colors.semantic.tabInactive,
-  },
   signUpButton: {
     backgroundColor: 'transparent',
     borderWidth: 1,
@@ -304,14 +222,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.semantic.bodyText,
-  },
-  legalFooter: {
-    alignItems: 'center',
-    paddingTop: 32,
-  },
-  copyrightText: {
-    fontSize: 12,
-    color: Colors.semantic.tabInactive,
-    textAlign: 'center',
   },
 });

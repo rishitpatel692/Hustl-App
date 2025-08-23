@@ -211,7 +211,7 @@ export default function WelcomeScreen() {
     transform: [{ translateY: contentTranslateY.value }],
   }));
 
-  const handleSelectUniversity = () => {
+  const handleChooseCampus = () => {
     router.push('/(onboarding)/university-selection');
   };
 
@@ -259,12 +259,25 @@ export default function WelcomeScreen() {
           </Text>
         </Animated.View>
 
+        {/* University Carousel */}
+        <Animated.View style={[styles.universitySection, animatedContentStyle]}>
+          <UniversityCarousel />
+          
+          <View style={styles.moreUniversities}>
+            <View style={styles.moreDots}>
+              <View style={styles.dot} />
+              <View style={styles.dot} />
+              <View style={styles.dot} />
+            </View>
+            <Text style={styles.moreText}>Your campus could be next 🚀</Text>
+          </View>
+        </Animated.View>
       </ScrollView>
 
       {/* Bottom Action Section */}
       <Animated.View style={[styles.bottomSection, animatedContentStyle, { paddingBottom: insets.bottom + 20 }]}>
         <PulsingButton 
-          onPress={handleSelectUniversity}
+          onPress={handleChooseCampus}
           style={styles.primaryButtonContainer}
         >
           <LinearGradient
@@ -274,7 +287,7 @@ export default function WelcomeScreen() {
             style={styles.primaryButton}
           >
             <MapPin size={20} color={Colors.white} strokeWidth={2} />
-            <Text style={styles.primaryButtonText}>Select Your University</Text>
+            <Text style={styles.primaryButtonText}>Choose Your Campus</Text>
             <ChevronRight size={20} color={Colors.white} strokeWidth={2.5} />
           </LinearGradient>
         </PulsingButton>

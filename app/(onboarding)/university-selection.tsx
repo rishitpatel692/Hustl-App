@@ -1,22 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Image, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, ChevronRight, Lock, MapPin } from 'lucide-react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming, 
-  withSpring, 
-  withRepeat,
-  withSequence,
-  interpolate,
-  Easing
-} from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
+import { ArrowLeft, ChevronRight, Lock } from 'lucide-react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSequence, withSpring } from 'react-native-reanimated';
 import { Colors } from '@/theme/colors';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 interface UniversityCard {
   id: string;
@@ -57,167 +47,34 @@ const universities: UniversityCard[] = [
   },
 ];
 
-// Glowing logo animation
-const GlowingLogo = () => {
-  const glowOpacity = useSharedValue(0.3);
-  const shimmerPosition = useSharedValue(-1);
-
-  useEffect(() => {
-    // Gentle glow pulse
-    glowOpacity.value = withRepeat(
-      withSequence(
-        withTiming(0.6, { duration: 2000, easing: Easing.inOut(Easing.sin) }),
-        withTiming(0.3, { duration: 2000, easing: Easing.inOut(Easing.sin) })
-      ),
-      -1,
-      true
-    );
-
-    // Subtle shimmer sweep
-    shimmerPosition.value = withRepeat(
-      withTiming(1, { duration: 4000, easing: Easing.linear }),
-      -1,
-      false
-    );
-  }, []);
-
-  const animatedGlowStyle = useAnimatedStyle(() => ({
-    shadowOpacity: glowOpacity.value,
-  }));
-
-  const animatedShimmerStyle = useAnimatedStyle(() => {
-    const translateX = interpolate(shimmerPosition.value, [0, 1], [-120, 120]);
-    return {
-      transform: [{ translateX }],
-    };
-  });
-
-  return (
-    <Animated.View style={[styles.logoContainer, animatedGlowStyle]}>
-      <View style={styles.logoWrapper}>
-        <Image
-          source={require('../../src/assets/images/image.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <Animated.View style={[styles.shimmerOverlay, animatedShimmerStyle]} />
-      </View>
-    </Animated.View>
-  );
-};
-
-// University carousel component
-const UniversityCarousel = () => {
-  const scrollX = useSharedValue(0);
-
-  useEffect(() => {
-    // Auto-scroll carousel
-    scrollX.value = withRepeat(
-      withTiming(universities.length * 100, { 
-        duration: 8000, 
-        easing: Easing.linear 
-      }),
-      -1,
-      false
-    );
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    const translateX = interpolate(
-      scrollX.value % (universities.length * 100),
-      [0, universities.length * 100],
-      [0, -universities.length * 100]
-    );
-    return {
-      transform: [{ translateX }],
-    };
-  });
-
-  return (
-    <View style={styles.carouselContainer}>
-      <View style={styles.carouselTrack}>
-        <Animated.View style={[styles.carouselContent, animatedStyle]}>
-          {/* Render universities twice for seamless loop */}
-          {[...universities, ...universities].map((university, index) => (
-            <View key={`${university.id}-${index}`} style={styles.universityItem}>
-              <View style={styles.universityLogoContainer}>
-                <Image
-                  source={university.logo}
-                  style={styles.universityLogo}
-                  resizeMode="contain"
-                />
-                {!university.enabled && (
-                  <View style={styles.lockOverlay}>
-                    <Lock size={16} color={Colors.white} strokeWidth={2} />
-                  </View>
-                )}
-              </View>
-              <Text style={styles.universityName}>{university.shortName}</Text>
-            </View>
-          ))}
-        </Animated.View>
-      </View>
-    </View>
-  );
-};
-
-export default function UniversitySelectionScreen() {
+export default function UniversitySelection() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  
-  // Animation values
-  const logoOpacity = useSharedValue(0);
-  const logoScale = useSharedValue(0.8);
-  const titleOpacity = useSharedValue(0);
-  const titleTranslateY = useSharedValue(30);
-  const contentOpacity = useSharedValue(0);
-  const contentTranslateY = useSharedValue(40);
-
-  useEffect(() => {
-    // Staggered entrance animations
-    logoOpacity.value = withTiming(1, { duration: 800 });
-    logoScale.value = withSpring(1, { damping: 15, stiffness: 300 });
-
-    titleOpacity.value = withDelay(400, withTiming(1, { duration: 600 }));
-    titleTranslateY.value = withDelay(400, withSpring(0, { damping: 15 }));
-
-    contentOpacity.value = withDelay(800, withTiming(1, { duration: 600 }));
-    contentTranslateY.value = withDelay(800, withSpring(0, { damping: 15 }));
-  }, []);
-
-  const animatedLogoStyle = useAnimatedStyle(() => ({
-    opacity: logoOpacity.value,
-    transform: [{ scale: logoScale.value }],
-  }));
-
-  const animatedTitleStyle = useAnimatedStyle(() => ({
-    opacity: titleOpacity.value,
-    transform: [{ translateY: titleTranslateY.value }],
-  }));
-
-  const animatedContentStyle = useAnimatedStyle(() => ({
-    opacity: contentOpacity.value,
-    transform: [{ translateY: contentTranslateY.value }],
-  }));
 
   const handleUniversitySelect = (university: UniversityCard) => {
-    if (!university.enabled) {
-      Alert.alert('Coming Soon', 'This university will be available soon!');
-      return;
-    }
+    if (!university.enabled) return;
     
     if (university.id === 'uf') {
       setSelectedId(university.id);
       // Delay navigation to show animation
       setTimeout(() => {
-        router.push('/(auth)/welcome');
+        router.push('/(onboarding)/confirm-university');
       }, 300);
     }
   };
 
+  const handleRequestCampus = () => {
+    alert('Email us at HustlApp@outlook.com!');
+  };
+
   const handleBack = () => {
     router.back();
+  };
+
+  const handleSkip = () => {
+    // Allow users to skip and browse as guest
+    router.replace('/(tabs)/home');
   };
 
   const UniversityCardComponent = ({ university }: { university: UniversityCard }) => {
@@ -255,10 +112,7 @@ export default function UniversitySelectionScreen() {
     };
 
     const handlePress = () => {
-      if (!university.enabled) {
-        Alert.alert('Coming Soon', 'This university will be available soon!');
-        return;
-      }
+      if (!university.enabled) return;
       
       // Trigger selection animation
       logoTranslateX.value = withTiming(-8, { duration: 250 });
@@ -283,6 +137,7 @@ export default function UniversitySelectionScreen() {
           onPress={handlePress}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
+          disabled={!university.enabled}
           accessibilityLabel={
             university.enabled 
               ? `Select ${university.name}` 
@@ -297,11 +152,6 @@ export default function UniversitySelectionScreen() {
               style={styles.universityLogo}
               resizeMode="contain"
             />
-            {!university.enabled && (
-              <View style={styles.lockOverlay}>
-                <Lock size={20} color={Colors.white} strokeWidth={2} />
-              </View>
-            )}
           </Animated.View>
           
           <View style={styles.cardContent}>
@@ -313,7 +163,10 @@ export default function UniversitySelectionScreen() {
                 {university.name}
               </Text>
               {!university.enabled && (
-                <Text style={styles.comingSoonText}>Coming Soon</Text>
+                <View style={styles.comingSoonContainer}>
+                  <Lock size={12} color={Colors.semantic.tabInactive} strokeWidth={2} />
+                  <Text style={styles.comingSoonText}>Coming Soon</Text>
+                </View>
               )}
             </Animated.View>
             
@@ -332,64 +185,36 @@ export default function UniversitySelectionScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Background with gradient overlay */}
-      <View style={styles.backgroundContainer}>
-        <Image
-          source={{ uri: 'https://images.pexels.com/photos/1595391/pexels-photo-1595391.jpeg?auto=compress&cs=tinysrgb&w=800' }}
-          style={styles.backgroundImage}
-          resizeMode="cover"
-        />
-        <LinearGradient
-          colors={['rgba(0, 33, 165, 0.85)', 'rgba(250, 70, 22, 0.75)']}
-          style={styles.backgroundOverlay}
-        />
-      </View>
-
-      <View style={styles.content}>
-        {/* Logo Section */}
-        <Animated.View style={[styles.logoSection, animatedLogoStyle]}>
-          <GlowingLogo />
-        </Animated.View>
-
-        {/* Title Section */}
-        <Animated.View style={[styles.titleSection, animatedTitleStyle]}>
-          <Text style={styles.title}>Select your university</Text>
-          <Text style={styles.subtitle}>
-            Choose your campus to connect with your community
-          </Text>
-        </Animated.View>
-
-        {/* University Grid */}
-        <Animated.View style={[styles.universitiesSection, animatedContentStyle]}>
-          <View style={styles.universitiesGrid}>
-            {universities.map((university) => (
-              <UniversityCardComponent key={university.id} university={university} />
-            ))}
-          </View>
-          
-          <View style={styles.moreUniversities}>
-            <UniversityCarousel />
-            <Text style={styles.moreText}>More universities coming soon...</Text>
-          </View>
-        </Animated.View>
-      </View>
-
-      {/* Footer */}
-      <Animated.View style={[styles.footer, animatedContentStyle, { paddingBottom: insets.bottom + 20 }]}>
-        <View style={styles.legalLinks}>
-          <TouchableOpacity onPress={() => console.log('Terms pressed')}>
-            <Text style={styles.legalText}>Terms of Service</Text>
+      <View style={styles.header}>
+        <View style={styles.headerRow}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+            <ArrowLeft size={24} color={Colors.semantic.bodyText} strokeWidth={2} />
           </TouchableOpacity>
-          <Text style={styles.legalSeparator}>•</Text>
-          <TouchableOpacity onPress={() => console.log('Privacy pressed')}>
-            <Text style={styles.legalText}>Privacy Policy</Text>
+          <Image
+            source={require('../../src/assets/images/image.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <TouchableOpacity onPress={handleSkip}>
+            <Text style={styles.skipText}>Skip</Text>
           </TouchableOpacity>
         </View>
-        
-        <Text style={styles.copyrightText}>
-          © 2025 HUSTLU LLC. All Rights Reserved.
-        </Text>
-      </Animated.View>
+        <Text style={styles.title}>Select Your University</Text>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.cardsList}>
+          {universities.map((university) => (
+            <UniversityCardComponent key={university.id} university={university} />
+          ))}
+        </View>
+      </ScrollView>
+
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
+        <TouchableOpacity style={styles.requestButton} onPress={handleRequestCampus}>
+          <Text style={styles.requestButtonText}>Request your campus here</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -399,117 +224,70 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.semantic.screen,
   },
-  backgroundContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+  header: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    gap: 16,
   },
-  backgroundImage: {
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     width: '100%',
-    height: '100%',
   },
-  backgroundOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.muted,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 32,
+    height: 32,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: Colors.semantic.bodyText,
+    textAlign: 'center',
+  },
+  skipText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.primary,
   },
   content: {
     flex: 1,
-    justifyContent: 'flex-start',
     paddingHorizontal: 24,
-    paddingTop: height * 0.05, // Reduced top padding
   },
-  logoSection: {
-    alignItems: 'center',
-    paddingBottom: 24, // Reduced padding
-  },
-  logoContainer: {
-    shadowColor: '#FA4616',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 20,
-    elevation: 12,
-  },
-  logoWrapper: {
-    position: 'relative',
-    overflow: 'hidden',
-    borderRadius: width * 0.1,
-  },
-  logo: {
-    width: width * 0.2, // Smaller logo
-    height: width * 0.2,
-    maxWidth: 80,
-    maxHeight: 80,
-  },
-  shimmerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: -120,
-    width: 120,
-    height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    transform: [{ skewX: '-20deg' }],
-  },
-  titleSection: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 32, // Reduced margin
-  },
-  title: {
-    fontSize: 28, // Slightly smaller
-    fontWeight: '700',
-    color: Colors.white,
-    textAlign: 'center',
-    marginBottom: 12,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-    letterSpacing: 0.5,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.white,
-    textAlign: 'center',
-    lineHeight: 22,
-    opacity: 0.9,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  universitiesSection: {
-    flex: 1,
-    justifyContent: 'flex-start',
-  },
-  universitiesGrid: {
+  cardsList: {
     gap: 12,
-    marginBottom: 24,
   },
   universityCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: Colors.white,
     borderRadius: 16,
     padding: 16,
     minHeight: 80,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: Colors.border,
   },
   selectedCard: {
-    backgroundColor: 'rgba(0, 56, 255, 0.1)',
+    backgroundColor: 'rgba(0, 56, 255, 0.06)',
     borderColor: Colors.primary,
-    borderWidth: 2,
   },
   disabledCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    backgroundColor: Colors.muted,
     opacity: 0.7,
   },
   logoContainer: {
@@ -518,23 +296,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
-    position: 'relative',
   },
   universityLogo: {
     width: 56,
     height: 56,
-    borderRadius: 28,
-  },
-  lockOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   cardContent: {
     flex: 1,
@@ -551,11 +316,16 @@ const styles = StyleSheet.create({
   disabledText: {
     color: Colors.semantic.tabInactive,
   },
+  comingSoonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
   comingSoonText: {
     fontSize: 12,
     color: Colors.semantic.tabInactive,
     fontWeight: '500',
-    marginTop: 2,
   },
   arrowContainer: {
     marginLeft: 12,
@@ -568,97 +338,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  moreUniversities: {
-    alignItems: 'center',
-    gap: 16,
-  },
-  carouselContainer: {
-    height: 60,
-    marginBottom: 12,
-    overflow: 'hidden',
-  },
-  carouselTrack: {
-    width: width,
-    height: 60,
-    overflow: 'hidden',
-  },
-  carouselContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 60,
-  },
-  universityItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 80,
-    height: 60,
-    gap: 6,
-  },
-  universityLogoContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  universityName: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: Colors.white,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  moreText: {
-    fontSize: 14,
-    color: Colors.white,
-    opacity: 0.8,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
   footer: {
     paddingHorizontal: 24,
     paddingTop: 20,
+  },
+  requestButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
     alignItems: 'center',
-    gap: 12,
   },
-  legalLinks: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 12,
-  },
-  legalText: {
-    fontSize: 14,
-    color: Colors.white,
-    opacity: 0.8,
-    textDecorationLine: 'underline',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  legalSeparator: {
-    fontSize: 14,
-    color: Colors.white,
-    opacity: 0.6,
-  },
-  copyrightText: {
-    fontSize: 12,
-    color: Colors.white,
-    opacity: 0.7,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+  requestButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.primary,
   },
 });
