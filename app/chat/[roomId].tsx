@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image, Dimensions } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, Send } from 'lucide-react-native';
-import { Colors } from '@constants/Colors';
-import { useAuth } from '@contexts/AuthContext';
-import { ChatService } from '@lib/chat';
+import { ArrowLeft, Send, MoreHorizontal, Plus } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Colors } from '@/theme/colors';
+import { useAuth } from '@/contexts/AuthContext';
+import { ChatService } from '@/lib/chat';
 import { supabase } from '@/lib/supabase';
-import type { ChatMessage } from '@src/types/chat';
-import UserProfileSheet from '@components/UserProfileSheet';
+import type { ChatMessage } from '@/types/chat';
+import UserProfileSheet from '@/components/UserProfileSheet';
+
+const { width } = Dimensions.get('window');
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -190,13 +193,19 @@ export default function ChatScreen() {
   const formatTime = (timestamp: string): string => {
     const date = new Date(timestamp);
     const now = new Date();
+    const diffInMinutes = (now.getTime() - date.getTime()) / (1000 * 60);
+    const diffInHours = diffInMinutes / 60;
     const isToday = date.toDateString() === now.toDateString();
+    const isYesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toDateString() === date.toDateString();
     
-    if (isToday) {
+    if (diffInMinutes < 1) {
+      return 'now';
+    } else if (isToday) {
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (isYesterday) {
+      return 'Yesterday ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } else {
-      return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ', ' +
-             date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
     }
   };
 
@@ -237,17 +246,17 @@ export default function ChatScreen() {
           ]}>
             {message.text}
           </Text>
-          <View style={styles.messageFooter}>
-            <Text style={[
-              styles.messageTime,
-              isOwnMessage ? styles.ownMessageTime : styles.otherMessageTime
-            ]}>
-              {formatTime(message.created_at)}
-            </Text>
-            {isOwnMessage && seen && (
-              <Text style={styles.seenText}>Seen</Text>
-            )}
-          </View>
+        </View>
+        <View style={[
+          styles.messageFooter,
+          isOwnMessage ? styles.ownMessageFooter : styles.otherMessageFooter
+        ]}>
+          <Text style={styles.messageTime}>
+            {formatTime(message.created_at)}
+          </Text>
+          {isOwnMessage && seen && (
+            <Text style={styles.seenText}>Seen</Text>
+          )}
         </View>
       </View>
     );
@@ -261,17 +270,19 @@ export default function ChatScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          <ArrowLeft size={24} color={Colors.white} strokeWidth={2} />
+          <ArrowLeft size={24} color={Colors.semantic.bodyText} strokeWidth={2} />
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.headerCenter} onPress={handleProfilePress}>
-          <View style={styles.headerAvatar}>
+          <View style={styles.headerAvatarContainer}>
             {otherUserProfile?.avatar_url ? (
-              <Image source={{ uri: otherUserProfile.avatar_url }} style={styles.headerAvatarImage} />
+              <Image source={{ uri: otherUserProfile.avatar_url }} style={styles.headerAvatar} />
             ) : (
-              <Text style={styles.headerAvatarText}>
-                {getInitials(otherUserProfile?.full_name || otherUserProfile?.username)}
-              </Text>
+              <View style={styles.headerAvatarPlaceholder}>
+                <Text style={styles.headerAvatarText}>
+                  {getInitials(otherUserProfile?.full_name || otherUserProfile?.username)}
+                </Text>
+              </View>
             )}
           </View>
           <View style={styles.headerInfo}>
@@ -284,7 +295,9 @@ export default function ChatScreen() {
           </View>
         </TouchableOpacity>
         
-        <View style={styles.headerRight} />
+        <TouchableOpacity style={styles.optionsButton}>
+          <MoreHorizontal size={20} color={Colors.semantic.bodyText} strokeWidth={2} />
+        </TouchableOpacity>
       </View>
 
       {/* Messages */}
@@ -301,8 +314,11 @@ export default function ChatScreen() {
           </View>
         ) : messages.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No messages yet</Text>
-            <Text style={styles.emptySubtext}>Start the conversation!</Text>
+            <View style={styles.emptyIconContainer}>
+              <Text style={styles.emptyIcon}>💬</Text>
+            </View>
+            <Text style={styles.emptyText}>Start the conversation</Text>
+            <Text style={styles.emptySubtext}>Send a message to get things started!</Text>
           </View>
         ) : (
           messages.map(renderMessage)
@@ -311,15 +327,22 @@ export default function ChatScreen() {
 
       {/* Input */}
       <View style={[styles.inputContainer, { paddingBottom: insets.bottom + 16 }]}>
-        <TextInput
-          style={styles.textInput}
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="Type a message..."
-          placeholderTextColor={Colors.semantic.tabInactive}
-          multiline
-          maxLength={1000}
-        />
+        <View style={styles.inputRow}>
+          <TouchableOpacity style={styles.attachButton}>
+            <Plus size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
+          </TouchableOpacity>
+          
+          <TextInput
+            style={styles.textInput}
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder="Type a message..."
+            placeholderTextColor={Colors.semantic.tabInactive}
+            multiline
+            maxLength={1000}
+          />
+        </View>
+        
         <TouchableOpacity
           style={[
             styles.sendButton,
@@ -328,7 +351,18 @@ export default function ChatScreen() {
           onPress={handleSendMessage}
           disabled={!inputText.trim() || isSending}
         >
-          <Send size={20} color={Colors.white} strokeWidth={2} />
+          {(!inputText.trim() || isSending) ? (
+            <Send size={18} color={Colors.white} strokeWidth={2} />
+          ) : (
+            <LinearGradient
+              colors={[Colors.primary, Colors.secondary]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.sendButtonGradient}
+            >
+              <Send size={18} color={Colors.white} strokeWidth={2} />
+            </LinearGradient>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -351,42 +385,49 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: Colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: Colors.white,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(229, 231, 235, 0.6)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.white + '33',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(245, 245, 245, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 12,
   },
   headerCenter: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 12,
+  },
+  headerAvatarContainer: {
     marginRight: 12,
   },
   headerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.white + '33',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  headerAvatarPlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
-    overflow: 'hidden',
-  },
-  headerAvatarImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 18,
   },
   headerAvatarText: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
     color: Colors.white,
   },
@@ -394,24 +435,32 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '600',
-    color: Colors.white,
+    color: Colors.semantic.headingText,
     marginBottom: 2,
   },
   headerSubtitle: {
-    fontSize: 12,
-    color: Colors.white + 'CC',
+    fontSize: 13,
+    color: Colors.semantic.tabInactive,
+    fontWeight: '500',
   },
-  headerRight: {
-    width: 40,
+  optionsButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(245, 245, 245, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 12,
   },
   messagesContainer: {
     flex: 1,
+    backgroundColor: '#FAFAFA',
   },
   messagesContent: {
-    padding: 16,
-    paddingBottom: 8,
+    padding: 20,
+    paddingBottom: 12,
   },
   loadingContainer: {
     flex: 1,
@@ -427,20 +476,34 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: 60,
+    gap: 16,
   },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: Colors.semantic.headingText,
+  emptyIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(245, 245, 245, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 8,
   },
+  emptyIcon: {
+    fontSize: 32,
+  },
+  emptyText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: Colors.semantic.headingText,
+    textAlign: 'center',
+  },
   emptySubtext: {
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.semantic.tabInactive,
+    textAlign: 'center',
   },
   messageContainer: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
   ownMessageContainer: {
     alignItems: 'flex-end',
@@ -449,22 +512,29 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   messageBubble: {
-    maxWidth: '80%',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    maxWidth: width * 0.75,
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
   },
   ownMessageBubble: {
     backgroundColor: Colors.primary,
-    borderBottomRightRadius: 4,
+    borderBottomRightRadius: 6,
   },
   otherMessageBubble: {
-    backgroundColor: Colors.muted,
-    borderBottomLeftRadius: 4,
+    backgroundColor: Colors.white,
+    borderBottomLeftRadius: 6,
+    borderWidth: 0.5,
+    borderColor: 'rgba(229, 231, 235, 0.8)',
   },
   messageText: {
-    fontSize: 16,
-    lineHeight: 20,
+    fontSize: 17,
+    lineHeight: 22,
   },
   ownMessageText: {
     color: Colors.white,
@@ -473,59 +543,92 @@ const styles = StyleSheet.create({
     color: Colors.semantic.bodyText,
   },
   messageFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 4,
+    marginTop: 6,
+    alignItems: 'flex-end',
+  },
+  ownMessageFooter: {
+    alignItems: 'flex-end',
+  },
+  otherMessageFooter: {
+    alignItems: 'flex-start',
   },
   messageTime: {
-    fontSize: 12,
-    opacity: 0.7,
-  },
-  ownMessageTime: {
-    color: Colors.white,
-  },
-  otherMessageTime: {
+    fontSize: 11,
     color: Colors.semantic.tabInactive,
+    fontWeight: '500',
   },
   seenText: {
-    fontSize: 11,
-    color: Colors.white,
-    opacity: 0.8,
+    fontSize: 10,
+    color: Colors.semantic.tabInactive,
     fontWeight: '500',
-    marginLeft: 8,
+    marginTop: 2,
   },
   inputContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    backgroundColor: Colors.white,
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(229, 231, 235, 0.6)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    backgroundColor: Colors.semantic.screen,
-    borderTopWidth: 1,
-    borderTopColor: Colors.semantic.divider,
-    gap: 12,
+    backgroundColor: 'rgba(245, 245, 245, 0.8)',
+    borderRadius: 24,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(229, 231, 235, 0.5)',
+  },
+  attachButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
   },
   textInput: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: Colors.semantic.inputBorder,
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 17,
     color: Colors.semantic.inputText,
-    backgroundColor: Colors.semantic.inputBackground,
-    maxHeight: 100,
+    backgroundColor: 'transparent',
+    maxHeight: 120,
+    minHeight: 36,
   },
   sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.primary,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.semantic.tabInactive,
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 12,
+    overflow: 'hidden',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   sendButtonDisabled: {
     backgroundColor: Colors.semantic.tabInactive,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  sendButtonGradient: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
