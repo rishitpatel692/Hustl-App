@@ -221,7 +221,7 @@ export default function UserProfileSheet({
     </View>
   );
 
-  const renderReviewItem = (review: TaskReview) => (
+  const renderReviewItem = (review: any) => (
     <View key={review.id} style={styles.reviewItem}>
       <View style={styles.reviewHeader}>
         <StarRating rating={review.stars} size={16} showNumber={false} />
@@ -234,7 +234,7 @@ export default function UserProfileSheet({
       
       {review.tags && review.tags.length > 0 && (
         <View style={styles.reviewTags}>
-          {review.tags.slice(0, 3).map((tag, index) => (
+          {review.tags.slice(0, 3).map((tag: string, index: number) => (
             <View key={index} style={styles.reviewTag}>
               <Text style={styles.reviewTagText}>{tag}</Text>
             </View>
@@ -308,7 +308,7 @@ export default function UserProfileSheet({
               ) : error ? (
                 <View style={styles.errorContainer}>
                   <Text style={styles.errorText}>{error}</Text>
-                  <TouchableOpacity style={styles.retryButton} onPress={() => loadProfile(false)}>
+                  <TouchableOpacity style={styles.retryButton} onPress={() => refreshProfile()}>
                     <Text style={styles.retryButtonText}>Retry</Text>
                   </TouchableOpacity>
                 </View>
