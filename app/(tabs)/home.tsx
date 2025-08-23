@@ -602,14 +602,15 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 14,
-    gap: 6,
   },
   selectTaskText: {
     fontSize: 14,
     fontWeight: '600',
     color: Colors.white,
     letterSpacing: 0.2,
+    flex: 1,
+    textAlign: 'center',
   },
 });
