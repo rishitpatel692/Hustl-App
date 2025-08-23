@@ -25,53 +25,47 @@ const categories = [
   {
     id: 'car',
     title: 'Car Rides',
-    backgroundColor: '#3B82F6',
     image: 'https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
   {
     id: 'food',
     title: 'Food Pickup',
-    backgroundColor: '#FA4616',
     image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
   {
     id: 'workout',
     title: 'Workout Partner',
-    backgroundColor: '#10B981',
     image: 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
   {
     id: 'coffee',
     title: 'Coffee Runs',
-    backgroundColor: '#8B4513',
     image: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
   {
     id: 'study',
     title: 'Study Partner',
-    backgroundColor: '#8B5CF6',
     image: 'https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
   {
     id: 'custom',
     title: 'Custom Task',
-    backgroundColor: '#6B7280',
     image: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400',
   },
 ];
 
-// Floating Particles Component
+// Floating Particles Component for subtle depth
 const FloatingParticles = () => {
-  const particles = Array.from({ length: 12 }, (_, i) => {
+  const particles = Array.from({ length: 8 }, (_, i) => {
     const translateY = useSharedValue(height + 50);
     const translateX = useSharedValue(Math.random() * width);
     const opacity = useSharedValue(0);
-    const scale = useSharedValue(0.5 + Math.random() * 0.5);
+    const scale = useSharedValue(0.3 + Math.random() * 0.4);
 
     React.useEffect(() => {
       const startAnimation = () => {
-        const delay = i * 800 + Math.random() * 2000;
-        const duration = 8000 + Math.random() * 4000;
+        const delay = i * 1200 + Math.random() * 3000;
+        const duration = 12000 + Math.random() * 6000;
         
         translateY.value = withDelay(
           delay,
@@ -86,8 +80,8 @@ const FloatingParticles = () => {
           delay,
           withRepeat(
             withSequence(
-              withTiming(0.1 + Math.random() * 0.15, { duration: duration * 0.1 }),
-              withTiming(0.1 + Math.random() * 0.15, { duration: duration * 0.8 }),
+              withTiming(0.08 + Math.random() * 0.12, { duration: duration * 0.1 }),
+              withTiming(0.08 + Math.random() * 0.12, { duration: duration * 0.8 }),
               withTiming(0, { duration: duration * 0.1 })
             ),
             -1,
@@ -114,8 +108,8 @@ const FloatingParticles = () => {
         style={[
           styles.particle,
           {
-            width: 4 + Math.random() * 8,
-            height: 4 + Math.random() * 8,
+            width: 6 + Math.random() * 12,
+            height: 6 + Math.random() * 12,
           },
           animatedStyle
         ]}
@@ -136,13 +130,14 @@ const AnimatedReferralsBanner = () => {
   const glowAnimation = useSharedValue(0);
   const pulseAnimation = useSharedValue(1);
   const shimmerAnimation = useSharedValue(-1);
+  const gradientAnimation = useSharedValue(0);
 
   React.useEffect(() => {
     // Glow animation
     glowAnimation.value = withRepeat(
       withSequence(
-        withTiming(1, { duration: 2500 }),
-        withTiming(0, { duration: 2500 })
+        withTiming(1, { duration: 3000 }),
+        withTiming(0, { duration: 3000 })
       ),
       -1,
       true
@@ -151,8 +146,8 @@ const AnimatedReferralsBanner = () => {
     // Pulse animation for button
     pulseAnimation.value = withRepeat(
       withSequence(
-        withTiming(1.02, { duration: 1500 }),
-        withTiming(1, { duration: 1500 })
+        withTiming(1.02, { duration: 1800 }),
+        withTiming(1, { duration: 1800 })
       ),
       -1,
       true
@@ -160,14 +155,24 @@ const AnimatedReferralsBanner = () => {
 
     // Shimmer animation
     shimmerAnimation.value = withRepeat(
-      withTiming(1, { duration: 3000, easing: Easing.linear }),
+      withTiming(1, { duration: 3500, easing: Easing.linear }),
       -1,
       false
+    );
+
+    // Gradient shift animation
+    gradientAnimation.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 4000 }),
+        withTiming(0, { duration: 4000 })
+      ),
+      -1,
+      true
     );
   }, []);
 
   const animatedGlowStyle = useAnimatedStyle(() => {
-    const shadowOpacity = interpolate(glowAnimation.value, [0, 1], [0.3, 0.7]);
+    const shadowOpacity = interpolate(glowAnimation.value, [0, 1], [0.2, 0.4]);
     return {
       shadowOpacity,
     };
@@ -178,7 +183,7 @@ const AnimatedReferralsBanner = () => {
   }));
 
   const animatedShimmerStyle = useAnimatedStyle(() => {
-    const translateX = interpolate(shimmerAnimation.value, [0, 1], [-100, 300]);
+    const translateX = interpolate(shimmerAnimation.value, [0, 1], [-120, 320]);
     return {
       transform: [{ translateX }],
     };
@@ -210,9 +215,10 @@ const AnimatedReferralsBanner = () => {
     <Animated.View style={[styles.referralCard, animatedGlowStyle]}>
       <TouchableOpacity onPress={handleBannerPress} activeOpacity={0.95}>
         <LinearGradient
-          colors={['#0047FF', '#0021A5']}
+          colors={['#0047FF', '#0021A5', '#FA4616']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
+          locations={[0, 0.7, 1]}
           style={styles.referralGradient}
         >
           <View style={styles.referralContent}>
@@ -244,15 +250,17 @@ const AnimatedReferralsBanner = () => {
 const CategoryCard = ({ category, index, onPress }: { category: any; index: number; onPress: () => void }) => {
   const scaleAnimation = useSharedValue(0.8);
   const opacityAnimation = useSharedValue(0);
-  const translateY = useSharedValue(20);
+  const translateY = useSharedValue(30);
+  const shadowAnimation = useSharedValue(0);
 
   // Staggered entrance animation
   React.useEffect(() => {
-    const delay = index * 150;
+    const delay = index * 100;
     
-    opacityAnimation.value = withDelay(delay, withTiming(1, { duration: 800 }));
+    opacityAnimation.value = withDelay(delay, withTiming(1, { duration: 600 }));
     scaleAnimation.value = withDelay(delay, withSpring(1, { damping: 15, stiffness: 300 }));
     translateY.value = withDelay(delay, withSpring(0, { damping: 15, stiffness: 300 }));
+    shadowAnimation.value = withDelay(delay, withTiming(1, { duration: 600 }));
   }, [index]);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -263,17 +271,26 @@ const CategoryCard = ({ category, index, onPress }: { category: any; index: numb
     opacity: opacityAnimation.value,
   }));
 
+  const animatedShadowStyle = useAnimatedStyle(() => {
+    const shadowOpacity = interpolate(shadowAnimation.value, [0, 1], [0, 0.15]);
+    return {
+      shadowOpacity,
+    };
+  });
+
   const handlePressIn = () => {
-    scaleAnimation.value = withTiming(0.95, { duration: 150 });
+    scaleAnimation.value = withTiming(0.96, { duration: 150 });
+    shadowAnimation.value = withTiming(1.5, { duration: 150 });
   };
 
   const handlePressOut = () => {
     scaleAnimation.value = withSpring(1, { damping: 15 });
+    shadowAnimation.value = withSpring(1, { damping: 15 });
   };
 
   const handlePress = () => {
     scaleAnimation.value = withSequence(
-      withTiming(1.05, { duration: 100 }),
+      withTiming(1.03, { duration: 100 }),
       withSpring(1, { damping: 15 })
     );
     
@@ -289,7 +306,7 @@ const CategoryCard = ({ category, index, onPress }: { category: any; index: numb
   };
 
   return (
-    <Animated.View style={[styles.categoryCard, animatedStyle]}>
+    <Animated.View style={[styles.categoryCard, animatedStyle, animatedShadowStyle]}>
       <TouchableOpacity
         onPress={handlePress}
         onPressIn={handlePressIn}
@@ -328,12 +345,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#0021A5', '#0047FF']}
-        style={styles.backgroundGradient}
-      />
-      
-      {/* Floating Particles */}
+      {/* Subtle Floating Particles */}
       <FloatingParticles />
       
       <GlobalHeader />
@@ -371,16 +383,8 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
     position: 'relative',
-  },
-  backgroundGradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
   },
   particlesContainer: {
     position: 'absolute',
@@ -393,7 +397,7 @@ const styles = StyleSheet.create({
   },
   particle: {
     position: 'absolute',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#0021A5',
     borderRadius: 50,
     opacity: 0.1,
   },
@@ -413,7 +417,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     shadowColor: '#0047FF',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.25,
     shadowRadius: 20,
     elevation: 15,
     overflow: 'hidden',
@@ -434,7 +438,7 @@ const styles = StyleSheet.create({
   referralTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#F1F5F9',
+    color: '#FFFFFF',
     lineHeight: 24,
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
@@ -442,9 +446,9 @@ const styles = StyleSheet.create({
   },
   referralSubtitle: {
     fontSize: 14,
-    color: '#E2E8F0',
+    color: '#F1F5F9',
     lineHeight: 20,
-    opacity: 0.9,
+    opacity: 0.95,
   },
   inviteButton: {
     backgroundColor: '#FA4616',
@@ -465,8 +469,8 @@ const styles = StyleSheet.create({
   shimmerOverlay: {
     position: 'absolute',
     top: 0,
-    left: -100,
-    width: 100,
+    left: -120,
+    width: 120,
     height: '100%',
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     transform: [{ skewX: '-20deg' }],
@@ -474,7 +478,7 @@ const styles = StyleSheet.create({
   inviteButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#F1F5F9',
+    color: '#FFFFFF',
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
@@ -488,18 +492,14 @@ const styles = StyleSheet.create({
   categoriesTitle: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#F1F5F9',
+    color: '#111827',
     marginBottom: 8,
     letterSpacing: 0.5,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
   },
   categoriesSubtitle: {
     fontSize: 16,
-    color: '#E2E8F0',
+    color: '#6B7280',
     marginBottom: 24,
-    opacity: 0.9,
   },
   categoriesGrid: {
     flexDirection: 'row',
@@ -512,17 +512,17 @@ const styles = StyleSheet.create({
   categoryCard: {
     width: '47%',
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
   },
   categoryButton: {
     height: 160,
     borderRadius: 16,
     overflow: 'hidden',
     position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 12,
   },
   categoryImage: {
     position: 'absolute',
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#F1F5F9',
+    color: '#FFFFFF',
     lineHeight: 22,
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 0, height: 2 },

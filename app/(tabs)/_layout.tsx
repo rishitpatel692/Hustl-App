@@ -76,8 +76,8 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: 'transparent',
-            borderTopColor: 'rgba(255, 255, 255, 0.1)',
+            backgroundColor: '#FFFFFF',
+            borderTopColor: '#E5E7EB',
             borderTopWidth: 1,
             height: 80 + insets.bottom,
             paddingBottom: insets.bottom,
@@ -86,17 +86,14 @@ export default function TabLayout() {
             bottom: 0,
             left: 0,
             right: 0,
-            elevation: 0,
-            shadowOpacity: 0,
+            elevation: 8,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
           },
-          tabBarBackground: () => (
-            <LinearGradient
-              colors={['#0047FF', '#0021A5']}
-              style={{ flex: 1 }}
-            />
-          ),
           tabBarActiveTintColor: '#FA4616', // UF Orange for active
-          tabBarInactiveTintColor: '#A0A7B3', // Light gray for inactive
+          tabBarInactiveTintColor: '#6B7280', // Gray for inactive
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '600',

@@ -17,10 +17,10 @@ export const Colors = {
 
   // Surfaces & Text
   white: '#FFFFFF',
-  bg: '#0021A5', // Vibrant UF Blue background
+  bg: '#FFFFFF', // Clean white background
   muted: '#F5F5F5',
   border: '#E5E7EB',
-  text: '#F1F5F9', // Light text for dark theme
+  text: '#111827', // Dark text for light theme
   textHover: '#0A1B3D',
 
   // Status / Badges
@@ -50,14 +50,14 @@ export const Colors = {
     secondaryButtonAccent: '#FF5A1F',
 
     // Surfaces
-    screen: '#0021A5', // Vibrant blue background
+    screen: '#FFFFFF', // Clean white background
     card: '#FFFFFF',
     cardBorder: '#E5E7EB',
     
     // Text
-    bodyText: '#F1F5F9', // Light text
-    headingText: '#F1F5F9', // Light text
-    interactiveText: '#F1F5F9', // Light text
+    bodyText: '#111827', // Dark text for light theme
+    headingText: '#111827', // Dark text for light theme
+    interactiveText: '#111827', // Dark text for light theme
     interactiveTextPressed: '#0A1B3D',
     
     // Inputs
@@ -84,7 +84,7 @@ export const Colors = {
     infoAlert: '#0038FF',
     
     // Navigation
-    tabInactive: '#9CA3AF', // Derived from border
+    tabInactive: '#6B7280', // Gray for inactive tabs
     tabActive: '#0021A5',
     fabBackground: '#FF4D23',
     fabIcon: '#FFFFFF',
