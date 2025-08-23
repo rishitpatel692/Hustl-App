@@ -27,7 +27,6 @@ export default function ChatScreen() {
   const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
   const [otherLastReadAt, setOtherLastReadAt] = useState<Date | null>(null);
   const [showUserProfileSheet, setShowUserProfileSheet] = useState(false);
-  const [showUserProfileSheet, setShowUserProfileSheet] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const readChannelRef = useRef<any>(null);
 
