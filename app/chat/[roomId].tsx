@@ -177,10 +177,6 @@ export default function ChatScreen() {
     setShowUserProfileSheet(true);
   }, []);
 
-  const handleProfilePress = useCallback(() => {
-    setShowUserProfileSheet(true);
-  }, []);
-
   const formatTime = (timestamp: string): string => {
     const date = new Date(timestamp);
     const now = new Date();
