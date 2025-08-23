@@ -341,12 +341,14 @@ const CategoryCard = ({
           <Text style={styles.categoryTitle}>{category.title}</Text>
         </View>
         
-        {/* Select Task Button */}
-        <TaskSelectButton
-          onPress={onSelectTask}
-          loading={isSelecting}
-          taskTitle={category.title}
-        />
+        {/* Footer with Select Task Button */}
+        <View style={styles.categoryFooter}>
+          <TaskSelectButton
+            onPress={onSelectTask}
+            loading={isSelecting}
+            taskTitle={category.title}
+          />
+        </View>
         
         {/* Select Task Button */}
         <TaskSelectButton

@@ -104,8 +104,6 @@ export default function TaskSelectButton({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 8,
-    marginHorizontal: 12,
     height: 36,
     borderRadius: 10,
     overflow: 'hidden',
