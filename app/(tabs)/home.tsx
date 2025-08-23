@@ -132,7 +132,6 @@ const AnimatedReferralsBanner = () => {
   const glowAnimation = useSharedValue(0);
   const pulseAnimation = useSharedValue(1);
   const shimmerAnimation = useSharedValue(-1);
-  const gradientAnimation = useSharedValue(0);
 
   React.useEffect(() => {
     // Glow animation
@@ -160,16 +159,6 @@ const AnimatedReferralsBanner = () => {
       withTiming(1, { duration: 3500, easing: Easing.linear }),
       -1,
       false
-    );
-
-    // Gradient shift animation
-    gradientAnimation.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 4000 }),
-        withTiming(0, { duration: 4000 })
-      ),
-      -1,
-      true
     );
   }, []);
 
@@ -252,13 +241,11 @@ const AnimatedReferralsBanner = () => {
 const CategoryCard = ({ 
   category, 
   index, 
-  onPress, 
   onSelectTask,
   isSelecting 
 }: { 
   category: any; 
   index: number; 
-  onPress: () => void;
   onSelectTask: () => void;
   isSelecting: boolean;
 }) => {
@@ -292,53 +279,25 @@ const CategoryCard = ({
     };
   });
 
-  const handlePressIn = () => {
-    scaleAnimation.value = withTiming(0.96, { duration: 150 });
-    shadowAnimation.value = withTiming(1.5, { duration: 150 });
-  };
-
-  const handlePressOut = () => {
-    scaleAnimation.value = withSpring(1, { damping: 15 });
-    shadowAnimation.value = withSpring(1, { damping: 15 });
-  };
-
-  const handlePress = () => {
-    scaleAnimation.value = withSequence(
-      withTiming(1.03, { duration: 100 }),
-      withSpring(1, { damping: 15 })
-    );
-    
-    if (Platform.OS !== 'web') {
-      try {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      } catch (error) {
-        // Haptics not available, continue silently
-      }
-    }
-    
-    onPress();
-  };
-
   return (
     <Animated.View style={[styles.categoryCard, animatedStyle, animatedShadowStyle]}>
-      <TouchableOpacity
-        onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        activeOpacity={0.9}
-        style={styles.categoryButton}
-      >
-        <Image
-          source={{ uri: category.image }}
-          style={styles.categoryImage}
-          resizeMode="cover"
-        />
-        <LinearGradient
-          colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']}
-          style={styles.categoryOverlay}
-        />
-        <View style={styles.categoryContent}>
-          <Text style={styles.categoryTitle}>{category.title}</Text>
+      <View style={styles.categoryButton}>
+        {/* Image Section */}
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: category.image }}
+            style={styles.categoryImage}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']}
+            style={styles.categoryOverlay}
+          />
+          <View style={styles.categoryContent}>
+            <Text style={styles.categoryTitle} numberOfLines={2}>
+              {category.title}
+            </Text>
+          </View>
         </View>
         
         {/* Footer with Select Task Button */}
@@ -349,35 +308,31 @@ const CategoryCard = ({
             taskTitle={category.title}
           />
         </View>
-        
-        {/* Select Task Button */}
-        <TaskSelectButton
-          onPress={onSelectTask}
-          loading={isSelecting}
-          taskTitle={category.title}
-        />
-      </TouchableOpacity>
+      </View>
     </Animated.View>
   );
 };
 
 export default function HomeScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const [selectingTaskId, setSelectingTaskId] = useState<string | null>(null);
-
-  const handleCategoryPress = (categoryId: string) => {
-    // Navigate to Post Task with category prefill
-    router.push({
-      pathname: '/(tabs)/post',
-      params: { category: categoryId }
-    });
-  };
 
   const handleSelectTask = async (categoryId: string) => {
     if (selectingTaskId) return;
     
+    // Log analytics
+    console.log('home_select_task_clicked', { taskId: categoryId, category: categoryId });
+    
     setSelectingTaskId(categoryId);
+    
+    // Haptics feedback
+    if (Platform.OS !== 'web') {
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } catch (error) {
+        // Haptics not available, continue silently
+      }
+    }
     
     // Simulate task selection process
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -390,6 +345,7 @@ export default function HomeScreen() {
     
     setSelectingTaskId(null);
   };
+
   return (
     <View style={styles.container}>
       {/* Subtle Floating Particles */}
@@ -417,9 +373,6 @@ export default function HomeScreen() {
                 key={category.id}
                 category={category}
                 index={index}
-                onPress={() => handleCategoryPress(category.id)}
-                onSelectTask={() => handleSelectTask(category.id)}
-                isSelecting={selectingTaskId === category.id}
                 onSelectTask={() => handleSelectTask(category.id)}
                 isSelecting={selectingTaskId === category.id}
               />
@@ -562,6 +515,7 @@ const styles = StyleSheet.create({
   // Enhanced Category Cards
   categoryCard: {
     width: '47%',
+    height: 220, // Fixed height for consistency
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
@@ -570,30 +524,29 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   categoryButton: {
-    height: 200, // Increased height to accommodate button
+    flex: 1,
     borderRadius: 16,
     overflow: 'hidden',
+    backgroundColor: Colors.white,
+  },
+  imageContainer: {
+    flex: 1,
     position: 'relative',
   },
   categoryImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 44, // Leave space for button
     width: '100%',
-    height: 156, // Adjusted height
+    height: '100%',
   },
   categoryOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    bottom: 44, // Leave space for button
+    bottom: 0,
   },
   categoryContent: {
     position: 'absolute',
-    bottom: 52, // Moved up to accommodate button
+    bottom: 16,
     left: 16,
     right: 16,
   },
@@ -605,5 +558,12 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
+  },
+  categoryFooter: {
+    backgroundColor: Colors.white,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: Colors.semantic.divider,
   },
 });
