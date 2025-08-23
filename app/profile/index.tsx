@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { User, Camera, ChevronRight, FileText, History, MessageSquare, Settings, CircleHelp as HelpCircle, LogOut, ArrowLeft } from 'lucide-react-native';
+import { User, Camera, ChevronRight, FileText, History, MessageSquare, Settings, CircleHelp as HelpCircle, LogOut, ArrowLeft, Star } from 'lucide-react-native';
 import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
 
