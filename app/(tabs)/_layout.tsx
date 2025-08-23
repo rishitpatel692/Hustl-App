@@ -94,7 +94,7 @@ export default function TabLayout() {
               colors={['#0047FF', '#0021A5']}
               style={{ flex: 1 }}
             />
-          },
+          ),
           tabBarActiveTintColor: '#FA4616', // UF Orange for active
           tabBarInactiveTintColor: '#A0A7B3', // Light gray for inactive
           tabBarLabelStyle: {
