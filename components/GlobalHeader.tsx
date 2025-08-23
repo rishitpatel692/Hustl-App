@@ -165,37 +165,6 @@ export default function GlobalHeader({
     </>
   );
 }
-            </View>
-          </TouchableOpacity>
-          
-          <Image
-            source={require('../src/assets/images/image.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
-
-        {title && (
-          <Text style={styles.title}>{title}</Text>
-        )}
-
-        <View style={styles.rightSection}>
-          {showSearch && (
-            <TouchableOpacity style={styles.iconButton} onPress={handleSearchPress}>
-              <Search size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-            </TouchableOpacity>
-          )}
-          
-          {showNotifications && (
-            <TouchableOpacity style={styles.iconButton} onPress={handleNotificationsPress}>
-              <Bell size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
