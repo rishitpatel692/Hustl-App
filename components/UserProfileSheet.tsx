@@ -402,10 +402,12 @@ export default function UserProfileSheet({
                       </View>
                     </View>
 
-                    {data.profile.bio && (
+                    {data.profile.bio ? (
                       <Text style={styles.bioText} numberOfLines={3}>
                         {data.profile.bio}
                       </Text>
+                    ) : (
+                      <Text style={styles.noBioText}>No bio available</Text>
                     )}
                   </View>
 
@@ -737,6 +739,11 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     fontStyle: 'italic',
   },
+  noBioText: {
+    fontSize: 16,
+    color: Colors.semantic.tabInactive,
+    fontStyle: 'italic',
+  },
   ratingBreakdown: {
     backgroundColor: Colors.muted,
     borderRadius: 12,
@@ -764,7 +771,7 @@ const styles = StyleSheet.create({
   },
   breakdownFill: {
     height: '100%',
-    backgroundColor: '#FFD700',
+    backgroundColor: '#FA4616',
     borderRadius: 3,
   },
   breakdownCount: {

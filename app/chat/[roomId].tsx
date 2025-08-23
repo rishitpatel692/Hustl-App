@@ -8,7 +8,7 @@ import { useAuth } from '@contexts/AuthContext';
 import { ChatService } from '@lib/chat';
 import { supabase } from '@/lib/supabase';
 import type { ChatMessage } from '@src/types/chat';
-import UserProfileSheet from '@/components/UserProfileSheet';
+import UserProfileSheet from '@components/UserProfileSheet';
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function ChatScreen() {
   const [otherUserId, setOtherUserId] = useState<string | null>(null);
   const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
   const [otherLastReadAt, setOtherLastReadAt] = useState<Date | null>(null);
-  const [showUserProfileSheet, setShowUserProfileSheet] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const readChannelRef = useRef<any>(null);
 
@@ -173,8 +173,13 @@ export default function ChatScreen() {
     router.back();
   };
 
-  const handleProfilePress = useCallback(() => {
-    setShowUserProfileSheet(true);
+  const handleProfilePress = () => {
+    if (!otherUserId) return;
+    
+    // Analytics
+    console.log('chat_profile_opened', { otherUserId, roomId });
+    
+    setShowProfile(true);
   }, []);
 
   const formatTime = (timestamp: string): string => {
@@ -324,8 +329,8 @@ export default function ChatScreen() {
 
       {/* User Profile Sheet */}
       <UserProfileSheet
-        visible={showUserProfileSheet}
-        onClose={() => setShowUserProfileSheet(false)}
+        visible={showProfile}
+        onClose={() => setShowProfile(false)}
         userId={otherUserId}
         currentChatRoomId={roomId}
       />
