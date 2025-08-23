@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, Send, User } from 'lucide-react-native';
+import { ArrowLeft, Send } from 'lucide-react-native';
 import { Colors } from '@constants/Colors';
 import { useAuth } from '@contexts/AuthContext';
 import { ChatService } from '@lib/chat';
@@ -173,9 +173,9 @@ export default function ChatScreen() {
     router.back();
   };
 
-  const handleProfilePress = () => {
+  const handleProfilePress = useCallback(() => {
     setShowUserProfileSheet(true);
-  };
+  }, []);
 
   const formatTime = (timestamp: string): string => {
     const date = new Date(timestamp);
