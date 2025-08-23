@@ -1,6 +1,5 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { usePathname } from 'expo-router';
 import { Chrome as Home, List, MessageCircle, Gift, Zap } from 'lucide-react-native';
 import { TouchableOpacity, View, StyleSheet, Platform, Text } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -34,7 +33,9 @@ const PostTaskButton = ({ focused }: { focused: boolean }) => {
     >
       <View style={styles.postTaskIconContainer}>
         <LinearGradient
-          colors={['#FF5A1F', '#FA4616']}
+          colors={['#0021A5', '#FA4616']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
           style={styles.postTaskGradient}
         >
           <Zap size={24} color={Colors.white} strokeWidth={2.5} fill={Colors.white} />
@@ -42,7 +43,7 @@ const PostTaskButton = ({ focused }: { focused: boolean }) => {
       </View>
       <Text style={[
         styles.postTaskLabel,
-        { color: focused ? '#FA4616' : '#6B7280' }
+        { color: focused ? '#0021A5' : '#9CA3AF' }
       ]}>
         Post Task
       </Text>
@@ -69,27 +70,27 @@ export default function TabLayout() {
           headerShown: false,
           tabBarStyle: {
             backgroundColor: '#FFFFFF',
-            borderTopColor: '#E5E7EB',
+            borderTopColor: 'rgba(229, 231, 235, 0.3)',
             borderTopWidth: 1,
-            height: 85 + insets.bottom,
+            height: 88 + insets.bottom,
             paddingBottom: insets.bottom,
-            paddingTop: 8,
+            paddingTop: 12,
             position: 'absolute',
             bottom: 0,
             left: 0,
             right: 0,
-            elevation: 8,
+            elevation: 12,
             shadowColor: '#000',
-            shadowOffset: { width: 0, height: -2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
+            shadowOffset: { width: 0, height: -4 },
+            shadowOpacity: 0.08,
+            shadowRadius: 16,
           },
-          tabBarActiveTintColor: '#FA4616', // UF Orange for active
-          tabBarInactiveTintColor: '#6B7280', // Gray for inactive
+          tabBarActiveTintColor: '#0021A5', // UF Blue for active
+          tabBarInactiveTintColor: '#9CA3AF', // Lighter gray for inactive
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: '600',
-            marginTop: 6,
+            marginTop: 8,
           },
         }}
       >
@@ -111,7 +112,6 @@ export default function TabLayout() {
                 size={size} 
                 color={color} 
                 strokeWidth={focused ? 2.5 : 2}
-                fill={focused ? color : 'none'}
               />
             ),
           }}
@@ -154,25 +154,25 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 8,
-    paddingBottom: 8,
+    paddingTop: 4,
+    paddingBottom: 12,
   },
   postTaskButton: {
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: 6,
+    gap: 8,
     height: '100%',
   },
   postTaskIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     overflow: 'hidden',
-    shadowColor: '#FA4616',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowColor: '#0021A5',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
   },
   postTaskGradient: {
     width: '100%',
