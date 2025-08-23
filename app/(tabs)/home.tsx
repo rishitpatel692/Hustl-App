@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Car, Coffee, Dumbbell, BookOpen, Pizza, Plus } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
+import { useState } from 'react';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -16,9 +17,8 @@ import Animated, {
   Easing
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors } from '@constants/Colors';
+import { Colors } from '@/theme/colors';
 import GlobalHeader from '@components/GlobalHeader';
-import TaskSelectButton from '@components/TaskSelectButton';
 import TaskSelectButton from '@components/TaskSelectButton';
 
 const { width, height } = Dimensions.get('window');
