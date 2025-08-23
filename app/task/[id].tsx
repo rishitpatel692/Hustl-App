@@ -322,7 +322,7 @@ export default function TaskDetailScreen() {
   const nextStatus = task.current_status ? TaskRepo.getNextStatus(task.current_status) : null;
   const showStatusUpdate = canUpdateStatus && nextStatus;
   const isTaskPoster = user && task.created_by === user.id;
-  const showReviewButton = canReview && isTaskPoster && task.status === 'completed';
+  const showReviewButton = canReview && isTaskPoster && task.status === 'completed' && !taskReview;
 
   return (
     <>

@@ -277,6 +277,7 @@ export default function TasksScreen() {
       (task.created_by === user.id || task.accepted_by === user.id);
     const canUpdateStatus = activeTab === 'doing' && user && task.accepted_by === user.id && task.status === 'accepted';
     const showStatusUpdate = canUpdateStatus && task.current_status && task.current_status !== 'completed';
+  const canReview = activeTab === 'posts' && user && task.created_by === user.id && task.status === 'completed';
 
     return (
       <View key={task.id} style={styles.taskCard}>
@@ -396,6 +397,15 @@ export default function TasksScreen() {
               >
                 <MessageCircle size={16} color={Colors.primary} strokeWidth={2} />
                 <Text style={styles.chatButtonText}>Chat</Text>
+              </TouchableOpacity>
+            )}
+
+            {canReview && (
+              <TouchableOpacity 
+                style={styles.reviewButton}
+                onPress={() => router.push(`/task/${task.id}`)}
+              >
+                <Text style={styles.reviewButtonText}>Review</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -865,6 +875,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: Colors.primary,
+  },
+  reviewButton: {
+    backgroundColor: Colors.semantic.successAlert,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    minHeight: 36,
+    justifyContent: 'center',
+  },
+  reviewButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
   },
   ownTaskIndicator: {
     backgroundColor: Colors.muted,
