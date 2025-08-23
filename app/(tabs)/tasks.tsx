@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, RefreshControl, Platform, Alert, SafeAreaView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Clock, MapPin, Store, MessageCircle, Map as MapIcon, List as ListIcon } from 'lucide-react-native';
+import { Clock, MapPin, Store, MessageCircle, Map as MapIcon, List as ListIcon, ChevronRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
@@ -10,7 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { TaskRepo } from '@/lib/taskRepo';
 import { ChatService } from '@/lib/chat';
 import { openGoogleMapsNavigation } from '@/lib/navigation';
-import { Task } from '@/types/database';
+import { Task, TaskCurrentStatus } from '@/types/database';
 import GlobalHeader from '@/components/GlobalHeader';
 import Toast from '@/components/Toast';
 import TasksMap, { TaskPin } from '@/components/TasksMap';
@@ -275,6 +275,8 @@ export default function TasksScreen() {
     const canAccept = activeTab === 'available' && !isOwnTask && !isGuest && user;
     const canChat = task.status === 'accepted' && user && 
       (task.created_by === user.id || task.accepted_by === user.id);
+    const canUpdateStatus = activeTab === 'doing' && user && task.accepted_by === user.id && task.status === 'accepted';
+    const showStatusUpdate = canUpdateStatus && task.current_status && task.current_status !== 'completed';
 
     return (
       <View key={task.id} style={styles.taskCard}>
@@ -298,6 +300,35 @@ export default function TasksScreen() {
           </Text>
         ) : null}
         
+        {/* Current Status Display */}
+        {task.current_status && task.current_status !== 'accepted' && (
+          <View style={styles.statusContainer}>
+            <View style={[
+              styles.statusBadge,
+              { backgroundColor: TaskRepo.getCurrentStatusColor(task.current_status) + '20' }
+            ]}>
+              <View style={[
+                styles.statusDot,
+                { backgroundColor: TaskRepo.getCurrentStatusColor(task.current_status) }
+              ]} />
+              <Text style={[
+                styles.statusText,
+                { color: TaskRepo.getCurrentStatusColor(task.current_status) }
+              ]}>
+                {TaskRepo.formatCurrentStatus(task.current_status)}
+              </Text>
+            </View>
+            {task.last_status_update && (
+              <Text style={styles.lastUpdated}>
+                Updated {new Date(task.last_status_update).toLocaleTimeString([], { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </Text>
+            )}
+          </View>
+        )}
+
         <View style={styles.taskDetails}>
           <View style={styles.detailRow}>
             <Store size={16} color={Colors.semantic.tabInactive} strokeWidth={2} />
@@ -348,6 +379,16 @@ export default function TasksScreen() {
               </TouchableOpacity>
             )}
             
+            {showStatusUpdate && (
+              <TouchableOpacity 
+                style={styles.statusButton}
+                onPress={() => router.push(`/task/${task.id}`)}
+              >
+                <Text style={styles.statusButtonText}>Update Status</Text>
+                <ChevronRight size={14} color={Colors.primary} strokeWidth={2} />
+              </TouchableOpacity>
+            )}
+
             {canChat && (
               <TouchableOpacity 
                 style={styles.chatButton}
@@ -417,7 +458,7 @@ export default function TasksScreen() {
         }
       >
         {/* Tab Selector for List View */}
-        <View style={styles.segmentedControl}>
+        <View style={[styles.segmentedControl, { marginTop: 12, marginBottom: 24 }]}>
           <TouchableOpacity
             style={[styles.segment, activeTab === 'available' && styles.activeSegment]}
             onPress={() => handleTabChange('available')}
@@ -505,7 +546,7 @@ export default function TasksScreen() {
         <GlobalHeader title="Tasks" showSearch={false} />
 
         {/* View Mode Toggle */}
-        <View style={styles.viewModeToggle}>
+        <View style={[styles.viewModeToggle, { marginTop: 8 }]}>
           <TouchableOpacity
             style={[styles.viewModeButton, viewMode === 'map' && styles.activeViewMode]}
             onPress={() => handleViewModeChange('map')}
@@ -529,7 +570,7 @@ export default function TasksScreen() {
 
         {/* Error Banner */}
         {error ? (
-          <View style={styles.errorBanner}>
+          <View style={[styles.errorBanner, { marginHorizontal: 16 }]}>
             <Text style={styles.errorText}>{error}</Text>
           </View>
         ) : null}
@@ -556,7 +597,6 @@ const styles = StyleSheet.create({
   viewModeToggle: {
     flexDirection: 'row',
     marginHorizontal: 16,
-    marginTop: 8,
     marginBottom: 8,
     backgroundColor: Colors.muted,
     borderRadius: 12,
@@ -593,8 +633,6 @@ const styles = StyleSheet.create({
   segmentedControl: {
     flexDirection: 'row',
     marginHorizontal: 16,
-    marginTop: 12,
-    marginBottom: 24,
     backgroundColor: Colors.muted,
     borderRadius: 12,
     padding: 4,
@@ -627,7 +665,6 @@ const styles = StyleSheet.create({
     borderColor: '#FECACA',
     borderRadius: 8,
     padding: 12,
-    marginHorizontal: 16,
     marginBottom: 16,
   },
   errorText: {
@@ -637,9 +674,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 16,
   },
   loadingState: {
+    paddingHorizontal: 16,
     paddingVertical: 40,
     alignItems: 'center',
   },
@@ -648,7 +685,8 @@ const styles = StyleSheet.create({
     color: Colors.semantic.tabInactive,
   },
   tasksList: {
-    paddingBottom: 80 + 24, // Tab bar height + extra padding for FAB
+    paddingHorizontal: 16,
+    paddingBottom: 80 + 24,
   },
   taskCard: {
     backgroundColor: Colors.semantic.card,
@@ -662,6 +700,33 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
+  },
+  statusContainer: {
+    marginBottom: 16,
+    gap: 8,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 8,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  lastUpdated: {
+    fontSize: 12,
+    color: Colors.semantic.tabInactive,
+    fontStyle: 'italic',
   },
   taskHeader: {
     flexDirection: 'row',
@@ -751,6 +816,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  statusButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    minHeight: 36,
+    gap: 4,
+  },
+  statusButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
   acceptButton: {
     backgroundColor: Colors.semantic.primaryButton,
     borderRadius: 8,
@@ -796,11 +878,12 @@ const styles = StyleSheet.create({
     color: Colors.semantic.tabInactive,
   },
   emptyState: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 40,
-    paddingBottom: 80 + 24, // Tab bar height + extra padding for FAB
+    paddingHorizontal: 40,
+    paddingVertical: 60,
+    paddingBottom: 80 + 24,
+    minHeight: 300,
     gap: 16,
   },
   emptyStateLogo: {

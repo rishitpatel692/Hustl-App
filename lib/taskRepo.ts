@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { Task, CreateTaskData, TaskStatus, TaskCategory, TaskUrgency } from '@/types/database';
+import type { Task, CreateTaskData, TaskStatus, TaskCategory, TaskUrgency, TaskCurrentStatus, TaskStatusHistory, UpdateTaskStatusData } from '@/types/database';
 
 /**
  * Safe Task Repository - Eliminates 406 PGRST116 errors completely
@@ -217,6 +217,55 @@ export class TaskRepo {
     }
   }
 
+  /**
+   * Update task status with history tracking
+   */
+  static async updateTaskStatus(data: UpdateTaskStatusData): Promise<{ data: any | null; error: string | null }> {
+    try {
+      const { data: result, error } = await supabase.rpc('update_task_status', {
+        p_task_id: data.taskId,
+        p_new_status: data.newStatus,
+        p_note: data.note || '',
+        p_photo_url: data.photoUrl || ''
+      });
+
+      if (error) {
+        return { data: null, error: error.message };
+      }
+
+      if (result?.error) {
+        return { data: null, error: result.error };
+      }
+
+      return { data: result, error: null };
+    } catch (error) {
+      return { data: null, error: 'Network error. Please check your connection.' };
+    }
+  }
+
+  /**
+   * Get task status history
+   */
+  static async getTaskStatusHistory(taskId: string): Promise<{ data: TaskStatusHistory[] | null; error: string | null }> {
+    try {
+      const { data: result, error } = await supabase.rpc('get_task_status_history', {
+        p_task_id: taskId
+      });
+
+      if (error) {
+        return { data: null, error: error.message };
+      }
+
+      if (result?.error) {
+        return { data: null, error: result.error };
+      }
+
+      return { data: result?.data || [], error: null };
+    } catch (error) {
+      return { data: null, error: 'Network error. Please check your connection.' };
+    }
+  }
+
   // Utility methods for formatting (moved from TaskService)
   static formatReward(cents: number): string {
     return `$${(cents / 100).toFixed(0)}`;
@@ -262,5 +311,50 @@ export class TaskRepo {
       default:
         return '#6B7280'; // Gray
     }
+  }
+
+  static formatCurrentStatus(status: TaskCurrentStatus): string {
+    switch (status) {
+      case 'accepted':
+        return 'Accepted';
+      case 'picked_up':
+        return 'Picked Up';
+      case 'on_the_way':
+        return 'On the Way';
+      case 'delivered':
+        return 'Delivered';
+      case 'completed':
+        return 'Completed';
+      default:
+        return status;
+    }
+  }
+
+  static getCurrentStatusColor(status: TaskCurrentStatus): string {
+    switch (status) {
+      case 'accepted':
+        return '#3B82F6'; // Blue
+      case 'picked_up':
+        return '#F59E0B'; // Orange
+      case 'on_the_way':
+        return '#8B5CF6'; // Purple
+      case 'delivered':
+        return '#10B981'; // Green
+      case 'completed':
+        return '#059669'; // Dark green
+      default:
+        return '#6B7280'; // Gray
+    }
+  }
+
+  static getNextStatus(currentStatus: TaskCurrentStatus): TaskCurrentStatus | null {
+    const statusFlow: TaskCurrentStatus[] = ['accepted', 'picked_up', 'on_the_way', 'delivered', 'completed'];
+    const currentIndex = statusFlow.indexOf(currentStatus);
+    
+    if (currentIndex === -1 || currentIndex === statusFlow.length - 1) {
+      return null; // Invalid status or already at final status
+    }
+    
+    return statusFlow[currentIndex + 1];
   }
 }
