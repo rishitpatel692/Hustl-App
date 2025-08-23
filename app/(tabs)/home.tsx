@@ -16,10 +16,11 @@ import Animated, {
   withSpring,
   Easing
 } from 'react-native-reanimated';
+import { ActivityIndicator } from 'react-native';
+import { ChevronRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/theme/colors';
 import GlobalHeader from '@components/GlobalHeader';
-import TaskSelectButton from '@components/TaskSelectButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -281,33 +282,53 @@ const CategoryCard = ({
 
   return (
     <Animated.View style={[styles.categoryCard, animatedStyle, animatedShadowStyle]}>
-      <View style={styles.categoryButton}>
-        {/* Image Section */}
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: category.image }}
-            style={styles.categoryImage}
-            resizeMode="cover"
-          />
+      {/* Image Section */}
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: category.image }}
+          style={styles.categoryImage}
+          resizeMode="cover"
+        />
+        <LinearGradient
+          colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']}
+          style={styles.categoryOverlay}
+        />
+        <View style={styles.categoryContent}>
+          <Text style={styles.categoryTitle} numberOfLines={2}>
+            {category.title}
+          </Text>
+        </View>
+      </View>
+      
+      {/* Footer with Select Task Button */}
+      <View style={styles.categoryFooter}>
+        <TouchableOpacity
+          style={[
+            styles.selectTaskButton,
+            isSelecting && styles.selectTaskButtonDisabled
+          ]}
+          onPress={onSelectTask}
+          disabled={isSelecting}
+          activeOpacity={0.8}
+          accessibilityLabel={`Select ${category.title} task`}
+          accessibilityRole="button"
+        >
           <LinearGradient
-            colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.7)']}
-            style={styles.categoryOverlay}
-          />
-          <View style={styles.categoryContent}>
-            <Text style={styles.categoryTitle} numberOfLines={2}>
-              {category.title}
-            </Text>
-          </View>
-        </View>
-        
-        {/* Footer with Select Task Button */}
-        <View style={styles.categoryFooter}>
-          <TaskSelectButton
-            onPress={onSelectTask}
-            loading={isSelecting}
-            taskTitle={category.title}
-          />
-        </View>
+            colors={['#0047FF', '#0021A5']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.selectTaskGradient}
+          >
+            {isSelecting ? (
+              <ActivityIndicator size="small" color={Colors.white} />
+            ) : (
+              <>
+                <Text style={styles.selectTaskText}>Select Task</Text>
+                <ChevronRight size={16} color={Colors.white} strokeWidth={2.5} />
+              </>
+            )}
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
     </Animated.View>
   );
@@ -515,22 +536,19 @@ const styles = StyleSheet.create({
   // Enhanced Category Cards
   categoryCard: {
     width: '47%',
-    height: 220, // Fixed height for consistency
+    height: 240, // Increased height for button
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 16,
     elevation: 8,
-  },
-  categoryButton: {
-    flex: 1,
     borderRadius: 16,
     overflow: 'hidden',
     backgroundColor: Colors.white,
   },
   imageContainer: {
-    flex: 1,
+    height: 160, // Fixed height for image section
     position: 'relative',
   },
   categoryImage: {
@@ -560,10 +578,38 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   categoryFooter: {
+    height: 60, // Fixed height for footer
     backgroundColor: Colors.white,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: Colors.semantic.divider,
+    justifyContent: 'center',
+  },
+  selectTaskButton: {
+    height: 36,
+    borderRadius: 10,
+    overflow: 'hidden',
+    shadowColor: '#0047FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  selectTaskButtonDisabled: {
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  selectTaskGradient: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    gap: 6,
+  },
+  selectTaskText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
+    letterSpacing: 0.2,
   },
 });
