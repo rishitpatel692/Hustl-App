@@ -34,10 +34,10 @@ const PostTaskButton = ({ focused }: { focused: boolean }) => {
     >
       <View style={styles.postTaskIconContainer}>
         <LinearGradient
-          colors={focused ? ['#FF5A1F', '#FA4616'] : ['#6B7280', '#6B7280']}
+          colors={['#FF5A1F', '#FA4616']}
           style={styles.postTaskGradient}
         >
-          <Zap size={24} color={Colors.white} strokeWidth={2.5} fill={focused ? Colors.white : 'none'} />
+          <Zap size={24} color={Colors.white} strokeWidth={2.5} fill={Colors.white} />
         </LinearGradient>
       </View>
       <Text style={[
@@ -153,25 +153,26 @@ const styles = StyleSheet.create({
   postTaskTabContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 6,
-    paddingBottom: 6,
+    justifyContent: 'flex-start',
+    paddingTop: 8,
+    paddingBottom: 8,
   },
   postTaskButton: {
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
+    justifyContent: 'flex-start',
+    gap: 6,
+    height: '100%',
   },
   postTaskIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     overflow: 'hidden',
     shadowColor: '#FA4616',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   postTaskGradient: {
     width: '100%',
@@ -183,6 +184,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
-    marginTop: 4,
   },
 });
