@@ -6,8 +6,9 @@ import { ArrowLeft, Send, User } from 'lucide-react-native';
 import { Colors } from '@constants/Colors';
 import { useAuth } from '@contexts/AuthContext';
 import { ChatService } from '@lib/chat';
-import { supabase } from '@lib/supabase';
+import { supabase } from '@/lib/supabase';
 import type { ChatMessage } from '@src/types/chat';
+import UserProfileSheet from '@/components/UserProfileSheet';
 import UserProfileSheet from '@components/UserProfileSheet';
 
 export default function ChatScreen() {
@@ -26,6 +27,7 @@ export default function ChatScreen() {
   const [otherUserId, setOtherUserId] = useState<string | null>(null);
   const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
   const [otherLastReadAt, setOtherLastReadAt] = useState<Date | null>(null);
+  const [showUserProfileSheet, setShowUserProfileSheet] = useState(false);
   const [showUserProfileSheet, setShowUserProfileSheet] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const readChannelRef = useRef<any>(null);
@@ -173,6 +175,10 @@ export default function ChatScreen() {
     router.back();
   };
 
+  const handleProfilePress = () => {
+    setShowUserProfileSheet(true);
+  };
+
   const formatTime = (timestamp: string): string => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -238,7 +244,7 @@ export default function ChatScreen() {
               <Text style={styles.seenText}>Seen</Text>
             )}
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -321,6 +327,14 @@ export default function ChatScreen() {
           <Send size={20} color={Colors.white} strokeWidth={2} />
         </TouchableOpacity>
       </View>
+
+      {/* User Profile Sheet */}
+      <UserProfileSheet
+        visible={showUserProfileSheet}
+        onClose={() => setShowUserProfileSheet(false)}
+        userId={otherUserId}
+        currentChatRoomId={roomId}
+      />
 
       {/* User Profile Sheet */}
       <UserProfileSheet
