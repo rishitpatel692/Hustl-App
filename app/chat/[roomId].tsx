@@ -8,7 +8,7 @@ import { useAuth } from '@contexts/AuthContext';
 import { ChatService } from '@lib/chat';
 import { supabase } from '@lib/supabase';
 import type { ChatMessage } from '@src/types/chat';
-import ProfileSheet from '@components/ProfileSheet';
+import UserProfileSheet from '@components/UserProfileSheet';
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function ChatScreen() {
   const [otherUserId, setOtherUserId] = useState<string | null>(null);
   const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
   const [otherLastReadAt, setOtherLastReadAt] = useState<Date | null>(null);
-  const [showProfileSheet, setShowProfileSheet] = useState(false);
+  const [showUserProfileSheet, setShowUserProfileSheet] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const readChannelRef = useRef<any>(null);
 
@@ -195,7 +195,7 @@ export default function ChatScreen() {
   };
 
   const handleProfilePress = () => {
-    setShowProfileSheet(true);
+    setShowUserProfileSheet(true);
   };
 
   const getInitials = (name: string | null): string => {
@@ -322,11 +322,12 @@ export default function ChatScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Profile Sheet */}
-      <ProfileSheet
-        visible={showProfileSheet}
-        onClose={() => setShowProfileSheet(false)}
-        profile={otherUserProfile}
+      {/* User Profile Sheet */}
+      <UserProfileSheet
+        visible={showUserProfileSheet}
+        onClose={() => setShowUserProfileSheet(false)}
+        userId={otherUserId}
+        currentChatRoomId={roomId}
       />
     </KeyboardAvoidingView>
   );
