@@ -6,22 +6,24 @@
 
 export const Colors = {
   // Primary / UF Blue
-  primary: '#0021A5', // Updated UF Blue
-  primaryDark: '#001F5C',
-  primaryLight: '#0038FF',
+  primary: '#0021A5',
+  primaryDark: '#001B85',
+  primaryLight: '#1E40AF',
 
   // Secondary / UF Orange  
   secondary: '#FA4616', // Updated UF Orange
-  secondaryLight: '#FF5A1F',
+  secondaryLight: '#FB7C47',
   secondaryDark: '#E63A0B',
 
   // Surfaces & Text
   white: '#FFFFFF',
-  bg: '#FFFFFF', // Clean white background
-  muted: '#F5F5F5',
-  border: '#E5E7EB',
-  text: '#111827', // Dark text for light theme
-  textHover: '#0A1B3D',
+  bg: '#FAFBFC',
+  muted: '#F8FAFC',
+  mutedDark: '#F1F5F9',
+  border: '#E2E8F0',
+  borderLight: '#F1F5F9',
+  text: '#0F172A',
+  textHover: '#020617',
 
   // Status / Badges
   gold: '#FFD700',
@@ -42,29 +44,31 @@ export const Colors = {
   semantic: {
     // Buttons
     primaryButton: '#0021A5',
-    primaryButtonPressed: '#001F5C',
-    primaryButtonFocus: '#0038FF',
+    primaryButtonPressed: '#001B85',
+    primaryButtonFocus: '#1E40AF',
     
     secondaryButton: '#FA4616',
     secondaryButtonPressed: '#E63A0B',
-    secondaryButtonAccent: '#FF5A1F',
+    secondaryButtonAccent: '#FB7C47',
 
     // Surfaces
-    screen: '#FFFFFF', // Clean white background
+    screen: '#FAFBFC',
     card: '#FFFFFF',
-    cardBorder: '#E5E7EB',
+    cardBorder: '#E2E8F0',
+    cardShadow: 'rgba(15, 23, 42, 0.08)',
     
     // Text
-    bodyText: '#111827', // Dark text for light theme
-    headingText: '#111827', // Dark text for light theme
-    interactiveText: '#111827', // Dark text for light theme
-    interactiveTextPressed: '#0A1B3D',
+    bodyText: '#334155',
+    headingText: '#0F172A',
+    interactiveText: '#475569',
+    interactiveTextPressed: '#020617',
     
     // Inputs
-    inputBackground: '#F5F5F5',
-    inputBorder: '#E5E7EB',
-    inputText: '#0F2557',
-    inputFocus: '#0038FF',
+    inputBackground: '#FFFFFF',
+    inputBorder: '#E2E8F0',
+    inputBorderFocus: '#0021A5',
+    inputText: '#0F172A',
+    inputFocus: '#1E40AF',
     
     // Status badges
     premiumBadge: '#FFD700',
@@ -84,13 +88,14 @@ export const Colors = {
     infoAlert: '#0038FF',
     
     // Navigation
-    tabInactive: '#6B7280', // Gray for inactive tabs
+    tabInactive: '#94A3B8',
     tabActive: '#0021A5',
     fabBackground: '#FF4D23',
     fabIcon: '#FFFFFF',
     
     // Dividers
-    divider: '#E5E7EB',
+    divider: '#E2E8F0',
+    dividerLight: '#F1F5F9',
   }
 };
 
