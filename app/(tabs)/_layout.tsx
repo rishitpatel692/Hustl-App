@@ -5,7 +5,7 @@ import { TouchableOpacity, View, StyleSheet, Platform, Text } from 'react-native
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors } from '@/theme/colors';
+import { Colors, Shadows, Typography, Spacing, BorderRadius } from '@/theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Post Task Tab Button Component
@@ -31,19 +31,17 @@ const PostTaskButton = ({ focused }: { focused: boolean }) => {
       accessibilityLabel="Post Task"
       accessibilityRole="button"
     >
-      <View style={styles.postTaskIconContainer}>
-        <LinearGradient
-          colors={['#0021A5', '#FA4616']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.postTaskGradient}
-        >
-          <Zap size={24} color={Colors.white} strokeWidth={2.5} fill={Colors.white} />
-        </LinearGradient>
-      </View>
+      <LinearGradient
+        colors={['#0B1426', '#F97316']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.postTaskGradient}
+      >
+        <Zap size={22} color={Colors.white} strokeWidth={2.5} fill={Colors.white} />
+      </LinearGradient>
       <Text style={[
         styles.postTaskLabel,
-        { color: focused ? '#0021A5' : '#9CA3AF' }
+        { color: focused ? Colors.semantic.primary : Colors.semantic.textTertiary }
       ]}>
         Post Task
       </Text>
@@ -69,29 +67,23 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: '#FFFFFF',
-            borderTopColor: Colors.semantic.dividerLight,
+            backgroundColor: Colors.white,
+            borderTopColor: Colors.semantic.borderLight,
             borderTopWidth: 1,
-            height: 88 + insets.bottom,
+            height: 84 + insets.bottom,
             paddingBottom: insets.bottom,
-            paddingTop: 16,
+            paddingTop: Spacing.lg,
             position: 'absolute',
             bottom: 0,
             left: 0,
             right: 0,
-            elevation: 20,
-            shadowColor: Colors.semantic.cardShadow,
-            shadowOffset: { width: 0, height: -8 },
-            shadowOpacity: 1,
-            shadowRadius: 24,
+            ...Shadows.xl,
           },
-          tabBarActiveTintColor: Colors.semantic.tabActive,
-          tabBarInactiveTintColor: Colors.semantic.tabInactive,
+          tabBarActiveTintColor: Colors.semantic.primary,
+          tabBarInactiveTintColor: Colors.semantic.textTertiary,
           tabBarLabelStyle: {
-            fontSize: 13,
-            fontWeight: '700',
-            marginTop: 10,
-            letterSpacing: 0.2,
+            ...Typography.labelSmall,
+            marginTop: Spacing.sm,
           },
         }}
       >
@@ -154,37 +146,25 @@ const styles = StyleSheet.create({
   postTaskTabContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 4,
-    paddingBottom: 12,
+    justifyContent: 'center',
+    paddingTop: Spacing.xs,
   },
   postTaskButton: {
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    gap: 8,
-    height: '100%',
-  },
-  postTaskIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    overflow: 'hidden',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 16,
-    elevation: 12,
+    justifyContent: 'center',
+    gap: Spacing.sm,
   },
   postTaskGradient: {
-    width: '100%',
-    height: '100%',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+    ...Shadows.medium,
   },
   postTaskLabel: {
-    fontSize: 13,
-    fontWeight: '700',
+    ...Typography.labelSmall,
     textAlign: 'center',
-    letterSpacing: 0.2,
   },
 });

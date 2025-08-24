@@ -11,6 +11,7 @@ import Animated, {
   runOnJS 
 } from 'react-native-reanimated';
 import { Colors } from '@/theme/colors';
+import { Shadows, Typography, Spacing, BorderRadius } from '@/theme/colors';
 
 const { width } = Dimensions.get('window');
 
@@ -116,37 +117,30 @@ export default function Toast({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    left: 16,
-    right: 16,
+    left: Spacing.lg,
+    right: Spacing.lg,
     zIndex: 1000,
-    borderRadius: 16,
-    shadowColor: Colors.semantic.cardShadow,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 20,
-    elevation: 12,
+    borderRadius: BorderRadius.lg,
+    ...Shadows.large,
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    gap: 16,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.lg,
+    gap: Spacing.lg,
   },
   iconContainer: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: Colors.white + '40',
     justifyContent: 'center',
     alignItems: 'center',
   },
   message: {
     flex: 1,
-    fontSize: 15,
-    fontWeight: '700',
+    ...Typography.labelMedium,
     color: Colors.white,
-    lineHeight: 20,
-    letterSpacing: 0.2,
   },
 });
