@@ -136,7 +136,7 @@ export default function AuthScreen() {
               value={email}
               onChangeText={setEmail}
               placeholder="Enter your email"
-              placeholderTextColor={Colors.semantic.textTertiary}
+              placeholderTextColor={Colors.muted.foreground}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -152,7 +152,7 @@ export default function AuthScreen() {
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Enter your password"
-                placeholderTextColor={Colors.semantic.textTertiary}
+                placeholderTextColor={Colors.muted.foreground}
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -164,9 +164,9 @@ export default function AuthScreen() {
                 disabled={isLoading}
               >
                 {showPassword ? (
-                  <EyeOff size={20} color={Colors.semantic.textTertiary} strokeWidth={2} />
+                  <EyeOff size={20} color={Colors.muted.foreground} strokeWidth={2} />
                 ) : (
-                  <Eye size={20} color={Colors.semantic.textTertiary} strokeWidth={2} />
+                  <Eye size={20} color={Colors.muted.foreground} strokeWidth={2} />
                 )}
               </TouchableOpacity>
             </View>
