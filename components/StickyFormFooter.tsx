@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Colors } from '@/theme/colors';
-import { Shadows, Typography, Spacing, BorderRadius } from '@/theme/colors';
 
 interface StickyFormFooterProps {
   onSubmit: () => void;
@@ -56,35 +55,47 @@ export default function StickyFormFooter({
 const styles = StyleSheet.create({
   footer: {
     position: 'absolute',
-    left: Spacing.lg,
-    right: Spacing.lg,
+    left: 16,
+    right: 16,
     zIndex: 100,
     backgroundColor: Colors.white,
-    paddingTop: Spacing.xl,
-    paddingBottom: Spacing.md,
+    paddingTop: 20,
+    paddingBottom: 12,
     borderTopWidth: 1,
-    borderTopColor: Colors.semantic.borderLight,
-    ...Shadows.large,
-    borderRadius: BorderRadius.xl,
+    borderTopColor: Colors.semantic.dividerLight,
+    shadowColor: Colors.semantic.cardShadow,
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 1,
+    shadowRadius: 20,
+    elevation: 12,
+    borderRadius: 20,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
   },
   button: {
-    backgroundColor: Colors.semantic.primary,
-    borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.lg,
+    backgroundColor: Colors.semantic.primaryButton,
+    borderRadius: 16,
+    paddingVertical: 18,
     alignItems: 'center',
-    minHeight: 56,
-    ...Shadows.medium,
+    minHeight: 52,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
   },
   buttonText: {
-    ...Typography.labelLarge,
+    fontSize: 17,
+    fontWeight: '700',
     color: Colors.white,
+    letterSpacing: 0.3,
   },
   disabledButton: {
-    backgroundColor: Colors.gray300,
+    backgroundColor: Colors.semantic.tabInactive,
+    shadowOpacity: 0,
+    elevation: 0,
   },
   disabledButtonText: {
-    color: Colors.gray500,
+    color: Colors.semantic.tabInactive,
   },
 });
