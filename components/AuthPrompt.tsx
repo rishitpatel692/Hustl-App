@@ -34,7 +34,7 @@ export default function AuthPrompt({ visible, onClose, title, message }: AuthPro
       <View style={styles.overlay}>
         <View style={styles.modal}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <X size={20} color={Colors.muted.foreground} strokeWidth={2} />
+            <X size={20} color={Colors.semantic.textTertiary} strokeWidth={2} />
           </TouchableOpacity>
           
           <View style={styles.content}>
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: Colors.muted,
+    backgroundColor: Colors.semantic.surfaceSecondary,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: Colors.muted,
+    backgroundColor: Colors.semantic.surfaceSecondary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
