@@ -222,6 +222,9 @@ export default function WelcomeScreen() {
   const handlePrivacy = () => {
     console.log('Privacy Policy pressed');
   };
+
+  return (
+    <View style={styles.container}>
       <View style={styles.backgroundContainer}>
         <Image
           source={{ uri: 'https://images.pexels.com/photos/1595391/pexels-photo-1595391.jpeg?auto=compress&cs=tinysrgb&w=800' }}
@@ -293,7 +296,9 @@ export default function WelcomeScreen() {
             <Text style={styles.legalText}>Terms of Service</Text>
           </TouchableOpacity>
           <Text style={styles.legalSeparator}>•</Text>
-          <View style={styles.placeholder} />
+          <TouchableOpacity onPress={handlePrivacy}>
+            <Text style={styles.legalText}>Privacy Policy</Text>
+          </TouchableOpacity>
         </View>
       </Animated.View>
     </View>
@@ -304,9 +309,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.semantic.screen,
-  },
-  placeholder: {
-    width: 40,
   },
   backgroundContainer: {
     position: 'absolute',
