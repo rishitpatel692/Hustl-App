@@ -117,13 +117,17 @@ export default function AuthScreen() {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Display Name</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { minHeight: 52 }]}
                 value={displayName}
                 onChangeText={setDisplayName}
                 placeholder="Enter your display name"
                 placeholderTextColor={Colors.muted.foreground}
                 autoCapitalize="words"
                 editable={!isLoading}
+                returnKeyType="next"
+                onSubmitEditing={() => {
+                  // Focus next input if available
+                }}
               />
             </View>
           )}
@@ -131,7 +135,7 @@ export default function AuthScreen() {
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { minHeight: 52 }]}
               value={email}
               onChangeText={setEmail}
               placeholder="Enter your email"
@@ -140,6 +144,7 @@ export default function AuthScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               editable={!isLoading}
+              returnKeyType="next"
             />
           </View>
 
@@ -147,7 +152,7 @@ export default function AuthScreen() {
             <Text style={styles.label}>Password</Text>
             <View style={styles.passwordContainer}>
               <TextInput
-                style={styles.passwordInput}
+                style={[styles.passwordInput, { minHeight: 52, paddingVertical: 0 }]}
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Enter your password"
@@ -156,6 +161,8 @@ export default function AuthScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={!isLoading}
+                returnKeyType="done"
+                onSubmitEditing={handleAuth}
               />
               <TouchableOpacity
                 style={styles.eyeButton}
@@ -291,7 +298,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.semantic.inputBorder,
     borderRadius: 14,
     paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingVertical: 16,
     fontSize: 16,
     color: Colors.semantic.inputText,
     backgroundColor: Colors.semantic.inputBackground,
@@ -313,16 +320,19 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 12,
     elevation: 3,
+    minHeight: 52,
   },
   passwordInput: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingVertical: 16,
     fontSize: 16,
     color: Colors.semantic.inputText,
   },
   eyeButton: {
-    padding: 18,
+    padding: 16,
+    minHeight: 52,
+    justifyContent: 'center',
   },
   buttonContainer: {
     gap: 16,

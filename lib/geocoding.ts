@@ -20,7 +20,7 @@ export interface CampusLocation {
   type: 'dining_hall' | 'food_court' | 'library' | 'gym' | 'store' | 'building';
 }
 
-// UF Campus locations for quick selection
+// Enhanced UF Campus locations with accurate coordinates
 export const UF_CAMPUS_LOCATIONS: CampusLocation[] = [
   // Dining Halls
   {
@@ -61,6 +61,18 @@ export const UF_CAMPUS_LOCATIONS: CampusLocation[] = [
     coordinates: { latitude: 29.6516, longitude: -82.3442 },
     type: 'store'
   },
+  {
+    name: 'Chipotle - Archer Road',
+    address: '3832 SW Archer Rd, Gainesville, FL 32608',
+    coordinates: { latitude: 29.6234, longitude: -82.3678 },
+    type: 'store'
+  },
+  {
+    name: 'Chick-fil-A - Reitz Union',
+    address: '686 Museum Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6465, longitude: -82.3473 },
+    type: 'store'
+  },
   
   // Popular Campus Buildings
   {
@@ -81,16 +93,33 @@ export const UF_CAMPUS_LOCATIONS: CampusLocation[] = [
     coordinates: { latitude: 29.6508, longitude: -82.3417 },
     type: 'building'
   },
+  {
+    name: 'Ben Hill Griffin Stadium',
+    address: '157 Gale Lemerand Dr, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6499, longitude: -82.3487 },
+    type: 'building'
+  },
+  {
+    name: 'Plaza of the Americas',
+    address: 'Plaza of the Americas, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6480, longitude: -82.3434 },
+    type: 'building'
+  },
 ];
 
 export class GeocodingService {
   /**
-   * Geocode an address to get coordinates
+   * Geocode an address to get coordinates using Google Maps API
    */
   static async geocodeAddress(address: string): Promise<{ data: Coordinates | null; error: string | null }> {
     try {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&components=country:US|administrative_area:FL&key=${GOOGLE_MAPS_API_KEY}`;
       const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const data = await response.json();
 
       if (data.status === 'OK' && data.results.length > 0) {
@@ -102,10 +131,20 @@ export class GeocodingService {
           },
           error: null,
         };
-      } else {
+      } else if (data.status === 'ZERO_RESULTS') {
         return {
           data: null,
           error: 'Address not found. Please check the address and try again.',
+        };
+      } else if (data.status === 'OVER_QUERY_LIMIT') {
+        return {
+          data: null,
+          error: 'Too many requests. Please try again later.',
+        };
+      } else {
+        return {
+          data: null,
+          error: 'Unable to find location. Please try a different address.',
         };
       }
     } catch (error) {
@@ -124,6 +163,11 @@ export class GeocodingService {
     try {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates.latitude},${coordinates.longitude}&key=${GOOGLE_MAPS_API_KEY}`;
       const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const data = await response.json();
 
       if (data.status === 'OK' && data.results.length > 0) {
@@ -147,7 +191,7 @@ export class GeocodingService {
   }
 
   /**
-   * Search for places near UF campus
+   * Search for places near UF campus using Google Places API
    */
   static async searchPlaces(query: string, location?: Coordinates): Promise<{ data: PlaceDetails[] | null; error: string | null }> {
     try {
@@ -155,6 +199,11 @@ export class GeocodingService {
       
       const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&location=${searchLocation.latitude},${searchLocation.longitude}&radius=5000&key=${GOOGLE_MAPS_API_KEY}`;
       const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
       const data = await response.json();
 
       if (data.status === 'OK') {
@@ -170,6 +219,10 @@ export class GeocodingService {
         }));
 
         return { data: places, error: null };
+      } else if (data.status === 'ZERO_RESULTS') {
+        return { data: [], error: null };
+      } else if (data.status === 'OVER_QUERY_LIMIT') {
+        return { data: null, error: 'Search limit reached. Please try again later.' };
       } else {
         return { data: [], error: null };
       }
@@ -224,6 +277,28 @@ export class GeocodingService {
     
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
+  }
+
+  /**
+   * Get estimated travel time between coordinates
+   */
+  static getEstimatedTravelTime(coord1: Coordinates, coord2: Coordinates, mode: 'walking' | 'driving' = 'walking'): number {
+    const distance = this.calculateDistance(coord1, coord2);
+    
+    if (mode === 'walking') {
+      return Math.round(distance * 12); // ~12 minutes per km walking
+    } else {
+      return Math.round(distance * 2.5); // ~2.5 minutes per km driving on campus
+    }
+  }
+
+  /**
+   * Check if coordinates are within UF campus bounds
+   */
+  static isWithinCampus(coordinates: Coordinates): boolean {
+    const campusCenter = { latitude: 29.6436, longitude: -82.3549 };
+    const distance = this.calculateDistance(coordinates, campusCenter);
+    return distance <= 5; // Within 5km of campus center
   }
 
   private static toRadians(degrees: number): number {

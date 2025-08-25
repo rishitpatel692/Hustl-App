@@ -531,7 +531,7 @@ export default function PostScreen() {
                   setStoreCoordinates(coordinates || null);
                   updateFieldError('store', address);
                 }}
-                placeholder="Search for store (e.g., Publix, Starbucks)"
+                placeholder="Search for store or restaurant..."
                 label="Store *"
                 error={fieldErrors.store}
                 showCampusLocations={true}
@@ -550,7 +550,7 @@ export default function PostScreen() {
                   setDropoffCoordinates(coordinates || null);
                   updateFieldError('dropoffAddress', address);
                 }}
-                placeholder="Where should this be delivered?"
+                placeholder="Search for delivery location..."
                 label="Drop-off Address *"
                 error={fieldErrors.dropoffAddress}
                 showCampusLocations={true}
@@ -568,16 +568,19 @@ export default function PostScreen() {
               )}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Drop-off Instructions</Text>
-                <View style={styles.inputWithIcon}>
+                <View style={[styles.inputWithIcon, fieldErrors.dropoffInstructions && styles.inputError]}>
                   <Package size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
                   <TextInput
-                    style={styles.inputText}
+                    style={[styles.inputText, { minHeight: 48 }]}
                     value={dropoffInstructions}
                     onChangeText={setDropoffInstructions}
                     placeholder="Any special delivery instructions?"
                     placeholderTextColor={Colors.semantic.tabInactive}
                     editable={!isLoading}
                     accessibilityLabel="Drop-off instructions"
+                    multiline
+                    numberOfLines={2}
+                    textAlignVertical="top"
                   />
                 </View>
               </View>
@@ -592,7 +595,7 @@ export default function PostScreen() {
                 <View style={[styles.inputWithIcon, fieldErrors.estimatedMinutes && styles.inputError]}>
                   <Clock size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
                   <TextInput
-                    style={styles.inputText}
+                    style={[styles.inputText, { minHeight: 48 }]}
                     value={estimatedMinutes}
                     onChangeText={(value) => {
                       setEstimatedMinutes(value);
@@ -603,6 +606,7 @@ export default function PostScreen() {
                     keyboardType="number-pad"
                     editable={!isLoading}
                     accessibilityLabel="Estimated time in minutes"
+                    returnKeyType="done"
                   />
                 </View>
                 <Text style={styles.helperText}>in minutes</Text>
@@ -735,6 +739,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: Colors.semantic.inputText,
+    paddingVertical: 0,
   },
   helperText: {
     fontSize: 14,

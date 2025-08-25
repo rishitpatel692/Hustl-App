@@ -80,11 +80,12 @@ export default function EditProfileScreen() {
             <View style={styles.inputContainer}>
               <User size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { minHeight: 48 }]}
                 value={displayName}
                 onChangeText={setDisplayName}
                 placeholder="Enter your display name"
                 placeholderTextColor={Colors.semantic.tabInactive}
+                returnKeyType="next"
               />
             </View>
           </View>
@@ -94,13 +95,14 @@ export default function EditProfileScreen() {
             <View style={styles.inputContainer}>
               <Mail size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { minHeight: 48 }]}
                 value={email}
                 onChangeText={setEmail}
                 placeholder="Enter your email"
                 placeholderTextColor={Colors.semantic.tabInactive}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                returnKeyType="next"
               />
             </View>
           </View>
@@ -110,11 +112,12 @@ export default function EditProfileScreen() {
             <View style={styles.inputContainer}>
               <GraduationCap size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { minHeight: 48 }]}
                 value={major}
                 onChangeText={setMajor}
                 placeholder="Enter your major"
                 placeholderTextColor={Colors.semantic.tabInactive}
+                returnKeyType="next"
               />
             </View>
           </View>
@@ -124,11 +127,12 @@ export default function EditProfileScreen() {
             <View style={styles.inputContainer}>
               <GraduationCap size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { minHeight: 48 }]}
                 value={year}
                 onChangeText={setYear}
                 placeholder="Enter your year"
                 placeholderTextColor={Colors.semantic.tabInactive}
+                returnKeyType="next"
               />
             </View>
           </View>
@@ -138,11 +142,12 @@ export default function EditProfileScreen() {
             <View style={styles.inputContainer}>
               <MapPin size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { minHeight: 48 }]}
                 value={university}
                 onChangeText={setUniversity}
                 placeholder="Enter your university"
                 placeholderTextColor={Colors.semantic.tabInactive}
+                returnKeyType="done"
               />
             </View>
           </View>
@@ -249,13 +254,15 @@ const styles = StyleSheet.create({
     borderColor: Colors.semantic.inputBorder,
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
     gap: 12,
     backgroundColor: Colors.semantic.inputBackground,
+    minHeight: 52,
   },
   input: {
     flex: 1,
     fontSize: 16,
     color: Colors.semantic.inputText,
+    paddingVertical: 0,
   },
 });

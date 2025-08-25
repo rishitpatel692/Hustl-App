@@ -199,6 +199,7 @@ export default function ReviewSheet({ visible, onClose, task, onReviewSubmitted 
                 maxLength={200}
                 textAlignVertical="top"
                 editable={!isSubmitting}
+                returnKeyType="done"
               />
               <Text style={styles.characterCount}>
                 {comment.length}/200 characters
@@ -374,7 +375,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.semantic.inputText,
     backgroundColor: Colors.semantic.inputBackground,
-    height: 120,
+    minHeight: 120,
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },

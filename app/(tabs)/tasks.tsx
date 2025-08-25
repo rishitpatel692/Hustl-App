@@ -450,11 +450,12 @@ export default function TasksScreen() {
   const renderMapView = () => {
     const currentTasks = getCurrentTasks();
     
-    // Convert tasks to map pins with demo coordinates around UF campus
+    // Convert tasks to map pins with realistic coordinates around UF campus
     const pins: TaskPin[] = currentTasks.map((task) => {
-      // For demo, place tasks around UF campus with slight offsets
-      const latitude = 29.6436 + (Math.random() - 0.5) * 0.02;
-      const longitude = -82.3549 + (Math.random() - 0.5) * 0.02;
+      // Use more realistic coordinates based on task store
+      const baseCoords = getStoreCoordinates(task.store);
+      const latitude = baseCoords.latitude + (Math.random() - 0.5) * 0.005;
+      const longitude = baseCoords.longitude + (Math.random() - 0.5) * 0.005;
       
       return {
         id: task.id,
@@ -464,13 +465,14 @@ export default function TasksScreen() {
         urgency: task.urgency,
         latitude,
         longitude,
+        storeCoordinates: baseCoords,
       };
     });
     
     return (
       <TasksMap
         pins={pins}
-        onPressPin={(taskId) => console.log('Task details:', taskId)}
+        onPressPin={(taskId) => router.push(`/task/${taskId}`)}
         showsUserLocation={locationPermission === 'granted'}
         locationPermission={locationPermission}
         onRequestLocation={requestLocationPermission}
@@ -577,6 +579,30 @@ export default function TasksScreen() {
     }
   };
 
+  const getStoreCoordinates = (storeName: string): Coordinates => {
+    // Map common store names to campus locations
+    const storeMap: Record<string, Coordinates> = {
+      'Starbucks': { latitude: 29.6516, longitude: -82.3442 },
+      'Chipotle': { latitude: 29.6234, longitude: -82.3678 },
+      'Chick-fil-A': { latitude: 29.6465, longitude: -82.3473 },
+      'Publix': { latitude: 29.6234, longitude: -82.3678 },
+      'Subway': { latitude: 29.6465, longitude: -82.3473 },
+      'Dunkin': { latitude: 29.6516, longitude: -82.3442 },
+    };
+
+    // Find matching store or use default campus center
+    for (const [key, coords] of Object.entries(storeMap)) {
+      if (storeName.toLowerCase().includes(key.toLowerCase())) {
+        return coords;
+      }
+    }
+
+    // Default to campus center with slight variation
+    return {
+      latitude: 29.6436 + (Math.random() - 0.5) * 0.01,
+      longitude: -82.3549 + (Math.random() - 0.5) * 0.01,
+    };
+  };
   return (
     <>
       <SafeAreaView style={styles.container}>

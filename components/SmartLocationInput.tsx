@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Platform, ActivityIndicator } from 'react-native';
 import { MapPin, Navigation, Building, Search, X } from 'lucide-react-native';
 import * as Location from 'expo-location';
 import * as Haptics from 'expo-haptics';
@@ -29,6 +29,8 @@ export default function SmartLocationInput({
   const [isExpanded, setIsExpanded] = useState(false);
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [manualInput, setManualInput] = useState('');
+  const [showManualInput, setShowManualInput] = useState(false);
   const googlePlacesRef = useRef<any>(null);
 
   useEffect(() => {
@@ -64,7 +66,17 @@ export default function SmartLocationInput({
     triggerHaptics();
     onLocationSelect(address, coordinates);
     setIsExpanded(false);
-    googlePlacesRef.current?.setAddressText('');
+    setShowManualInput(false);
+    setManualInput('');
+    if (googlePlacesRef.current) {
+      googlePlacesRef.current.setAddressText('');
+    }
+  };
+
+  const handleManualInputSubmit = () => {
+    if (manualInput.trim()) {
+      handleLocationSelect(manualInput.trim());
+    }
   };
 
   const handleUseCurrentLocation = async () => {
@@ -156,38 +168,85 @@ export default function SmartLocationInput({
             </TouchableOpacity>
           </View>
 
-          {/* Google Places Autocomplete */}
-          <View style={styles.searchContainer}>
-            <GooglePlacesAutocomplete
-              ref={googlePlacesRef}
-              placeholder="Search with Google Maps..."
-              onPress={handleGooglePlaceSelect}
-              query={{
-                key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
-                language: 'en',
-                components: 'country:us',
-                location: userLocation ? `${userLocation.latitude},${userLocation.longitude}` : '29.6436,-82.3549',
-                radius: 50000,
-              }}
-              fetchDetails={true}
-              enablePoweredByContainer={false}
-              styles={{
-                container: styles.autocompleteContainer,
-                textInputContainer: styles.autocompleteInputContainer,
-                textInput: styles.autocompleteInput,
-                listView: styles.autocompleteList,
-                row: styles.autocompleteRow,
-                description: styles.autocompleteDescription,
-              }}
-              textInputProps={{
-                placeholderTextColor: Colors.semantic.tabInactive,
-                autoCorrect: false,
-                autoCapitalize: 'none',
-              }}
-              debounce={300}
-              minLength={2}
-            />
+          {/* Manual Input Toggle */}
+          <View style={styles.inputToggleContainer}>
+            <TouchableOpacity
+              style={[styles.inputToggle, !showManualInput && styles.inputToggleActive]}
+              onPress={() => setShowManualInput(false)}
+            >
+              <Text style={[styles.inputToggleText, !showManualInput && styles.inputToggleTextActive]}>
+                Search
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.inputToggle, showManualInput && styles.inputToggleActive]}
+              onPress={() => setShowManualInput(true)}
+            >
+              <Text style={[styles.inputToggleText, showManualInput && styles.inputToggleTextActive]}>
+                Type Address
+              </Text>
+            </TouchableOpacity>
           </View>
+
+          {showManualInput ? (
+            /* Manual Text Input */
+            <View style={styles.manualInputContainer}>
+              <TextInput
+                style={styles.manualInput}
+                value={manualInput}
+                onChangeText={setManualInput}
+                placeholder="Type address manually..."
+                placeholderTextColor={Colors.semantic.tabInactive}
+                autoCorrect={false}
+                autoCapitalize="words"
+                returnKeyType="done"
+                onSubmitEditing={handleManualInputSubmit}
+              />
+              <TouchableOpacity
+                style={[
+                  styles.manualSubmitButton,
+                  !manualInput.trim() && styles.manualSubmitButtonDisabled
+                ]}
+                onPress={handleManualInputSubmit}
+                disabled={!manualInput.trim()}
+              >
+                <Text style={styles.manualSubmitButtonText}>Use Address</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            /* Google Places Autocomplete */
+            <View style={styles.searchContainer}>
+              <GooglePlacesAutocomplete
+                ref={googlePlacesRef}
+                placeholder="Search with Google Maps..."
+                onPress={handleGooglePlaceSelect}
+                query={{
+                  key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+                  language: 'en',
+                  components: 'country:us',
+                  location: userLocation ? `${userLocation.latitude},${userLocation.longitude}` : '29.6436,-82.3549',
+                  radius: 50000,
+                }}
+                fetchDetails={true}
+                enablePoweredByContainer={false}
+                styles={{
+                  container: styles.autocompleteContainer,
+                  textInputContainer: styles.autocompleteInputContainer,
+                  textInput: styles.autocompleteInput,
+                  listView: styles.autocompleteList,
+                  row: styles.autocompleteRow,
+                  description: styles.autocompleteDescription,
+                }}
+                textInputProps={{
+                  placeholderTextColor: Colors.semantic.tabInactive,
+                  autoCorrect: false,
+                  autoCapitalize: 'none',
+                }}
+                debounce={300}
+                minLength={2}
+              />
+            </View>
+          )}
 
           {/* Current Location */}
           <TouchableOpacity
@@ -199,6 +258,9 @@ export default function SmartLocationInput({
             <Text style={styles.currentLocationText}>
               {isGettingLocation ? 'Getting location...' : 'Use Current Location'}
             </Text>
+            {isGettingLocation && (
+              <ActivityIndicator size="small" color={Colors.primary} />
+            )}
           </TouchableOpacity>
 
           {/* Campus Locations */}
@@ -233,6 +295,7 @@ export default function SmartLocationInput({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
+    zIndex: 1000,
   },
   label: {
     fontSize: 16,
@@ -295,7 +358,7 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 12,
     zIndex: 1000,
-    maxHeight: 400,
+    maxHeight: 500,
   },
   expandedHeader: {
     flexDirection: 'row',
@@ -319,6 +382,66 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  inputToggleContainer: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    marginVertical: 16,
+    backgroundColor: Colors.mutedDark,
+    borderRadius: 12,
+    padding: 4,
+  },
+  inputToggle: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  inputToggleActive: {
+    backgroundColor: Colors.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  inputToggleText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.semantic.tabInactive,
+  },
+  inputToggleTextActive: {
+    color: Colors.primary,
+  },
+  manualInputContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    gap: 12,
+  },
+  manualInput: {
+    borderWidth: 1,
+    borderColor: Colors.semantic.inputBorder,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: Colors.semantic.inputText,
+    backgroundColor: Colors.semantic.inputBackground,
+    minHeight: 48,
+  },
+  manualSubmitButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  manualSubmitButtonDisabled: {
+    backgroundColor: Colors.semantic.tabInactive,
+  },
+  manualSubmitButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.white,
+  },
   searchContainer: {
     paddingHorizontal: 20,
     paddingVertical: 16,
@@ -339,16 +462,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: Colors.semantic.inputBorder,
+    minHeight: 48,
   },
   autocompleteList: {
     backgroundColor: Colors.semantic.inputBackground,
     borderRadius: 12,
     marginTop: 8,
     maxHeight: 150,
+    borderWidth: 1,
+    borderColor: Colors.semantic.inputBorder,
   },
   autocompleteRow: {
     backgroundColor: Colors.semantic.inputBackground,
@@ -372,6 +498,7 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.semantic.dividerLight,
   },
   currentLocationText: {
+    flex: 1,
     fontSize: 16,
     fontWeight: '600',
     color: Colors.primary,

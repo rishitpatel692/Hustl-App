@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker, Circle, PROVIDER_GOOGLE, Region, Callout } from 'expo-maps';
 import * as Location from 'expo-location';
-import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { MapPin, Store, Navigation } from 'lucide-react-native';
+import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
+import { MapPin, Store, Navigation, Phone } from 'lucide-react-native';
 import { Colors } from '@/theme/colors';
 import { openGoogleMapsNavigation } from '@/lib/navigation';
 
@@ -44,12 +44,35 @@ export default function TasksMap({
 }: TasksMapProps) {
   const [isReady, setIsReady] = useState(false);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [mapRegion, setMapRegion] = useState<Region>(UF_CAMPUS);
 
   useEffect(() => {
     const initializeMap = async () => {
       try {
         if (locationPermission !== 'granted') {
-          await Location.requestForegroundPermissionsAsync();
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status === 'granted') {
+            const location = await Location.getCurrentPositionAsync({});
+            const userCoords = {
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            };
+            setUserLocation(userCoords);
+            
+            // Center map on user location if it's near campus
+            const distanceFromCampus = Math.sqrt(
+              Math.pow(userCoords.latitude - UF_CAMPUS.latitude, 2) +
+              Math.pow(userCoords.longitude - UF_CAMPUS.longitude, 2)
+            );
+            
+            if (distanceFromCampus < 0.1) { // Within ~10km of campus
+              setMapRegion({
+                ...userCoords,
+                latitudeDelta: 0.02,
+                longitudeDelta: 0.02,
+              });
+            }
+          }
         }
       } catch (error) {
         console.warn('Location permission error:', error);
@@ -58,26 +81,21 @@ export default function TasksMap({
       }
     };
 
-    const getCurrentLocation = async () => {
-      try {
-        if (locationPermission === 'granted') {
-          const location = await Location.getCurrentPositionAsync({});
-          setUserLocation({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          });
-        }
-      } catch (error) {
-        console.warn('Failed to get current location:', error);
-      }
-    };
-
     initializeMap();
-    getCurrentLocation();
   }, [locationPermission]);
 
   const handleNavigateToTask = async (pin: TaskPin) => {
-    if (!userLocation) return;
+    if (!userLocation) {
+      Alert.alert(
+        'Location Required',
+        'Please enable location services to use navigation.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Enable', onPress: onRequestLocation }
+        ]
+      );
+      return;
+    }
     
     try {
       await openGoogleMapsNavigation({
@@ -90,8 +108,14 @@ export default function TasksMap({
       });
     } catch (error) {
       console.warn('Failed to open navigation:', error);
+      Alert.alert(
+        'Navigation Error',
+        'Unable to open Google Maps. Please make sure the app is installed.',
+        [{ text: 'OK' }]
+      );
     }
   };
+
   const getUrgencyColor = (urgency: string): string => {
     switch (urgency) {
       case 'low':
@@ -105,10 +129,22 @@ export default function TasksMap({
     }
   };
 
+  const handleLocationPermissionRequest = () => {
+    Alert.alert(
+      'Location Permission',
+      'This app needs location access to show your position on the map and provide navigation.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Enable', onPress: onRequestLocation }
+      ]
+    );
+  };
+
   if (!isReady) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.primary} />
+        <Text style={styles.loadingText}>Loading map...</Text>
       </View>
     );
   }
@@ -118,17 +154,31 @@ export default function TasksMap({
       <MapView
         style={styles.map}
         provider={PROVIDER_GOOGLE}
-        initialRegion={UF_CAMPUS}
+        initialRegion={mapRegion}
         showsUserLocation={showsUserLocation && locationPermission === 'granted'}
         showsMyLocationButton={false}
-        showsCompass={false}
+        showsCompass={true}
         toolbarEnabled={false}
         mapType="standard"
         showsBuildings={true}
         showsIndoors={true}
         showsPointsOfInterest={true}
         showsTraffic={false}
+        onMapReady={() => setIsReady(true)}
       >
+        {/* User location permission prompt */}
+        {locationPermission !== 'granted' && (
+          <View style={styles.permissionOverlay}>
+            <TouchableOpacity
+              style={styles.permissionButton}
+              onPress={handleLocationPermissionRequest}
+            >
+              <MapPin size={20} color={Colors.white} strokeWidth={2} />
+              <Text style={styles.permissionButtonText}>Enable Location</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {pins.map((pin) => (
           <React.Fragment key={pin.id}>
             {/* Main task marker (dropoff location) */}
@@ -137,9 +187,12 @@ export default function TasksMap({
               pinColor={getUrgencyColor(pin.urgency)}
               onPress={() => onPressPin?.(pin.id)}
             >
+              <View style={[styles.customMarker, { backgroundColor: getUrgencyColor(pin.urgency) }]}>
+                <MapPin size={16} color={Colors.white} strokeWidth={2} />
+              </View>
               <Callout>
                 <View style={styles.calloutContainer}>
-                  <Text style={styles.calloutTitle} numberOfLines={1}>
+                  <Text style={styles.calloutTitle} numberOfLines={2}>
                     {pin.title}
                   </Text>
                   <Text style={styles.calloutReward}>{pin.reward}</Text>
@@ -170,7 +223,6 @@ export default function TasksMap({
             {pin.storeCoordinates && (
               <Marker
                 coordinate={pin.storeCoordinates}
-                pinColor="#FF6B35"
                 anchor={{ x: 0.5, y: 0.5 }}
               >
                 <View style={styles.storeMarker}>
@@ -203,6 +255,52 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.semantic.screen,
+    gap: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: Colors.semantic.tabInactive,
+    fontWeight: '500',
+  },
+  permissionOverlay: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    right: 20,
+    zIndex: 1000,
+  },
+  permissionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 8,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  permissionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  customMarker: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: Colors.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   storeMarker: {
     width: 32,
@@ -221,6 +319,7 @@ const styles = StyleSheet.create({
   },
   calloutContainer: {
     minWidth: 200,
+    maxWidth: 250,
     padding: 12,
     gap: 8,
   },
@@ -266,13 +365,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.primary,
     borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 6,
     marginTop: 8,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   navigateButtonText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     color: Colors.white,
   },

@@ -340,6 +340,9 @@ export default function ChatScreen() {
             placeholderTextColor={Colors.semantic.tabInactive}
             multiline
             maxLength={1000}
+            returnKeyType="send"
+            onSubmitEditing={handleSendMessage}
+            blurOnSubmit={false}
           />
         </View>
         
@@ -616,6 +619,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     maxHeight: 120,
     minHeight: 40,
+    textAlignVertical: 'center',
   },
   sendButton: {
     width: 40,
