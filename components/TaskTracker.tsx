@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { X, MapPin, Clock, Navigation, Phone, MessageCircle, CheckCircle } from 'lucide-react-native';
+import { X, MapPin, Clock, Navigation, Phone, MessageCircle, CircleCheck as CheckCircle } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/theme/colors';
