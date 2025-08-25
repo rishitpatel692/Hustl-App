@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { X, MapPin, Search, Navigation, Building } from 'lucide-react-native';
 import * as Location from 'expo-location';
 import * as Haptics from 'expo-haptics';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Colors } from '@/theme/colors';
 import { GeocodingService, UF_CAMPUS_LOCATIONS, type Coordinates, type CampusLocation } from '@/lib/geocoding';
 
@@ -35,27 +36,17 @@ export default function LocationPicker({
   showCampusLocations = true,
 }: LocationPickerProps) {
   const insets = useSafeAreaInsets();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [showGoogleSearch, setShowGoogleSearch] = useState(false);
 
   // Get user's current location on mount
   useEffect(() => {
     if (visible) {
       getCurrentLocation();
+      setShowGoogleSearch(false);
     }
   }, [visible]);
-
-  // Search for places when query changes
-  useEffect(() => {
-    if (searchQuery.length > 2) {
-      searchPlaces();
-    } else {
-      setSearchResults([]);
-    }
-  }, [searchQuery]);
 
   const getCurrentLocation = async () => {
     try {
@@ -76,25 +67,6 @@ export default function LocationPicker({
     }
   };
 
-  const searchPlaces = async () => {
-    setIsSearching(true);
-    try {
-      const { data, error } = await GeocodingService.searchPlaces(searchQuery, userLocation || undefined);
-      
-      if (data) {
-        setSearchResults(data);
-      } else if (error) {
-        console.warn('Search error:', error);
-        setSearchResults([]);
-      }
-    } catch (error) {
-      console.warn('Search failed:', error);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
   const triggerHaptics = () => {
     if (Platform.OS !== 'web') {
       try {
@@ -109,16 +81,21 @@ export default function LocationPicker({
     triggerHaptics();
     onLocationSelect(address, coordinates);
     onClose();
-    setSearchQuery('');
-    setSearchResults([]);
+    setShowGoogleSearch(false);
   };
 
   const handleCampusLocationSelect = (location: CampusLocation) => {
     handleLocationSelect(location.address, location.coordinates);
   };
 
-  const handleSearchResultSelect = (result: any) => {
-    handleLocationSelect(result.formatted_address, result.coordinates);
+  const handleGooglePlaceSelect = (data: any, details: any) => {
+    if (details?.geometry?.location) {
+      const coordinates: Coordinates = {
+        latitude: details.geometry.location.lat,
+        longitude: details.geometry.location.lng,
+      };
+      handleLocationSelect(details.formatted_address || data.description, coordinates);
+    }
   };
 
   const handleUseCurrentLocation = async () => {
@@ -193,21 +170,54 @@ export default function LocationPicker({
 
           <View style={styles.content}>
             {/* Search Input */}
-            <View style={styles.searchContainer}>
-              <View style={styles.searchInputContainer}>
-                <Search size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-                <TextInput
-                  style={styles.searchInput}
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  placeholder={placeholder}
-                  placeholderTextColor={Colors.semantic.tabInactive}
-                  autoCorrect={false}
-                />
-                {isSearching && (
-                  <ActivityIndicator size="small" color={Colors.primary} />
-                )}
-              </View>
+            <View style={styles.searchSection}>
+              <TouchableOpacity
+                style={styles.googleSearchButton}
+                onPress={() => setShowGoogleSearch(!showGoogleSearch)}
+              >
+                <Search size={20} color={Colors.primary} strokeWidth={2} />
+                <Text style={styles.googleSearchButtonText}>
+                  {showGoogleSearch ? 'Hide Search' : 'Search with Google Maps'}
+                </Text>
+              </TouchableOpacity>
+              
+              {showGoogleSearch && (
+                <View style={styles.googleSearchContainer}>
+                  <GooglePlacesAutocomplete
+                    placeholder={placeholder}
+                    onPress={handleGooglePlaceSelect}
+                    query={{
+                      key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+                      language: 'en',
+                      components: 'country:us',
+                      location: userLocation ? `${userLocation.latitude},${userLocation.longitude}` : '29.6436,-82.3549',
+                      radius: 50000, // 50km radius
+                    }}
+                    fetchDetails={true}
+                    enablePoweredByContainer={false}
+                    styles={{
+                      container: styles.autocompleteContainer,
+                      textInputContainer: styles.autocompleteInputContainer,
+                      textInput: styles.autocompleteInput,
+                      listView: styles.autocompleteList,
+                      row: styles.autocompleteRow,
+                      description: styles.autocompleteDescription,
+                      poweredContainer: { display: 'none' },
+                    }}
+                    textInputProps={{
+                      placeholderTextColor: Colors.semantic.tabInactive,
+                      autoCorrect: false,
+                      autoCapitalize: 'none',
+                    }}
+                    debounce={300}
+                    minLength={2}
+                    nearbyPlacesAPI="GooglePlacesSearch"
+                    GooglePlacesSearchQuery={{
+                      rankby: 'distance',
+                    }}
+                  />
+                </View>
+              )}
             </View>
 
             <ScrollView style={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -236,34 +246,8 @@ export default function LocationPicker({
                 </TouchableOpacity>
               </View>
 
-              {/* Search Results */}
-              {searchResults.length > 0 && (
-                <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>Search Results</Text>
-                  {searchResults.map((result, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={styles.locationItem}
-                      onPress={() => handleSearchResultSelect(result)}
-                    >
-                      <View style={styles.locationIcon}>
-                        <MapPin size={20} color={Colors.primary} strokeWidth={2} />
-                      </View>
-                      <View style={styles.locationInfo}>
-                        <Text style={styles.locationName} numberOfLines={1}>
-                          {result.name || 'Location'}
-                        </Text>
-                        <Text style={styles.locationAddress} numberOfLines={2}>
-                          {result.formatted_address}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-
               {/* Campus Locations */}
-              {showCampusLocations && searchQuery.length === 0 && (
+              {showCampusLocations && !showGoogleSearch && (
                 <View style={styles.section}>
                   <Text style={styles.sectionTitle}>Popular Campus Locations</Text>
                   
@@ -299,12 +283,12 @@ export default function LocationPicker({
               )}
 
               {/* Empty State */}
-              {searchQuery.length > 2 && searchResults.length === 0 && !isSearching && (
+              {showGoogleSearch && (
                 <View style={styles.emptyState}>
-                  <Building size={32} color={Colors.semantic.tabInactive} strokeWidth={1.5} />
-                  <Text style={styles.emptyStateText}>No locations found</Text>
+                  <MapPin size={32} color={Colors.semantic.tabInactive} strokeWidth={1.5} />
+                  <Text style={styles.emptyStateText}>Search for any location</Text>
                   <Text style={styles.emptyStateSubtext}>
-                    Try searching for a different address or location name
+                    Type in the search box above to find restaurants, stores, or any address
                   </Text>
                 </View>
               )}
@@ -367,17 +351,35 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
   },
-  searchContainer: {
+  searchSection: {
     marginBottom: 24,
   },
-  searchInputContainer: {
+  googleSearchButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.semantic.inputBackground,
+    backgroundColor: Colors.primary,
     borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 16,
     gap: 16,
+    shadowColor: Colors.semantic.cardShadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 4,
+    justifyContent: 'center',
+  },
+  googleSearchButtonText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: Colors.white,
+    letterSpacing: 0.3,
+  },
+  googleSearchContainer: {
+    marginTop: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: Colors.semantic.inputBackground,
     borderWidth: 1,
     borderColor: Colors.semantic.inputBorder,
     shadowColor: Colors.semantic.cardShadow,
@@ -386,9 +388,38 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
-  searchInput: {
-    flex: 1,
+  autocompleteContainer: {
+    flex: 0,
+  },
+  autocompleteInputContainer: {
+    backgroundColor: 'transparent',
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+  },
+  autocompleteInput: {
+    backgroundColor: Colors.semantic.inputBackground,
+    color: Colors.semantic.inputText,
     fontSize: 17,
+    fontWeight: '500',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderRadius: 0,
+  },
+  autocompleteList: {
+    backgroundColor: Colors.semantic.inputBackground,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    maxHeight: 200,
+  },
+  autocompleteRow: {
+    backgroundColor: Colors.semantic.inputBackground,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.semantic.dividerLight,
+  },
+  autocompleteDescription: {
+    fontSize: 16,
     color: Colors.semantic.inputText,
     fontWeight: '500',
   },
