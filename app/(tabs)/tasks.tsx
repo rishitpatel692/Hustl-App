@@ -603,6 +603,7 @@ export default function TasksScreen() {
       longitude: -82.3549 + (Math.random() - 0.5) * 0.01,
     };
   };
+
   return (
     <>
       <SafeAreaView style={styles.container}>
