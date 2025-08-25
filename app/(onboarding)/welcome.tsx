@@ -310,6 +310,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.semantic.screen,
   },
+  placeholder: {
+    width: 40,
+  },
   backgroundContainer: {
     position: 'absolute',
     top: 0,
