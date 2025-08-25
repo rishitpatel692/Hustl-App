@@ -21,6 +21,7 @@ import { ChevronRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/theme/colors';
 import GlobalHeader from '@components/GlobalHeader';
+import { useAuth } from '@/contexts/AuthContext';
 
 const { width, height } = Dimensions.get('window');
 

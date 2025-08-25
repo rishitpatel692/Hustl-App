@@ -20,7 +20,7 @@ export default function TaskHistoryScreen() {
   }, []);
 
   const loadTaskHistory = async () => {
-    if (isGuest || !user) {
+    if (!user) {
       setIsLoading(false);
       return;
     }

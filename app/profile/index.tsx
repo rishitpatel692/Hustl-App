@@ -146,7 +146,7 @@ export default function ProfileScreen() {
           {user ? user.displayName : 'Guest User'}
         </Text>
         <Text style={styles.userInfo}>
-          {user ? `${user.university || 'University of Florida'} • Student` : 'Browse as Guest'}
+          {user ? `${user.university || 'University of Florida'} • Student` : 'Student'}
         </Text>
       </View>
 

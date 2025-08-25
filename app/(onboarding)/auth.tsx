@@ -73,9 +73,6 @@ export default function AuthScreen() {
     router.back();
   };
 
-
-  const isFormValid = email.trim() && password.trim() && (isLogin || displayName.trim());
-
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
@@ -89,7 +86,7 @@ export default function AuthScreen() {
             resizeMode="contain"
           />
           <TouchableOpacity onPress={handleSkip}>
-            <Text style={styles.skipText}>Browse as Guest</Text>
+            <Text style={styles.skipText}>Back</Text>
           </TouchableOpacity>
         </View>
       </View>

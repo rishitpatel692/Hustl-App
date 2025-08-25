@@ -27,7 +27,7 @@ export default function TaskDetailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const insets = useSafeAreaInsets();
-  const { user, isGuest } = useAuth();
+  const { user } = useAuth();
   
   const taskId = params.id as string;
   

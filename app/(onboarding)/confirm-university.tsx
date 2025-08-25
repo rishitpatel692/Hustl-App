@@ -30,9 +30,7 @@ export default function ConfirmUniversity() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <TouchableOpacity onPress={handleSkip}>
-            <Text style={styles.skipText}>Skip</Text>
-          </TouchableOpacity>
+          <View style={styles.placeholder} />
         </View>
       </View>
 
@@ -100,6 +98,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.primary,
+  },
+  placeholder: {
+    width: 40,
   },
   content: {
     flex: 1,

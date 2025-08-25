@@ -7,6 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
 // Post Task Tab Button Component
 const PostTaskButton = ({ focused }: { focused: boolean }) => {
