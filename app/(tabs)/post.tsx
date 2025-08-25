@@ -14,6 +14,8 @@ import GlobalHeader from '@/components/GlobalHeader';
 import TaskSuccessSheet from '@components/TaskSuccessSheet';
 import Toast from '@components/Toast';
 import StickyFormFooter from '@components/StickyFormFooter';
+import LocationPicker from '@/components/LocationPicker';
+import { GeocodingService, type Coordinates } from '@/lib/geocoding';
 
 // Extended categories to support all card types
 const categories: { value: string; label: string }[] = [
@@ -103,6 +105,12 @@ export default function PostScreen() {
   const [estimatedMinutes, setEstimatedMinutes] = useState('');
   const [prefilledCategory, setPrefilledCategory] = useState<string | null>(null);
   
+  // Location state
+  const [storeCoordinates, setStoreCoordinates] = useState<Coordinates | null>(null);
+  const [dropoffCoordinates, setDropoffCoordinates] = useState<Coordinates | null>(null);
+  const [showStoreLocationPicker, setShowStoreLocationPicker] = useState(false);
+  const [showDropoffLocationPicker, setShowDropoffLocationPicker] = useState(false);
+  
   // Computed pricing
   const [computedPriceCents, setComputedPriceCents] = useState(BASE_PRICE_CENTS + 100); // Base + medium urgency
   
@@ -143,6 +151,8 @@ export default function PostScreen() {
       setDropoffInstructions('');
       setFieldErrors({});
       setSubmitError('');
+      setStoreCoordinates(null);
+      setDropoffCoordinates(null);
       
       // Show toast
       const categoryLabel = categories.find(cat => cat.value === categoryParam)?.label || 'Category';
@@ -214,6 +224,18 @@ export default function PostScreen() {
     }));
   };
 
+  const handleStoreLocationSelect = async (address: string, coordinates: Coordinates) => {
+    setStore(address);
+    setStoreCoordinates(coordinates);
+    updateFieldError('store', address);
+  };
+
+  const handleDropoffLocationSelect = async (address: string, coordinates: Coordinates) => {
+    setDropoffAddress(address);
+    setDropoffCoordinates(coordinates);
+    updateFieldError('dropoffAddress', address);
+  };
+
   const isFormValid = (): boolean => {
     const requiredFields = {
       title,
@@ -276,7 +298,11 @@ export default function PostScreen() {
         description: description.trim(),
         category: mapCategoryToDatabase(category),
         store: store.trim(),
+        store_latitude: storeCoordinates?.latitude || null,
+        store_longitude: storeCoordinates?.longitude || null,
         dropoff_address: dropoffAddress.trim(),
+        dropoff_latitude: dropoffCoordinates?.latitude || null,
+        dropoff_longitude: dropoffCoordinates?.longitude || null,
         dropoff_instructions: dropoffInstructions.trim(),
         urgency: urgency as TaskUrgency,
         estimated_minutes: Number(estimatedMinutes),
@@ -323,6 +349,8 @@ export default function PostScreen() {
     setDropoffInstructions('');
     setUrgency('medium');
     setEstimatedMinutes('');
+    setStoreCoordinates(null);
+    setDropoffCoordinates(null);
     setFieldErrors({});
     setSubmitError('');
   };
@@ -520,21 +548,22 @@ export default function PostScreen() {
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Store *</Text>
-                <View style={[styles.inputWithIcon, fieldErrors.store && styles.inputError]}>
+                <TouchableOpacity 
+                  style={[styles.inputWithIcon, fieldErrors.store && styles.inputError]}
+                  onPress={() => setShowStoreLocationPicker(true)}
+                  disabled={isLoading}
+                >
                   <Store size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-                  <TextInput
-                    style={styles.inputText}
-                    value={store}
-                    onChangeText={(value) => {
-                      setStore(value);
-                      updateFieldError('store', value);
-                    }}
-                    placeholder="e.g., Publix, Starbucks, Target"
-                    placeholderTextColor={Colors.semantic.tabInactive}
-                    editable={!isLoading}
-                    accessibilityLabel="Store name"
-                  />
-                </View>
+                  <View style={styles.inputText}>
+                    <Text style={[
+                      styles.inputDisplayText,
+                      !store && styles.inputPlaceholderText
+                    ]}>
+                      {store || 'Tap to select store location'}
+                    </Text>
+                  </View>
+                  <MapPin size={16} color={Colors.primary} strokeWidth={2} />
+                </TouchableOpacity>
                 {fieldErrors.store && (
                   <Text style={styles.fieldError}>{fieldErrors.store}</Text>
                 )}
@@ -547,21 +576,22 @@ export default function PostScreen() {
               
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Drop-off Address *</Text>
-                <View style={[styles.inputWithIcon, fieldErrors.dropoffAddress && styles.inputError]}>
+                <TouchableOpacity 
+                  style={[styles.inputWithIcon, fieldErrors.dropoffAddress && styles.inputError]}
+                  onPress={() => setShowDropoffLocationPicker(true)}
+                  disabled={isLoading}
+                >
                   <MapPin size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-                  <TextInput
-                    style={styles.inputText}
-                    value={dropoffAddress}
-                    onChangeText={(value) => {
-                      setDropoffAddress(value);
-                      updateFieldError('dropoffAddress', value);
-                    }}
-                    placeholder="Where should this be delivered?"
-                    placeholderTextColor={Colors.semantic.tabInactive}
-                    editable={!isLoading}
-                    accessibilityLabel="Drop-off address"
-                  />
-                </View>
+                  <View style={styles.inputText}>
+                    <Text style={[
+                      styles.inputDisplayText,
+                      !dropoffAddress && styles.inputPlaceholderText
+                    ]}>
+                      {dropoffAddress || 'Tap to select drop-off location'}
+                    </Text>
+                  </View>
+                  <MapPin size={16} color={Colors.primary} strokeWidth={2} />
+                </TouchableOpacity>
                 {fieldErrors.dropoffAddress && (
                   <Text style={styles.fieldError}>{fieldErrors.dropoffAddress}</Text>
                 )}
@@ -654,6 +684,25 @@ export default function PostScreen() {
         type={toast.type}
         onHide={hideToast}
       />
+
+      {/* Location Pickers */}
+      <LocationPicker
+        visible={showStoreLocationPicker}
+        onClose={() => setShowStoreLocationPicker(false)}
+        onLocationSelect={handleStoreLocationSelect}
+        title="Select Store Location"
+        placeholder="Search for store, restaurant, or business..."
+        showCampusLocations={true}
+      />
+
+      <LocationPicker
+        visible={showDropoffLocationPicker}
+        onClose={() => setShowDropoffLocationPicker(false)}
+        onLocationSelect={handleDropoffLocationSelect}
+        title="Select Drop-off Location"
+        placeholder="Search for delivery address..."
+        showCampusLocations={true}
+      />
     </>
   );
 }
@@ -736,6 +785,15 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: Colors.semantic.inputText,
+  },
+  inputDisplayText: {
+    fontSize: 16,
+    color: Colors.semantic.inputText,
+    fontWeight: '500',
+  },
+  inputPlaceholderText: {
+    color: Colors.semantic.tabInactive,
+    fontWeight: '400',
   },
   helperText: {
     fontSize: 14,

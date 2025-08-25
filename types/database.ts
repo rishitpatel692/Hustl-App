@@ -34,7 +34,11 @@ export interface CreateTaskData {
   store: string;
   store_latitude?: number;
   store_longitude?: number;
+  store_latitude?: number;
+  store_longitude?: number;
   dropoff_address: string;
+  dropoff_latitude?: number;
+  dropoff_longitude?: number;
   dropoff_latitude?: number;
   dropoff_longitude?: number;
   dropoff_instructions: string;

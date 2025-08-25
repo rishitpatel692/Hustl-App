@@ -442,11 +442,17 @@ export default function TasksScreen() {
   const renderMapView = () => {
     const currentTasks = getCurrentTasks();
     
-    // Convert tasks to map pins with demo coordinates around UF campus
+    // Convert tasks to map pins using actual coordinates or fallback to UF campus area
     const pins: TaskPin[] = currentTasks.map((task) => {
-      // For demo, place tasks around UF campus with slight offsets
-      const latitude = 29.6436 + (Math.random() - 0.5) * 0.02;
-      const longitude = -82.3549 + (Math.random() - 0.5) * 0.02;
+      // Use actual coordinates if available, otherwise use UF campus area with slight offsets
+      const latitude = task.dropoff_latitude || (29.6436 + (Math.random() - 0.5) * 0.02);
+      const longitude = task.dropoff_longitude || (-82.3549 + (Math.random() - 0.5) * 0.02);
+      
+      // Store coordinates for pickup location
+      const storeCoordinates = (task.store_latitude && task.store_longitude) ? {
+        latitude: task.store_latitude,
+        longitude: task.store_longitude,
+      } : undefined;
       
       return {
         id: task.id,
@@ -456,13 +462,15 @@ export default function TasksScreen() {
         urgency: task.urgency,
         latitude,
         longitude,
+        storeCoordinates,
+        dropoffCoordinates: { latitude, longitude },
       };
     });
     
     return (
       <TasksMap
         pins={pins}
-        onPressPin={(taskId) => console.log('Task details:', taskId)}
+        onPressPin={(taskId) => router.push(`/task/${taskId}`)}
         showsUserLocation={locationPermission === 'granted'}
         locationPermission={locationPermission}
         onRequestLocation={requestLocationPermission}

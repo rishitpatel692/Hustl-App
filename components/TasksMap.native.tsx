@@ -10,11 +10,11 @@ export type TaskPin = {
   title: string; 
   reward: string;
   store: string;
-  storeCoordinates?: { latitude: number; longitude: number };
-  dropoffCoordinates?: { latitude: number; longitude: number };
   urgency: string;
   latitude: number; 
   longitude: number; 
+  storeCoordinates?: { latitude: number; longitude: number };
+  dropoffCoordinates?: { latitude: number; longitude: number };
 };
 
 interface TasksMapProps {
