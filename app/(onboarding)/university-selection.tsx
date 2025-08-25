@@ -59,19 +59,23 @@ export default function UniversitySelection() {
       setSelectedId(university.id);
       // Delay navigation to show animation
       setTimeout(() => {
-        router.replace('/(onboarding)/confirm-university');
+        router.push('/(onboarding)/confirm-university');
       }, 300);
     }
   };
 
   const handleRequestCampus = () => {
-    console.log('Request campus feature');
+    alert('Email us at HustlApp@outlook.com!');
   };
 
   const handleBack = () => {
     router.back();
   };
 
+  const handleSkip = () => {
+    // Allow users to skip and browse as guest
+    router.replace('/(tabs)/home');
+  };
 
   const UniversityCardComponent = ({ university }: { university: UniversityCard }) => {
     const scale = useSharedValue(1);
@@ -191,7 +195,9 @@ export default function UniversitySelection() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <View style={styles.placeholder} />
+          <TouchableOpacity onPress={handleSkip}>
+            <Text style={styles.skipText}>Skip</Text>
+          </TouchableOpacity>
         </View>
         <Text style={styles.title}>Select Your University</Text>
       </View>
@@ -253,9 +259,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: Colors.primary,
-  },
-  placeholder: {
-    width: 40,
   },
   content: {
     flex: 1,

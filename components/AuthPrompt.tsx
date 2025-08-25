@@ -16,12 +16,12 @@ export default function AuthPrompt({ visible, onClose, title, message }: AuthPro
 
   const handleLogin = () => {
     onClose();
-    router.replace('/(onboarding)/auth');
+    router.push('/(onboarding)/auth');
   };
 
   const handleSignUp = () => {
     onClose();
-    router.replace('/(onboarding)/auth');
+    router.push('/(onboarding)/auth');
   };
 
   return (

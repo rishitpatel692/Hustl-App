@@ -9,20 +9,13 @@ import { useAuth } from '@contexts/AuthContext';
 export default function AuthScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { login, signup, isLoading, user } = useAuth();
+  const { login, signup, isLoading } = useAuth();
   const [isLogin, setIsLogin] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-
-  // Redirect if already authenticated
-  React.useEffect(() => {
-    if (user) {
-      router.replace('/(tabs)/home');
-    }
-  }, [user, router]);
 
   const handleAuth = async () => {
     // Clear previous errors
@@ -73,6 +66,12 @@ export default function AuthScreen() {
     router.back();
   };
 
+  const handleSkip = () => {
+    router.replace('/(tabs)/home');
+  };
+
+  const isFormValid = email.trim() && password.trim() && (isLogin || displayName.trim());
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
@@ -86,7 +85,7 @@ export default function AuthScreen() {
             resizeMode="contain"
           />
           <TouchableOpacity onPress={handleSkip}>
-            <Text style={styles.skipText}>Back</Text>
+            <Text style={styles.skipText}>Browse as Guest</Text>
           </TouchableOpacity>
         </View>
       </View>

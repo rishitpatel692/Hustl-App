@@ -212,7 +212,7 @@ export default function WelcomeScreen() {
   }));
 
   const handleChooseCampus = () => {
-    router.replace('/(onboarding)/university-selection');
+    router.push('/(onboarding)/university-selection');
   };
 
   const handleTerms = () => {
@@ -224,7 +224,8 @@ export default function WelcomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      {/* Background with gradient overlay */}
       <View style={styles.backgroundContainer}>
         <Image
           source={{ uri: 'https://images.pexels.com/photos/1595391/pexels-photo-1595391.jpeg?auto=compress&cs=tinysrgb&w=800' }}
@@ -235,8 +236,9 @@ export default function WelcomeScreen() {
           colors={['rgba(0, 33, 165, 0.85)', 'rgba(250, 70, 22, 0.75)']}
           style={styles.backgroundOverlay}
         />
-      
-      <ScrollView
+      </View>
+
+      <ScrollView 
         style={styles.content} 
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -301,7 +303,6 @@ export default function WelcomeScreen() {
         </View>
       </Animated.View>
     </View>
-    </View>
   );
 }
 
@@ -309,9 +310,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.semantic.screen,
-  },
-  placeholder: {
-    width: 40,
   },
   backgroundContainer: {
     position: 'absolute',

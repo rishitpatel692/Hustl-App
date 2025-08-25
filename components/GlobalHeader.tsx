@@ -21,7 +21,7 @@ export default function GlobalHeader({
 }: GlobalHeaderProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
 
   const [showProfileSidebar, setShowProfileSidebar] = React.useState(false);
 
@@ -38,7 +38,7 @@ export default function GlobalHeader({
   const handleProfilePress = () => {
     triggerHaptics();
     
-    if (!user) {
+    if (isGuest) {
       router.push('/(onboarding)/auth');
       return;
     }
@@ -48,7 +48,7 @@ export default function GlobalHeader({
   };
 
   const handleProfileLongPress = () => {
-    if (!user) return;
+    if (isGuest) return;
     // TODO: Implement quick menu
     console.log('Profile long press - show quick menu');
   };
@@ -70,7 +70,7 @@ export default function GlobalHeader({
       .slice(0, 2);
   };
 
-  if (!user) {
+  if (isGuest) {
     return (
       <>
         <View style={[styles.container, { paddingTop: insets.top }]}>

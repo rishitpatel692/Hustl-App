@@ -23,7 +23,7 @@ type ViewMode = 'map' | 'list';
 export default function TasksScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>('map');
   const [activeTab, setActiveTab] = useState<TabType>('available');
   
@@ -77,7 +77,7 @@ export default function TasksScreen() {
 
   // Load tasks based on active tab
   const loadTasks = useCallback(async (showRefreshIndicator = false) => {
-    if (!user) return;
+    if (isGuest || !user) return;
 
     if (showRefreshIndicator) {
       setIsRefreshing(true);
@@ -160,7 +160,7 @@ export default function TasksScreen() {
 
   // Handle task acceptance
   const handleAcceptTask = async (task: Task) => {
-    if (!user) return;
+    if (isGuest || !user) return;
     if (acceptingTaskId) return;
 
     if (Platform.OS !== 'web') {

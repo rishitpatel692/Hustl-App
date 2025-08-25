@@ -9,7 +9,6 @@ import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import GlobalHeader from '@/components/GlobalHeader';
 import Toast from '@components/Toast';
-import { useRouter } from 'expo-router';
 
 const howItWorksSteps = [
   {

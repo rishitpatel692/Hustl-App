@@ -20,7 +20,7 @@ export default function MyTasksScreen() {
   }, []);
 
   const loadMyTasks = async () => {
-    if (!user) {
+    if (isGuest || !user) {
       setIsLoading(false);
       return;
     }
