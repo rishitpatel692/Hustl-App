@@ -9,13 +9,11 @@ import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { TaskRepo } from '@/lib/taskRepo';
 import { TaskCategory, TaskUrgency } from '@/types/database';
-import AuthPrompt from '@components/AuthPrompt';
+import AuthPrompt from '@/components/AuthPrompt';
 import GlobalHeader from '@/components/GlobalHeader';
-import TaskSuccessSheet from '@components/TaskSuccessSheet';
-import Toast from '@components/Toast';
-import StickyFormFooter from '@components/StickyFormFooter';
-import SmartLocationInput from '@/components/SmartLocationInput';
-import TaskDistanceCalculator from '@/components/TaskDistanceCalculator';
+import TaskSuccessSheet from '@/components/TaskSuccessSheet';
+import Toast from '@/components/Toast';
+import StickyFormFooter from '@/components/StickyFormFooter';
 
 // Extended categories to support all card types
 const categories: { value: string; label: string }[] = [
@@ -104,10 +102,6 @@ export default function PostScreen() {
   const [urgency, setUrgency] = useState<string>('medium');
   const [estimatedMinutes, setEstimatedMinutes] = useState('');
   const [prefilledCategory, setPrefilledCategory] = useState<string | null>(null);
-  
-  // Location coordinates for enhanced features
-  const [storeCoordinates, setStoreCoordinates] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [dropoffCoordinates, setDropoffCoordinates] = useState<{ latitude: number; longitude: number } | null>(null);
   
   // Computed pricing
   const [computedPriceCents, setComputedPriceCents] = useState(BASE_PRICE_CENTS + 100); // Base + medium urgency
@@ -500,6 +494,9 @@ export default function PostScreen() {
                   placeholderTextColor={Colors.semantic.tabInactive}
                   editable={!isLoading}
                   accessibilityLabel="Task title"
+                  returnKeyType="next"
+                  autoCapitalize="sentences"
+                  autoCorrect={true}
                 />
                 {fieldErrors.title && (
                   <Text style={styles.fieldError}>{fieldErrors.title}</Text>
@@ -519,59 +516,74 @@ export default function PostScreen() {
                   textAlignVertical="top"
                   editable={!isLoading}
                   accessibilityLabel="Task description"
+                  autoCapitalize="sentences"
+                  autoCorrect={true}
                 />
               </View>
 
               <CategorySelector />
 
-              <SmartLocationInput
-                value={store}
-                onLocationSelect={(address, coordinates) => {
-                  setStore(address);
-                  setStoreCoordinates(coordinates || null);
-                  updateFieldError('store', address);
-                }}
-                placeholder="Enter store name or search..."
-                label="Store *"
-                error={fieldErrors.store}
-                showCampusLocations={true}
-                disabled={isLoading}
-              />
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Store *</Text>
+                <View style={[styles.inputWithIcon, fieldErrors.store && styles.inputError]}>
+                  <Store size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
+                  <TextInput
+                    style={styles.inputText}
+                    value={store}
+                    onChangeText={(value) => {
+                      setStore(value);
+                      updateFieldError('store', value);
+                    }}
+                    placeholder="Enter store name or location..."
+                    placeholderTextColor={Colors.semantic.tabInactive}
+                    editable={!isLoading}
+                    accessibilityLabel="Store name"
+                    returnKeyType="next"
+                    autoCapitalize="words"
+                    autoCorrect={true}
+                  />
+                </View>
+                {fieldErrors.store && (
+                  <Text style={styles.fieldError}>{fieldErrors.store}</Text>
+                )}
+              </View>
             </View>
 
             {/* Drop-off Section */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Drop-off</Text>
               
-              <SmartLocationInput
-                value={dropoffAddress}
-                onLocationSelect={(address, coordinates) => {
-                  setDropoffAddress(address);
-                  setDropoffCoordinates(coordinates || null);
-                  updateFieldError('dropoffAddress', address);
-                }}
-                placeholder="Enter delivery address..."
-                label="Drop-off Address *"
-                error={fieldErrors.dropoffAddress}
-                showCampusLocations={true}
-                disabled={isLoading}
-              />
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Drop-off Address *</Text>
+                <View style={[styles.inputWithIcon, fieldErrors.dropoffAddress && styles.inputError]}>
+                  <MapPin size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
+                  <TextInput
+                    style={styles.inputText}
+                    value={dropoffAddress}
+                    onChangeText={(value) => {
+                      setDropoffAddress(value);
+                      updateFieldError('dropoffAddress', value);
+                    }}
+                    placeholder="Enter delivery address..."
+                    placeholderTextColor={Colors.semantic.tabInactive}
+                    editable={!isLoading}
+                    accessibilityLabel="Drop-off address"
+                    returnKeyType="next"
+                    autoCapitalize="words"
+                    autoCorrect={true}
+                  />
+                </View>
+                {fieldErrors.dropoffAddress && (
+                  <Text style={styles.fieldError}>{fieldErrors.dropoffAddress}</Text>
+                )}
+              </View>
 
-              {/* Distance Calculator */}
-              {store && dropoffAddress && (
-                <TaskDistanceCalculator
-                  storeAddress={store}
-                  dropoffAddress={dropoffAddress}
-                  showWalkingTime={true}
-                  showDrivingTime={false}
-                />
-              )}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Drop-off Instructions</Text>
                 <View style={[styles.inputWithIcon, fieldErrors.dropoffInstructions && styles.inputError]}>
                   <Package size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
                   <TextInput
-                    style={[styles.inputText, { minHeight: 48 }]}
+                    style={[styles.inputText, styles.multilineInput]}
                     value={dropoffInstructions}
                     onChangeText={setDropoffInstructions}
                     placeholder="Any special delivery instructions?"
@@ -581,6 +593,8 @@ export default function PostScreen() {
                     multiline
                     numberOfLines={2}
                     textAlignVertical="top"
+                    autoCapitalize="sentences"
+                    autoCorrect={true}
                   />
                 </View>
               </View>
@@ -595,7 +609,7 @@ export default function PostScreen() {
                 <View style={[styles.inputWithIcon, fieldErrors.estimatedMinutes && styles.inputError]}>
                   <Clock size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
                   <TextInput
-                    style={[styles.inputText, { minHeight: 48 }]}
+                    style={styles.inputText}
                     value={estimatedMinutes}
                     onChangeText={(value) => {
                       setEstimatedMinutes(value);
@@ -703,7 +717,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.semantic.inputText,
     backgroundColor: Colors.semantic.inputBackground,
-    minHeight: 52,
+    minHeight: 56,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
@@ -717,6 +731,7 @@ const styles = StyleSheet.create({
   textArea: {
     height: 100,
     paddingTop: 18,
+    textAlignVertical: 'top',
   },
   inputWithIcon: {
     flexDirection: 'row',
@@ -727,7 +742,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 18,
     gap: 16,
-    minHeight: 52,
+    minHeight: 56,
     backgroundColor: Colors.semantic.inputBackground,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -740,6 +755,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.semantic.inputText,
     paddingVertical: 0,
+    minHeight: 20,
+  },
+  multilineInput: {
+    minHeight: 48,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
   helperText: {
     fontSize: 14,

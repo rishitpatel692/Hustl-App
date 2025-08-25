@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import MapView, { Marker, Circle, PROVIDER_GOOGLE, Region, Callout } from 'expo-maps';
+import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert, Platform } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE, Region, Callout } from 'expo-maps';
 import * as Location from 'expo-location';
-import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert } from 'react-native';
-import { MapPin, Store, Navigation, Phone } from 'lucide-react-native';
+import { MapPin, Store, Navigation } from 'lucide-react-native';
 import { Colors } from '@/theme/colors';
 import { openGoogleMapsNavigation } from '@/lib/navigation';
 

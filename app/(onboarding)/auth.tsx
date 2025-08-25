@@ -121,7 +121,7 @@ export default function AuthScreen() {
                 value={displayName}
                 onChangeText={setDisplayName}
                 placeholder="Enter your display name"
-                placeholderTextColor={Colors.muted.foreground}
+                placeholderTextColor={Colors.semantic.tabInactive}
                 autoCapitalize="words"
                 autoCorrect={true}
                 editable={!isLoading}
@@ -140,7 +140,7 @@ export default function AuthScreen() {
               value={email}
               onChangeText={setEmail}
               placeholder="Enter your email"
-              placeholderTextColor={Colors.muted.foreground}
+              placeholderTextColor={Colors.semantic.tabInactive}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -157,7 +157,7 @@ export default function AuthScreen() {
                 value={password}
                 onChangeText={setPassword}
                 placeholder="Enter your password"
-                placeholderTextColor={Colors.muted.foreground}
+                placeholderTextColor={Colors.semantic.tabInactive}
                 secureTextEntry={!showPassword}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -171,9 +171,9 @@ export default function AuthScreen() {
                 disabled={isLoading}
               >
                 {showPassword ? (
-                  <EyeOff size={20} color={Colors.muted.foreground} strokeWidth={2} />
+                  <EyeOff size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
                 ) : (
-                  <Eye size={20} color={Colors.muted.foreground} strokeWidth={2} />
+                  <Eye size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
                 )}
               </TouchableOpacity>
             </View>
@@ -303,6 +303,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.semantic.inputText,
     backgroundColor: Colors.semantic.inputBackground,
+    minHeight: 52,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
@@ -329,6 +330,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     fontSize: 16,
     color: Colors.semantic.inputText,
+    minHeight: 20,
   },
   eyeButton: {
     padding: 16,

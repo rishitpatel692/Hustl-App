@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { MapPin, Navigation, ExternalLink } from 'lucide-react-native';
 import { Colors } from '@/theme/colors';
+
+const { width, height } = Dimensions.get('window');
 
 export interface TaskPin {
   id: string;
@@ -29,11 +31,13 @@ export default function TasksMap({
   onRequestLocation
 }: TasksMapProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     // Simulate map loading
     const timer = setTimeout(() => {
       setIsLoading(false);
+      setMapLoaded(true);
     }, 1000);
 
     return () => clearTimeout(timer);
@@ -58,6 +62,19 @@ export default function TasksMap({
     onPressPin?.(pin.id);
   };
 
+  const getUrgencyColor = (urgency: string): string => {
+    switch (urgency) {
+      case 'low':
+        return '#10B981';
+      case 'medium':
+        return '#F59E0B';
+      case 'high':
+        return '#EF4444';
+      default:
+        return '#6B7280';
+    }
+  };
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -69,23 +86,27 @@ export default function TasksMap({
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.iconContainer}>
-          <MapPin size={48} color={Colors.primary} strokeWidth={1.5} />
-        </View>
+      {/* Embedded Google Maps iframe for web */}
+      <View style={styles.mapContainer}>
+        <iframe
+          src={`https://www.google.com/maps/embed/v1/view?key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}&center=29.6436,-82.3549&zoom=15&maptype=roadmap`}
+          style={styles.mapFrame}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
         
-        <Text style={styles.title}>Interactive Map</Text>
-        <Text style={styles.subtitle}>
-          Full interactive maps with Google Maps integration are available on mobile devices. 
-          Use the buttons below to view locations or browse tasks in the list view.
-        </Text>
-        
-        {pins.length > 0 && (
-          <>
-            <Text style={styles.taskCount}>
-              {pins.length} task{pins.length !== 1 ? 's' : ''} available near campus
-            </Text>
-            
+        {/* Map overlay with task pins */}
+        <View style={styles.mapOverlay}>
+          <View style={styles.mapHeader}>
+            <Text style={styles.mapTitle}>Campus Tasks</Text>
+            <TouchableOpacity style={styles.fullscreenButton} onPress={handleOpenGoogleMaps}>
+              <ExternalLink size={16} color={Colors.white} strokeWidth={2} />
+              <Text style={styles.fullscreenButtonText}>Open in Google Maps</Text>
+            </TouchableOpacity>
+          </View>
+          
+          {pins.length > 0 && (
             <View style={styles.taskPinsList}>
               {pins.slice(0, 3).map((pin) => (
                 <TouchableOpacity
@@ -103,30 +124,18 @@ export default function TasksMap({
                   <Text style={styles.pinReward}>{pin.reward}</Text>
                 </TouchableOpacity>
               ))}
+              
+              {pins.length > 3 && (
+                <TouchableOpacity style={styles.viewMoreButton} onPress={handleOpenGoogleMaps}>
+                  <Text style={styles.viewMoreText}>+{pins.length - 3} more tasks</Text>
+                </TouchableOpacity>
+              )}
             </View>
-          </>
-        )}
-
-        <TouchableOpacity style={styles.openMapsButton} onPress={handleOpenGoogleMaps}>
-          <ExternalLink size={16} color={Colors.white} strokeWidth={2} />
-          <Text style={styles.openMapsButtonText}>Open in Google Maps</Text>
-        </TouchableOpacity>
+          )}
+        </View>
       </View>
     </View>
   );
-
-  function getUrgencyColor(urgency: string): string {
-    switch (urgency) {
-      case 'low':
-        return '#10B981';
-      case 'medium':
-        return '#F59E0B';
-      case 'high':
-        return '#EF4444';
-      default:
-        return '#6B7280';
-    }
-  }
 }
 
 const styles = StyleSheet.create({
@@ -146,65 +155,82 @@ const styles = StyleSheet.create({
     color: Colors.semantic.tabInactive,
     fontWeight: '500',
   },
-  content: {
+  mapContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-    gap: 20,
+    position: 'relative',
   },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
+  mapFrame: {
+    width: '100%',
+    height: '100%',
+    border: 'none',
   },
-  title: {
-    fontSize: 24,
+  mapOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    pointerEvents: 'none',
+  },
+  mapHeader: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    pointerEvents: 'auto',
+  },
+  mapTitle: {
+    fontSize: 18,
     fontWeight: '700',
-    color: Colors.semantic.headingText,
-    textAlign: 'center',
+    color: Colors.white,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
   },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.semantic.tabInactive,
-    textAlign: 'center',
-    lineHeight: 24,
-    paddingHorizontal: 20,
+  fullscreenButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 6,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  taskCount: {
-    fontSize: 16,
+  fullscreenButtonText: {
+    fontSize: 12,
     fontWeight: '600',
-    color: Colors.primary,
-    textAlign: 'center',
+    color: Colors.white,
   },
   taskPinsList: {
-    width: '100%',
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 12,
+    padding: 16,
     gap: 8,
+    pointerEvents: 'auto',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
   taskPinItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.white,
-    borderRadius: 12,
-    padding: 12,
+    paddingVertical: 8,
     gap: 12,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   pinMarker: {
     width: 24,
@@ -231,23 +257,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.secondary,
   },
-  openMapsButton: {
-    flexDirection: 'row',
+  viewMoreButton: {
     alignItems: 'center',
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    gap: 8,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: Colors.semantic.dividerLight,
+    marginTop: 8,
   },
-  openMapsButtonText: {
-    fontSize: 16,
+  viewMoreText: {
+    fontSize: 14,
     fontWeight: '600',
-    color: Colors.white,
+    color: Colors.primary,
   },
 });
