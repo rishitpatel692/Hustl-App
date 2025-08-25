@@ -40,8 +40,22 @@ export default function TasksMap({
   }, []);
 
   const handleOpenGoogleMaps = () => {
-    const campusUrl = `https://www.google.com/maps/@29.6436,-82.3549,15z`;
-    window.open(campusUrl, '_blank');
+    // Create a URL with all task pins as markers
+    let mapUrl = 'https://www.google.com/maps/@29.6436,-82.3549,15z';
+    
+    if (pins.length > 0) {
+      // Add markers for each task
+      const markers = pins.map(pin => `${pin.latitude},${pin.longitude}`).join('|');
+      mapUrl = `https://www.google.com/maps/search/?api=1&query=${pins[0].latitude},${pins[0].longitude}`;
+    }
+    
+    window.open(mapUrl, '_blank');
+  };
+
+  const handleTaskPin = (pin: TaskPin) => {
+    const taskUrl = `https://www.google.com/maps/search/?api=1&query=${pin.latitude},${pin.longitude}`;
+    window.open(taskUrl, '_blank');
+    onPressPin?.(pin.id);
   };
 
   if (isLoading) {
@@ -63,13 +77,34 @@ export default function TasksMap({
         <Text style={styles.title}>Interactive Map</Text>
         <Text style={styles.subtitle}>
           Full interactive maps with Google Maps integration are available on mobile devices. 
-          Use the List view below to browse all available tasks.
+          Use the buttons below to view locations or browse tasks in the list view.
         </Text>
         
         {pins.length > 0 && (
-          <Text style={styles.taskCount}>
-            {pins.length} task{pins.length !== 1 ? 's' : ''} available near campus
-          </Text>
+          <>
+            <Text style={styles.taskCount}>
+              {pins.length} task{pins.length !== 1 ? 's' : ''} available near campus
+            </Text>
+            
+            <View style={styles.taskPinsList}>
+              {pins.slice(0, 3).map((pin) => (
+                <TouchableOpacity
+                  key={pin.id}
+                  style={styles.taskPinItem}
+                  onPress={() => handleTaskPin(pin)}
+                >
+                  <View style={[styles.pinMarker, { backgroundColor: getUrgencyColor(pin.urgency) }]}>
+                    <MapPin size={12} color={Colors.white} strokeWidth={2} />
+                  </View>
+                  <View style={styles.pinInfo}>
+                    <Text style={styles.pinTitle} numberOfLines={1}>{pin.title}</Text>
+                    <Text style={styles.pinStore} numberOfLines={1}>{pin.store}</Text>
+                  </View>
+                  <Text style={styles.pinReward}>{pin.reward}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
         )}
 
         <TouchableOpacity style={styles.openMapsButton} onPress={handleOpenGoogleMaps}>
@@ -79,6 +114,19 @@ export default function TasksMap({
       </View>
     </View>
   );
+
+  function getUrgencyColor(urgency: string): string {
+    switch (urgency) {
+      case 'low':
+        return '#10B981';
+      case 'medium':
+        return '#F59E0B';
+      case 'high':
+        return '#EF4444';
+      default:
+        return '#6B7280';
+    }
+  }
 }
 
 const styles = StyleSheet.create({
@@ -138,6 +186,50 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.primary,
     textAlign: 'center',
+  },
+  taskPinsList: {
+    width: '100%',
+    gap: 8,
+  },
+  taskPinItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    padding: 12,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: Colors.semantic.borderLight,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  pinMarker: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pinInfo: {
+    flex: 1,
+  },
+  pinTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.semantic.bodyText,
+    marginBottom: 2,
+  },
+  pinStore: {
+    fontSize: 12,
+    color: Colors.semantic.tabInactive,
+  },
+  pinReward: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.secondary,
   },
   openMapsButton: {
     flexDirection: 'row',

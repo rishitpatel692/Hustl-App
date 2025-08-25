@@ -531,7 +531,7 @@ export default function PostScreen() {
                   setStoreCoordinates(coordinates || null);
                   updateFieldError('store', address);
                 }}
-                placeholder="Search for store or restaurant..."
+                placeholder="Enter store name or search..."
                 label="Store *"
                 error={fieldErrors.store}
                 showCampusLocations={true}
@@ -550,7 +550,7 @@ export default function PostScreen() {
                   setDropoffCoordinates(coordinates || null);
                   updateFieldError('dropoffAddress', address);
                 }}
-                placeholder="Search for delivery location..."
+                placeholder="Enter delivery address..."
                 label="Drop-off Address *"
                 error={fieldErrors.dropoffAddress}
                 showCampusLocations={true}

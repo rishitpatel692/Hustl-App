@@ -45,6 +45,7 @@ export default function TasksMap({
   const [isReady, setIsReady] = useState(false);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [mapRegion, setMapRegion] = useState<Region>(UF_CAMPUS);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
     const initializeMap = async () => {
@@ -76,6 +77,7 @@ export default function TasksMap({
         }
       } catch (error) {
         console.warn('Location permission error:', error);
+        setMapError('Location services unavailable');
       } finally {
         setIsReady(true);
       }
@@ -149,6 +151,22 @@ export default function TasksMap({
     );
   }
 
+  if (mapError) {
+    return (
+      <View style={styles.errorContainer}>
+        <MapPin size={48} color={Colors.semantic.tabInactive} strokeWidth={1.5} />
+        <Text style={styles.errorTitle}>Map Unavailable</Text>
+        <Text style={styles.errorText}>{mapError}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={() => {
+          setMapError(null);
+          setIsReady(false);
+        }}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <MapView
@@ -165,6 +183,10 @@ export default function TasksMap({
         showsPointsOfInterest={true}
         showsTraffic={false}
         onMapReady={() => setIsReady(true)}
+        onError={(error) => {
+          console.error('Map error:', error);
+          setMapError('Failed to load map');
+        }}
       >
         {/* User location permission prompt */}
         {locationPermission !== 'granted' && (
@@ -261,6 +283,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.semantic.tabInactive,
     fontWeight: '500',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.semantic.screen,
+    paddingHorizontal: 40,
+    gap: 16,
+  },
+  errorTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: Colors.semantic.headingText,
+  },
+  errorText: {
+    fontSize: 16,
+    color: Colors.semantic.tabInactive,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  retryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.white,
   },
   permissionOverlay: {
     position: 'absolute',

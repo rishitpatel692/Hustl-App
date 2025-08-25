@@ -198,7 +198,13 @@ export class GeocodingService {
       const searchLocation = location || { latitude: 29.6436, longitude: -82.3549 }; // UF campus center
       
       const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&location=${searchLocation.latitude},${searchLocation.longitude}&radius=5000&key=${GOOGLE_MAPS_API_KEY}`;
-      const response = await fetch(url);
+      
+      // Use a CORS proxy for web requests
+      const proxyUrl = Platform.OS === 'web' 
+        ? `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+        : url;
+      
+      const response = await fetch(proxyUrl);
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);

@@ -200,6 +200,8 @@ export default function ReviewSheet({ visible, onClose, task, onReviewSubmitted 
                 textAlignVertical="top"
                 editable={!isSubmitting}
                 returnKeyType="done"
+                autoCapitalize="sentences"
+                autoCorrect={true}
               />
               <Text style={styles.characterCount}>
                 {comment.length}/200 characters

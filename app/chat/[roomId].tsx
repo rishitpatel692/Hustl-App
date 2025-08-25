@@ -343,6 +343,7 @@ export default function ChatScreen() {
             returnKeyType="send"
             onSubmitEditing={handleSendMessage}
             blurOnSubmit={false}
+            textAlignVertical="center"
           />
         </View>
         
@@ -618,8 +619,7 @@ const styles = StyleSheet.create({
     color: Colors.semantic.inputText,
     backgroundColor: 'transparent',
     maxHeight: 120,
-    minHeight: 40,
-    textAlignVertical: 'center',
+    minHeight: 44,
   },
   sendButton: {
     width: 40,

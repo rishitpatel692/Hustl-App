@@ -123,6 +123,7 @@ export default function AuthScreen() {
                 placeholder="Enter your display name"
                 placeholderTextColor={Colors.muted.foreground}
                 autoCapitalize="words"
+                autoCorrect={true}
                 editable={!isLoading}
                 returnKeyType="next"
                 onSubmitEditing={() => {

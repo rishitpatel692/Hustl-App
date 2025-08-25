@@ -497,7 +497,7 @@ export default function TasksScreen() {
         }
       >
         {/* Tab Selector for List View */}
-        <View style={[styles.segmentedControl, { marginTop: 12, marginBottom: 24 }]}>
+        <View style={styles.tabSelectorContainer}>
           <TouchableOpacity
             style={[styles.segment, activeTab === 'available' && styles.activeSegment]}
             onPress={() => handleTabChange('available')}
@@ -727,12 +727,11 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: '700',
   },
-  mapContainer: {
-    flex: 1,
-  },
-  segmentedControl: {
+  tabSelectorContainer: {
     flexDirection: 'row',
     marginHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 24,
     backgroundColor: Colors.mutedDark,
     borderRadius: 14,
     padding: 6,
@@ -743,6 +742,9 @@ const styles = StyleSheet.create({
     elevation: 3,
     borderWidth: 1,
     borderColor: Colors.semantic.borderLight,
+  },
+  mapContainer: {
+    flex: 1,
   },
   segment: {
     flex: 1,

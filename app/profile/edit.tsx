@@ -80,12 +80,14 @@ export default function EditProfileScreen() {
             <View style={styles.inputContainer}>
               <User size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               <TextInput
-                style={[styles.input, { minHeight: 48 }]}
+                style={styles.inputText}
                 value={displayName}
                 onChangeText={setDisplayName}
                 placeholder="Enter your display name"
                 placeholderTextColor={Colors.semantic.tabInactive}
                 returnKeyType="next"
+                autoCapitalize="words"
+                autoCorrect={true}
               />
             </View>
           </View>
@@ -95,13 +97,14 @@ export default function EditProfileScreen() {
             <View style={styles.inputContainer}>
               <Mail size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               <TextInput
-                style={[styles.input, { minHeight: 48 }]}
+                style={styles.inputText}
                 value={email}
                 onChangeText={setEmail}
                 placeholder="Enter your email"
                 placeholderTextColor={Colors.semantic.tabInactive}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                autoCorrect={false}
                 returnKeyType="next"
               />
             </View>
@@ -112,11 +115,13 @@ export default function EditProfileScreen() {
             <View style={styles.inputContainer}>
               <GraduationCap size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               <TextInput
-                style={[styles.input, { minHeight: 48 }]}
+                style={styles.inputText}
                 value={major}
                 onChangeText={setMajor}
                 placeholder="Enter your major"
                 placeholderTextColor={Colors.semantic.tabInactive}
+                autoCapitalize="words"
+                autoCorrect={true}
                 returnKeyType="next"
               />
             </View>
@@ -127,11 +132,12 @@ export default function EditProfileScreen() {
             <View style={styles.inputContainer}>
               <GraduationCap size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               <TextInput
-                style={[styles.input, { minHeight: 48 }]}
+                style={styles.inputText}
                 value={year}
                 onChangeText={setYear}
                 placeholder="Enter your year"
                 placeholderTextColor={Colors.semantic.tabInactive}
+                autoCapitalize="words"
                 returnKeyType="next"
               />
             </View>
@@ -142,11 +148,13 @@ export default function EditProfileScreen() {
             <View style={styles.inputContainer}>
               <MapPin size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
               <TextInput
-                style={[styles.input, { minHeight: 48 }]}
+                style={styles.inputText}
                 value={university}
                 onChangeText={setUniversity}
                 placeholder="Enter your university"
                 placeholderTextColor={Colors.semantic.tabInactive}
+                autoCapitalize="words"
+                autoCorrect={true}
                 returnKeyType="done"
               />
             </View>
@@ -254,15 +262,16 @@ const styles = StyleSheet.create({
     borderColor: Colors.semantic.inputBorder,
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
     gap: 12,
     backgroundColor: Colors.semantic.inputBackground,
     minHeight: 52,
   },
-  input: {
+  inputText: {
     flex: 1,
     fontSize: 16,
     color: Colors.semantic.inputText,
-    paddingVertical: 0,
+    paddingVertical: 4,
+    minHeight: 24,
   },
 });
