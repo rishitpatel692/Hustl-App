@@ -21,6 +21,8 @@ import { ChevronRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/theme/colors';
 import GlobalHeader from '@components/GlobalHeader';
+import NearbyTasksWidget from '@/components/NearbyTasksWidget';
+import LiveTaskUpdates from '@/components/LiveTaskUpdates';
 
 const { width, height } = Dimensions.get('window');
 
@@ -382,6 +384,9 @@ export default function HomeScreen() {
       >
         {/* Enhanced Referral Banner */}
         <AnimatedReferralsBanner />
+
+        {/* Nearby Tasks Widget */}
+        <NearbyTasksWidget />
 
         {/* Task Categories Section */}
         <View style={styles.categoriesSection}>

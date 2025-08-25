@@ -1,9 +1,4 @@
-import { Client } from '@googlemaps/google-maps-services-js';
-
 const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8';
-
-// Initialize Google Maps client
-const client = new Client({});
 
 export interface Coordinates {
   latitude: number;
@@ -94,19 +89,12 @@ export class GeocodingService {
    */
   static async geocodeAddress(address: string): Promise<{ data: Coordinates | null; error: string | null }> {
     try {
-      const response = await client.geocode({
-        params: {
-          address: address,
-          key: GOOGLE_MAPS_API_KEY,
-          components: {
-            country: 'US',
-            administrative_area: 'FL', // Florida
-          },
-        },
-      });
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&components=country:US|administrative_area:FL&key=${GOOGLE_MAPS_API_KEY}`;
+      const response = await fetch(url);
+      const data = await response.json();
 
-      if (response.data.status === 'OK' && response.data.results.length > 0) {
-        const location = response.data.results[0].geometry.location;
+      if (data.status === 'OK' && data.results.length > 0) {
+        const location = data.results[0].geometry.location;
         return {
           data: {
             latitude: location.lat,
@@ -134,16 +122,13 @@ export class GeocodingService {
    */
   static async reverseGeocode(coordinates: Coordinates): Promise<{ data: string | null; error: string | null }> {
     try {
-      const response = await client.reverseGeocode({
-        params: {
-          latlng: `${coordinates.latitude},${coordinates.longitude}`,
-          key: GOOGLE_MAPS_API_KEY,
-        },
-      });
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coordinates.latitude},${coordinates.longitude}&key=${GOOGLE_MAPS_API_KEY}`;
+      const response = await fetch(url);
+      const data = await response.json();
 
-      if (response.data.status === 'OK' && response.data.results.length > 0) {
+      if (data.status === 'OK' && data.results.length > 0) {
         return {
-          data: response.data.results[0].formatted_address,
+          data: data.results[0].formatted_address,
           error: null,
         };
       } else {
@@ -168,17 +153,12 @@ export class GeocodingService {
     try {
       const searchLocation = location || { latitude: 29.6436, longitude: -82.3549 }; // UF campus center
       
-      const response = await client.textSearch({
-        params: {
-          query: query,
-          location: `${searchLocation.latitude},${searchLocation.longitude}`,
-          radius: 5000, // 5km radius around campus
-          key: GOOGLE_MAPS_API_KEY,
-        },
-      });
+      const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&location=${searchLocation.latitude},${searchLocation.longitude}&radius=5000&key=${GOOGLE_MAPS_API_KEY}`;
+      const response = await fetch(url);
+      const data = await response.json();
 
-      if (response.data.status === 'OK') {
-        const places: PlaceDetails[] = response.data.results.map(place => ({
+      if (data.status === 'OK') {
+        const places: PlaceDetails[] = data.results.map((place: any) => ({
           place_id: place.place_id!,
           formatted_address: place.formatted_address!,
           name: place.name,

@@ -14,6 +14,8 @@ import GlobalHeader from '@/components/GlobalHeader';
 import TaskSuccessSheet from '@components/TaskSuccessSheet';
 import Toast from '@components/Toast';
 import StickyFormFooter from '@components/StickyFormFooter';
+import SmartLocationInput from '@/components/SmartLocationInput';
+import TaskDistanceCalculator from '@/components/TaskDistanceCalculator';
 
 // Extended categories to support all card types
 const categories: { value: string; label: string }[] = [
@@ -102,6 +104,10 @@ export default function PostScreen() {
   const [urgency, setUrgency] = useState<string>('medium');
   const [estimatedMinutes, setEstimatedMinutes] = useState('');
   const [prefilledCategory, setPrefilledCategory] = useState<string | null>(null);
+  
+  // Location coordinates for enhanced features
+  const [storeCoordinates, setStoreCoordinates] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [dropoffCoordinates, setDropoffCoordinates] = useState<{ latitude: number; longitude: number } | null>(null);
   
   // Computed pricing
   const [computedPriceCents, setComputedPriceCents] = useState(BASE_PRICE_CENTS + 100); // Base + medium urgency
@@ -518,55 +524,48 @@ export default function PostScreen() {
 
               <CategorySelector />
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Store *</Text>
-                <View style={[styles.inputWithIcon, fieldErrors.store && styles.inputError]}>
-                  <Store size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-                  <TextInput
-                    style={styles.inputText}
-                    value={store}
-                    onChangeText={(value) => {
-                      setStore(value);
-                      updateFieldError('store', value);
-                    }}
-                    placeholder="e.g., Publix, Starbucks, Target"
-                    placeholderTextColor={Colors.semantic.tabInactive}
-                    editable={!isLoading}
-                    accessibilityLabel="Store name"
-                  />
-                </View>
-                {fieldErrors.store && (
-                  <Text style={styles.fieldError}>{fieldErrors.store}</Text>
-                )}
-              </View>
+              <SmartLocationInput
+                value={store}
+                onLocationSelect={(address, coordinates) => {
+                  setStore(address);
+                  setStoreCoordinates(coordinates || null);
+                  updateFieldError('store', address);
+                }}
+                placeholder="Search for store (e.g., Publix, Starbucks)"
+                label="Store *"
+                error={fieldErrors.store}
+                showCampusLocations={true}
+                disabled={isLoading}
+              />
             </View>
 
             {/* Drop-off Section */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Drop-off</Text>
               
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Drop-off Address *</Text>
-                <View style={[styles.inputWithIcon, fieldErrors.dropoffAddress && styles.inputError]}>
-                  <MapPin size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-                  <TextInput
-                    style={styles.inputText}
-                    value={dropoffAddress}
-                    onChangeText={(value) => {
-                      setDropoffAddress(value);
-                      updateFieldError('dropoffAddress', value);
-                    }}
-                    placeholder="Where should this be delivered?"
-                    placeholderTextColor={Colors.semantic.tabInactive}
-                    editable={!isLoading}
-                    accessibilityLabel="Drop-off address"
-                  />
-                </View>
-                {fieldErrors.dropoffAddress && (
-                  <Text style={styles.fieldError}>{fieldErrors.dropoffAddress}</Text>
-                )}
-              </View>
+              <SmartLocationInput
+                value={dropoffAddress}
+                onLocationSelect={(address, coordinates) => {
+                  setDropoffAddress(address);
+                  setDropoffCoordinates(coordinates || null);
+                  updateFieldError('dropoffAddress', address);
+                }}
+                placeholder="Where should this be delivered?"
+                label="Drop-off Address *"
+                error={fieldErrors.dropoffAddress}
+                showCampusLocations={true}
+                disabled={isLoading}
+              />
 
+              {/* Distance Calculator */}
+              {store && dropoffAddress && (
+                <TaskDistanceCalculator
+                  storeAddress={store}
+                  dropoffAddress={dropoffAddress}
+                  showWalkingTime={true}
+                  showDrivingTime={false}
+                />
+              )}
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Drop-off Instructions</Text>
                 <View style={styles.inputWithIcon}>

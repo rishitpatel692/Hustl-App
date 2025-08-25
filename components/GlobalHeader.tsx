@@ -7,6 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import ProfileSidebar from './ProfileSidebar';
+import LiveTaskUpdates from './LiveTaskUpdates';
 
 interface GlobalHeaderProps {
   showSearch?: boolean;
@@ -98,6 +99,10 @@ export default function GlobalHeader({
                   <Search size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
                 </TouchableOpacity>
               )}
+              
+              {showNotifications && (
+                <LiveTaskUpdates />
+              )}
             </View>
           </View>
         </View>
@@ -149,9 +154,7 @@ export default function GlobalHeader({
             )}
             
             {showNotifications && (
-              <TouchableOpacity style={styles.iconButton} onPress={handleNotificationsPress}>
-                <Bell size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-              </TouchableOpacity>
+              <LiveTaskUpdates />
             )}
           </View>
         </View>

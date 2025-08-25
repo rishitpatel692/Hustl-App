@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import MapView, { Marker, Circle, PROVIDER_GOOGLE, Region, Callout } from 'expo-maps';
 import * as Location from 'expo-location';
 import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { MapPin, Store } from 'lucide-react-native';
+import { MapPin, Store, Navigation } from 'lucide-react-native';
 import { Colors } from '@/theme/colors';
+import { openGoogleMapsNavigation } from '@/lib/navigation';
 
 export type TaskPin = { 
   id: string; 
@@ -23,6 +24,7 @@ interface TasksMapProps {
   showsUserLocation?: boolean;
   locationPermission?: string;
   onRequestLocation?: () => void;
+  showNavigationButtons?: boolean;
 }
 
 const UF_CAMPUS: Region = { 
@@ -38,8 +40,10 @@ export default function TasksMap({
   showsUserLocation = false,
   locationPermission,
   onRequestLocation,
+  showNavigationButtons = true,
 }: TasksMapProps) {
   const [isReady, setIsReady] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
     const initializeMap = async () => {
@@ -54,9 +58,40 @@ export default function TasksMap({
       }
     };
 
+    const getCurrentLocation = async () => {
+      try {
+        if (locationPermission === 'granted') {
+          const location = await Location.getCurrentPositionAsync({});
+          setUserLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+        }
+      } catch (error) {
+        console.warn('Failed to get current location:', error);
+      }
+    };
+
     initializeMap();
+    getCurrentLocation();
   }, [locationPermission]);
 
+  const handleNavigateToTask = async (pin: TaskPin) => {
+    if (!userLocation) return;
+    
+    try {
+      await openGoogleMapsNavigation({
+        start: { lat: userLocation.latitude, lng: userLocation.longitude },
+        dest: { lat: pin.latitude, lng: pin.longitude },
+        waypoint: pin.storeCoordinates ? {
+          lat: pin.storeCoordinates.latitude,
+          lng: pin.storeCoordinates.longitude
+        } : undefined,
+      });
+    } catch (error) {
+      console.warn('Failed to open navigation:', error);
+    }
+  };
   const getUrgencyColor = (urgency: string): string => {
     switch (urgency) {
       case 'low':
@@ -117,6 +152,16 @@ export default function TasksMap({
                       {pin.urgency.toUpperCase()}
                     </Text>
                   </View>
+                  
+                  {showNavigationButtons && userLocation && (
+                    <TouchableOpacity
+                      style={styles.navigateButton}
+                      onPress={() => handleNavigateToTask(pin)}
+                    >
+                      <Navigation size={12} color={Colors.white} strokeWidth={2} />
+                      <Text style={styles.navigateButtonText}>Navigate</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               </Callout>
             </Marker>
@@ -215,5 +260,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  navigateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    gap: 4,
+    marginTop: 8,
+  },
+  navigateButtonText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.white,
   },
 });

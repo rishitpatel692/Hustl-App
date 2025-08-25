@@ -16,6 +16,7 @@ import GlobalHeader from '@/components/GlobalHeader';
 import Toast from '@/components/Toast';
 import TasksMap, { TaskPin } from '@/components/TasksMap';
 import ReviewSheet from '@/components/ReviewSheet';
+import TaskTracker from '@/components/TaskTracker';
 
 type TabType = 'available' | 'doing' | 'posts';
 type ViewMode = 'map' | 'list';
@@ -54,6 +55,10 @@ export default function TasksScreen() {
   // Review state
   const [showReviewSheet, setShowReviewSheet] = useState(false);
   const [taskToReview, setTaskToReview] = useState<Task | null>(null);
+  
+  // Task tracker state
+  const [showTaskTracker, setShowTaskTracker] = useState(false);
+  const [taskToTrack, setTaskToTrack] = useState<Task | null>(null);
 
   // Request location permission on mount
   useEffect(() => {
@@ -399,9 +404,12 @@ export default function TasksScreen() {
             {showStatusUpdate && (
               <TouchableOpacity 
                 style={styles.statusButton}
-                onPress={() => router.push(`/task/${task.id}`)}
+                onPress={() => {
+                  setTaskToTrack(task);
+                  setShowTaskTracker(true);
+                }}
               >
-                <Text style={styles.statusButtonText}>Update Status</Text>
+                <Text style={styles.statusButtonText}>Track Progress</Text>
                 <ChevronRight size={14} color={Colors.primary} strokeWidth={2} />
               </TouchableOpacity>
             )}
@@ -624,6 +632,23 @@ export default function TasksScreen() {
         }}
         task={taskToReview}
         onReviewSubmitted={handleReviewSubmitted}
+      />
+
+      {/* Task Tracker */}
+      <TaskTracker
+        visible={showTaskTracker}
+        onClose={() => {
+          setShowTaskTracker(false);
+          setTaskToTrack(null);
+        }}
+        task={taskToTrack}
+        onStatusUpdate={(status) => {
+          // Handle status update
+          console.log('Status update:', status);
+          setShowTaskTracker(false);
+          setTaskToTrack(null);
+          loadTasks(); // Refresh tasks
+        }}
       />
     </>
   );
