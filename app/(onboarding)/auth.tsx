@@ -9,13 +9,20 @@ import { useAuth } from '@contexts/AuthContext';
 export default function AuthScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { login, signup, isLoading } = useAuth();
+  const { login, signup, isLoading, user } = useAuth();
   const [isLogin, setIsLogin] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (user) {
+      router.replace('/(tabs)/home');
+    }
+  }, [user, router]);
 
   const handleAuth = async () => {
     // Clear previous errors
@@ -66,9 +73,6 @@ export default function AuthScreen() {
     router.back();
   };
 
-  const handleSkip = () => {
-    router.replace('/(tabs)/home');
-  };
 
   const isFormValid = email.trim() && password.trim() && (isLogin || displayName.trim());
 

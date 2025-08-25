@@ -59,23 +59,19 @@ export default function UniversitySelection() {
       setSelectedId(university.id);
       // Delay navigation to show animation
       setTimeout(() => {
-        router.push('/(onboarding)/confirm-university');
+        router.replace('/(onboarding)/confirm-university');
       }, 300);
     }
   };
 
   const handleRequestCampus = () => {
-    alert('Email us at HustlApp@outlook.com!');
+    console.log('Request campus feature');
   };
 
   const handleBack = () => {
     router.back();
   };
 
-  const handleSkip = () => {
-    // Allow users to skip and browse as guest
-    router.replace('/(tabs)/home');
-  };
 
   const UniversityCardComponent = ({ university }: { university: UniversityCard }) => {
     const scale = useSharedValue(1);

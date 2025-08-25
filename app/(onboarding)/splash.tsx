@@ -44,7 +44,7 @@ export default function SplashScreen() {
       
       // Navigate after fade out
       setTimeout(() => {
-       router.replace('/(onboarding)/welcome');
+        router.replace('/(onboarding)/welcome');
       }, 300);
     }, 2200);
 

@@ -212,7 +212,7 @@ export default function WelcomeScreen() {
   }));
 
   const handleChooseCampus = () => {
-    router.push('/(onboarding)/university-selection');
+    router.replace('/(onboarding)/university-selection');
   };
 
   const handleTerms = () => {
@@ -222,10 +222,6 @@ export default function WelcomeScreen() {
   const handlePrivacy = () => {
     console.log('Privacy Policy pressed');
   };
-
-  return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Background with gradient overlay */}
       <View style={styles.backgroundContainer}>
         <Image
           source={{ uri: 'https://images.pexels.com/photos/1595391/pexels-photo-1595391.jpeg?auto=compress&cs=tinysrgb&w=800' }}

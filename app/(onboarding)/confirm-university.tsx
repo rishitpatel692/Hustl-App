@@ -10,17 +10,13 @@ export default function ConfirmUniversity() {
   const insets = useSafeAreaInsets();
 
   const handleConfirm = () => {
-    router.push('/(onboarding)/auth');
+    router.replace('/(onboarding)/auth');
   };
 
   const handleCancel = () => {
     router.back();
   };
 
-  const handleSkip = () => {
-    // Allow users to skip and browse as guest
-    router.replace('/(tabs)/home');
-  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
