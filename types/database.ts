@@ -9,11 +9,7 @@ export interface Task {
   description: string;
   category: TaskCategory;
   store: string;
-  store_latitude: number | null;
-  store_longitude: number | null;
   dropoff_address: string;
-  dropoff_latitude: number | null;
-  dropoff_longitude: number | null;
   dropoff_instructions: string;
   urgency: TaskUrgency;
   reward_cents: number;
@@ -32,15 +28,7 @@ export interface CreateTaskData {
   description: string;
   category: TaskCategory;
   store: string;
-  store_latitude?: number;
-  store_longitude?: number;
-  store_latitude?: number;
-  store_longitude?: number;
   dropoff_address: string;
-  dropoff_latitude?: number;
-  dropoff_longitude?: number;
-  dropoff_latitude?: number;
-  dropoff_longitude?: number;
   dropoff_instructions: string;
   urgency: TaskUrgency;
   reward_cents: number;

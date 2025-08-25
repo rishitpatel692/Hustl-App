@@ -6,7 +6,7 @@ export default (): ExpoConfig => ({
     slug: "bolt-expo-nativewind",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/images/icon.png",
+    icon: "./src/assets/images/icon.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
@@ -21,12 +21,12 @@ export default (): ExpoConfig => ({
     web: {
       bundler: "metro",
       output: "single",
-      favicon: "./assets/images/favicon.png"
+      favicon: "./src/assets/images/favicon.png"
     },
     plugins: [
       "expo-router",
       ["expo-maps", { 
-        googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8"
+        googleMapsApiKey: "AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8"
       }],
       ["expo-location", {
         locationAlwaysAndWhenInUseUsageDescription: "We use your location to show nearby tasks on the map."
