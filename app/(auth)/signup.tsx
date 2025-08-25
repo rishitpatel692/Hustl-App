@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'reac
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react-native';
-import { Colors } from '@constants/Colors';
+import { Colors } from '@/theme/colors';
 
 export default function SignUpScreen() {
   const router = useRouter();

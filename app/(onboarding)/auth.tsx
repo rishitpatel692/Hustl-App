@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Image,
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react-native';
-import { Colors } from '@constants/Colors';
+import { Colors } from '@/theme/colors';
 import { useAuth } from '@contexts/AuthContext';
 
 export default function AuthScreen() {

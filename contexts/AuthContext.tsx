@@ -118,18 +118,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<{ error?: string }> => {
     try {
       setIsLoading(true);
+      
+      // Validate inputs
+      if (!email.trim()) {
+        return { error: 'Please enter your email address.' };
+      }
+      
+      if (!password.trim()) {
+        return { error: 'Please enter your password.' };
+      }
+      
       const { error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
       });
 
       if (error) {
+        console.error('Login error:', error);
         return { error: formatAuthError(error) };
       }
 
       setIsGuest(false);
       return {};
     } catch (error) {
+      console.error('Login network error:', error);
       return { error: 'Network error. Please check your connection and try again.' };
     } finally {
       setIsLoading(false);
@@ -139,6 +151,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = async (email: string, password: string, displayName: string): Promise<{ error?: string }> => {
     try {
       setIsLoading(true);
+      
+      // Validate inputs
+      if (!email.trim()) {
+        return { error: 'Please enter your email address.' };
+      }
+      
+      if (!password.trim()) {
+        return { error: 'Please enter your password.' };
+      }
+      
+      if (!displayName.trim()) {
+        return { error: 'Please enter your display name.' };
+      }
+      
       const { error } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
         password,
@@ -151,12 +177,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (error) {
+        console.error('Signup error:', error);
         return { error: formatAuthError(error) };
       }
 
       setIsGuest(false);
       return {};
     } catch (error) {
+      console.error('Signup network error:', error);
       return { error: 'Network error. Please check your connection and try again.' };
     } finally {
       setIsLoading(false);
