@@ -88,6 +88,7 @@ export default function EditProfileScreen() {
                 returnKeyType="next"
                 autoCapitalize="words"
                 autoCorrect={true}
+                minHeight={20}
               />
             </View>
           </View>
@@ -106,6 +107,7 @@ export default function EditProfileScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="next"
+                minHeight={20}
               />
             </View>
           </View>
@@ -123,6 +125,7 @@ export default function EditProfileScreen() {
                 autoCapitalize="words"
                 autoCorrect={true}
                 returnKeyType="next"
+                minHeight={20}
               />
             </View>
           </View>
@@ -139,6 +142,7 @@ export default function EditProfileScreen() {
                 placeholderTextColor={Colors.semantic.tabInactive}
                 autoCapitalize="words"
                 returnKeyType="next"
+                minHeight={20}
               />
             </View>
           </View>
@@ -156,6 +160,7 @@ export default function EditProfileScreen() {
                 autoCapitalize="words"
                 autoCorrect={true}
                 returnKeyType="done"
+                minHeight={20}
               />
             </View>
           </View>
@@ -271,7 +276,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: Colors.semantic.inputText,
-    paddingVertical: 4,
-    minHeight: 24,
+    paddingVertical: 0,
+    minHeight: 20,
   },
 });

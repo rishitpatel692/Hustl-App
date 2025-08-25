@@ -619,7 +619,8 @@ const styles = StyleSheet.create({
     color: Colors.semantic.inputText,
     backgroundColor: 'transparent',
     maxHeight: 120,
-    minHeight: 44,
+    minHeight: 20,
+    textAlignVertical: 'center',
   },
   sendButton: {
     width: 40,
