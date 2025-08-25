@@ -38,7 +38,7 @@ export default function LoginScreen() {
             <ArrowLeft size={24} color={Colors.semantic.bodyText} strokeWidth={2} />
           </TouchableOpacity>
           <Image
-            source={require('../../src/assets/images/image.png')}
+            source={require('../../assets/images/image.png')}
             style={styles.logo}
             resizeMode="contain"
           />

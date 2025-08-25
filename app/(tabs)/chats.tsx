@@ -142,7 +142,7 @@ export default function ChatsScreen() {
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Image
-        source={require('../../src/assets/images/image.png')}
+        source={require('../../assets/images/image.png')}
         style={styles.emptyStateLogo}
         resizeMode="contain"
       />

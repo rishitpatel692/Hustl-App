@@ -6,7 +6,7 @@ export default (): ExpoConfig => ({
     slug: "bolt-expo-nativewind",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./src/assets/images/icon.png",
+    icon: "./assets/images/icon.png",
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
@@ -21,7 +21,7 @@ export default (): ExpoConfig => ({
     web: {
       bundler: "metro",
       output: "single",
-      favicon: "./src/assets/images/favicon.png"
+      favicon: "./assets/images/favicon.png"
     },
     plugins: [
       "expo-router",
