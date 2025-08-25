@@ -235,9 +235,8 @@ export default function WelcomeScreen() {
           colors={['rgba(0, 33, 165, 0.85)', 'rgba(250, 70, 22, 0.75)']}
           style={styles.backgroundOverlay}
         />
-      </View>
-
-      <ScrollView 
+      
+      <ScrollView
         style={styles.content} 
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -301,6 +300,7 @@ export default function WelcomeScreen() {
           </TouchableOpacity>
         </View>
       </Animated.View>
+    </View>
     </View>
   );
 }
