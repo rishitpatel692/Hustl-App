@@ -6,22 +6,23 @@
 
 export const Colors = {
   // Primary / UF Blue
-  primary: '#002B7F',
-  primaryDark: '#001F5C',
-  primaryLight: '#0038FF',
+  primary: '#0052CC',
+  primaryDark: '#003D99',
+  primaryLight: '#1A66FF',
 
   // Secondary / UF Orange  
-  secondary: '#FF4D23',
-  secondaryLight: '#FF5A1F',
-  secondaryDark: '#E63A0B',
+  secondary: '#FF6B35',
+  secondaryLight: '#FF7A47',
+  secondaryDark: '#E55A2B',
 
   // Surfaces & Text
   white: '#FFFFFF',
-  bg: '#FFFFFF',
-  muted: '#F5F5F5',
-  border: '#E5E7EB',
-  text: '#0F2557',
-  textHover: '#0A1B3D',
+  bg: '#FAFBFC',
+  muted: '#F8F9FA',
+  mutedDark: '#F1F3F5',
+  border: '#E1E5E9',
+  text: '#1A2332',
+  textHover: '#0F1419',
 
   // Status / Badges
   gold: '#FFD700',
@@ -41,30 +42,31 @@ export const Colors = {
   // Semantic color mappings for components
   semantic: {
     // Buttons
-    primaryButton: '#002B7F',
-    primaryButtonPressed: '#001F5C',
-    primaryButtonFocus: '#0038FF',
+    primaryButton: '#0052CC',
+    primaryButtonPressed: '#003D99',
+    primaryButtonFocus: '#1A66FF',
     
-    secondaryButton: '#FF4D23',
-    secondaryButtonPressed: '#E63A0B',
-    secondaryButtonAccent: '#FF5A1F',
+    secondaryButton: '#FF6B35',
+    secondaryButtonPressed: '#E55A2B',
+    secondaryButtonAccent: '#FF7A47',
 
     // Surfaces
-    screen: '#FFFFFF',
+    screen: '#FAFBFC',
     card: '#FFFFFF',
-    cardBorder: '#E5E7EB',
+    cardBorder: '#E1E5E9',
+    cardShadow: 'rgba(16, 24, 40, 0.08)',
     
     // Text
-    bodyText: '#0F2557',
-    headingText: '#0F2557',
-    interactiveText: '#0F2557',
-    interactiveTextPressed: '#0A1B3D',
+    bodyText: '#1A2332',
+    headingText: '#0F1419',
+    interactiveText: '#0052CC',
+    interactiveTextPressed: '#003D99',
     
     // Inputs
-    inputBackground: '#F5F5F5',
-    inputBorder: '#E5E7EB',
-    inputText: '#0F2557',
-    inputFocus: '#0038FF',
+    inputBackground: '#FFFFFF',
+    inputBorder: '#E1E5E9',
+    inputText: '#1A2332',
+    inputFocus: '#1A66FF',
     
     // Status badges
     premiumBadge: '#FFD700',
@@ -79,18 +81,20 @@ export const Colors = {
     
     // Alerts & Toasts
     successAlert: '#10B981',
-    errorAlert: '#E63A0B',
+    errorAlert: '#E55A2B',
     errorAlertText: '#FFFFFF',
-    infoAlert: '#0038FF',
+    infoAlert: '#1A66FF',
     
     // Navigation
-    tabInactive: '#9CA3AF',
-    tabActive: '#002B7F',
-    fabBackground: '#FF4D23',
+    tabInactive: '#6B7280',
+    tabActive: '#0052CC',
+    fabBackground: '#FF6B35',
     fabIcon: '#FFFFFF',
     
     // Dividers
-    divider: '#E5E7EB',
+    divider: '#E1E5E9',
+    dividerLight: '#F1F3F5',
+    borderLight: '#E1E5E9',
   }
 };
 
