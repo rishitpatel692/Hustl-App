@@ -1,0 +1,252 @@
+import { Client } from '@googlemaps/google-maps-services-js';
+
+const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8';
+
+// Initialize Google Maps client
+const client = new Client({});
+
+export interface Coordinates {
+  latitude: number;
+  longitude: number;
+}
+
+export interface PlaceDetails {
+  place_id: string;
+  formatted_address: string;
+  name?: string;
+  coordinates: Coordinates;
+  types: string[];
+}
+
+export interface CampusLocation {
+  name: string;
+  address: string;
+  coordinates: Coordinates;
+  type: 'dining_hall' | 'food_court' | 'library' | 'gym' | 'store' | 'building';
+}
+
+// UF Campus locations for quick selection
+export const UF_CAMPUS_LOCATIONS: CampusLocation[] = [
+  // Dining Halls
+  {
+    name: 'Broward Dining',
+    address: '1 Museum Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6485, longitude: -82.3434 },
+    type: 'dining_hall'
+  },
+  {
+    name: 'Gator Corner Dining Center',
+    address: '1849 Museum Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6436, longitude: -82.3549 },
+    type: 'dining_hall'
+  },
+  {
+    name: 'Fresh Food Company',
+    address: '505 Newell Dr, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6473, longitude: -82.3444 },
+    type: 'dining_hall'
+  },
+  
+  // Food Courts & Restaurants
+  {
+    name: 'Reitz Union Food Court',
+    address: '686 Museum Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6465, longitude: -82.3473 },
+    type: 'food_court'
+  },
+  {
+    name: 'Hub Food Court',
+    address: '3025 SW 23rd St, Gainesville, FL 32608',
+    coordinates: { latitude: 29.6234, longitude: -82.3678 },
+    type: 'food_court'
+  },
+  {
+    name: 'Starbucks - Library West',
+    address: '1545 W University Ave, Gainesville, FL 32603',
+    coordinates: { latitude: 29.6516, longitude: -82.3442 },
+    type: 'store'
+  },
+  
+  // Popular Campus Buildings
+  {
+    name: 'Marston Science Library',
+    address: '444 Newell Dr, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6516, longitude: -82.3442 },
+    type: 'library'
+  },
+  {
+    name: 'Student Recreation & Fitness Center',
+    address: '1864 Stadium Rd, Gainesville, FL 32603',
+    coordinates: { latitude: 29.6497, longitude: -82.3486 },
+    type: 'gym'
+  },
+  {
+    name: 'Turlington Hall',
+    address: '330 Newell Dr, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6508, longitude: -82.3417 },
+    type: 'building'
+  },
+];
+
+export class GeocodingService {
+  /**
+   * Geocode an address to get coordinates
+   */
+  static async geocodeAddress(address: string): Promise<{ data: Coordinates | null; error: string | null }> {
+    try {
+      const response = await client.geocode({
+        params: {
+          address: address,
+          key: GOOGLE_MAPS_API_KEY,
+          components: {
+            country: 'US',
+            administrative_area: 'FL', // Florida
+          },
+        },
+      });
+
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        const location = response.data.results[0].geometry.location;
+        return {
+          data: {
+            latitude: location.lat,
+            longitude: location.lng,
+          },
+          error: null,
+        };
+      } else {
+        return {
+          data: null,
+          error: 'Address not found. Please check the address and try again.',
+        };
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+      return {
+        data: null,
+        error: 'Failed to find location. Please check your internet connection.',
+      };
+    }
+  }
+
+  /**
+   * Reverse geocode coordinates to get address
+   */
+  static async reverseGeocode(coordinates: Coordinates): Promise<{ data: string | null; error: string | null }> {
+    try {
+      const response = await client.reverseGeocode({
+        params: {
+          latlng: `${coordinates.latitude},${coordinates.longitude}`,
+          key: GOOGLE_MAPS_API_KEY,
+        },
+      });
+
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        return {
+          data: response.data.results[0].formatted_address,
+          error: null,
+        };
+      } else {
+        return {
+          data: null,
+          error: 'Unable to find address for this location.',
+        };
+      }
+    } catch (error) {
+      console.error('Reverse geocoding error:', error);
+      return {
+        data: null,
+        error: 'Failed to get address. Please check your internet connection.',
+      };
+    }
+  }
+
+  /**
+   * Search for places near UF campus
+   */
+  static async searchPlaces(query: string, location?: Coordinates): Promise<{ data: PlaceDetails[] | null; error: string | null }> {
+    try {
+      const searchLocation = location || { latitude: 29.6436, longitude: -82.3549 }; // UF campus center
+      
+      const response = await client.textSearch({
+        params: {
+          query: query,
+          location: `${searchLocation.latitude},${searchLocation.longitude}`,
+          radius: 5000, // 5km radius around campus
+          key: GOOGLE_MAPS_API_KEY,
+        },
+      });
+
+      if (response.data.status === 'OK') {
+        const places: PlaceDetails[] = response.data.results.map(place => ({
+          place_id: place.place_id!,
+          formatted_address: place.formatted_address!,
+          name: place.name,
+          coordinates: {
+            latitude: place.geometry!.location.lat,
+            longitude: place.geometry!.location.lng,
+          },
+          types: place.types || [],
+        }));
+
+        return { data: places, error: null };
+      } else {
+        return { data: [], error: null };
+      }
+    } catch (error) {
+      console.error('Places search error:', error);
+      return {
+        data: null,
+        error: 'Failed to search places. Please check your internet connection.',
+      };
+    }
+  }
+
+  /**
+   * Get campus locations by type
+   */
+  static getCampusLocationsByType(type: CampusLocation['type']): CampusLocation[] {
+    return UF_CAMPUS_LOCATIONS.filter(location => location.type === type);
+  }
+
+  /**
+   * Find nearest campus location to coordinates
+   */
+  static findNearestCampusLocation(coordinates: Coordinates): CampusLocation | null {
+    if (UF_CAMPUS_LOCATIONS.length === 0) return null;
+
+    let nearest = UF_CAMPUS_LOCATIONS[0];
+    let minDistance = this.calculateDistance(coordinates, nearest.coordinates);
+
+    for (const location of UF_CAMPUS_LOCATIONS) {
+      const distance = this.calculateDistance(coordinates, location.coordinates);
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearest = location;
+      }
+    }
+
+    return nearest;
+  }
+
+  /**
+   * Calculate distance between two coordinates (Haversine formula)
+   */
+  static calculateDistance(coord1: Coordinates, coord2: Coordinates): number {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = this.toRadians(coord2.latitude - coord1.latitude);
+    const dLon = this.toRadians(coord2.longitude - coord1.longitude);
+    
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRadians(coord1.latitude)) * Math.cos(this.toRadians(coord2.latitude)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  private static toRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
+  }
+}
