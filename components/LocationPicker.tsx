@@ -187,7 +187,7 @@ export default function LocationPicker({
                     placeholder={placeholder}
                     onPress={handleGooglePlaceSelect}
                     query={{
-                      key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+                      key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8',
                       language: 'en',
                       components: 'country:us',
                       location: userLocation ? `${userLocation.latitude},${userLocation.longitude}` : '29.6436,-82.3549',
@@ -208,12 +208,20 @@ export default function LocationPicker({
                       placeholderTextColor: Colors.semantic.tabInactive,
                       autoCorrect: false,
                       autoCapitalize: 'none',
+                      returnKeyType: 'search',
                     }}
                     debounce={300}
                     minLength={2}
                     nearbyPlacesAPI="GooglePlacesSearch"
                     GooglePlacesSearchQuery={{
                       rankby: 'distance',
+                    }}
+                    requestUrl={{
+                      useOnPlatform: 'web',
+                      url: 'https://cors-anywhere.herokuapp.com/https://maps.googleapis.com/maps/api',
+                      headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                      },
                     }}
                   />
                 </View>
@@ -404,6 +412,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderRadius: 0,
+    minHeight: 48,
   },
   autocompleteList: {
     backgroundColor: Colors.semantic.inputBackground,
