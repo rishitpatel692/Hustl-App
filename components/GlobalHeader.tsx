@@ -87,7 +87,7 @@ export default function GlobalHeader({
             </TouchableOpacity>
             
             <Image
-              source={require('../src/assets/images/image.png')}
+              source={require('../assets/images/image.png')}
               style={styles.logo}
               resizeMode="contain"
             />
@@ -131,7 +131,7 @@ export default function GlobalHeader({
             </TouchableOpacity>
             
             <Image
-              source={require('../src/assets/images/image.png')}
+              source={require('../assets/images/image.png')}
               style={styles.logo}
               resizeMode="contain"
             />
