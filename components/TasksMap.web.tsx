@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
-import { MapPin, Navigation, ExternalLink } from 'lucide-react-native';
+import { MapPin, Navigation, ExternalLink, Building, Coffee, BookOpen, Dumbbell, Store } from 'lucide-react-native';
 import { Colors } from '@/theme/colors';
+import { UF_CAMPUS_LOCATIONS } from '@/lib/geocoding';
 
 const { width, height } = Dimensions.get('window');
 
@@ -45,12 +46,13 @@ export default function TasksMap({
 
   const handleOpenGoogleMaps = () => {
     // Create a URL with all task pins as markers
-    let mapUrl = 'https://www.google.com/maps/@29.6436,-82.3549,15z';
+    const baseUrl = 'https://www.google.com/maps/embed/v1/view';
+    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
+    let mapUrl = `${baseUrl}?key=${apiKey}&center=29.6436,-82.3549&zoom=15&maptype=roadmap`;
     
     if (pins.length > 0) {
-      // Add markers for each task
-      const markers = pins.map(pin => `${pin.latitude},${pin.longitude}`).join('|');
-      mapUrl = `https://www.google.com/maps/search/?api=1&query=${pins[0].latitude},${pins[0].longitude}`;
+      // Focus on first task location
+      mapUrl = `${baseUrl}?key=${apiKey}&center=${pins[0].latitude},${pins[0].longitude}&zoom=16&maptype=roadmap`;
     }
     
     window.open(mapUrl, '_blank');
@@ -89,11 +91,12 @@ export default function TasksMap({
       {/* Embedded Google Maps iframe for web */}
       <View style={styles.mapContainer}>
         <iframe
-          src={`https://www.google.com/maps/embed/v1/view?key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}&center=29.6436,-82.3549&zoom=15&maptype=roadmap`}
+          src={`https://www.google.com/maps/embed/v1/view?key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}&center=29.6436,-82.3549&zoom=15&maptype=roadmap&q=University+of+Florida,Gainesville,FL`}
           style={styles.mapFrame}
           allowFullScreen
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
+          title="Campus Map"
         />
         
         {/* Map overlay with task pins */}
@@ -106,8 +109,34 @@ export default function TasksMap({
             </TouchableOpacity>
           </View>
           
+          {/* Campus Locations Legend */}
+          <View style={styles.legendContainer}>
+            <Text style={styles.legendTitle}>Campus Locations</Text>
+            <View style={styles.legendItems}>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendMarker, { backgroundColor: '#FF6B35' }]}>
+                  <Coffee size={8} color={Colors.white} strokeWidth={2} />
+                </View>
+                <Text style={styles.legendText}>Food Courts</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendMarker, { backgroundColor: '#8B5CF6' }]}>
+                  <BookOpen size={8} color={Colors.white} strokeWidth={2} />
+                </View>
+                <Text style={styles.legendText}>Libraries</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendMarker, { backgroundColor: '#6B7280' }]}>
+                  <Building size={8} color={Colors.white} strokeWidth={2} />
+                </View>
+                <Text style={styles.legendText}>Buildings</Text>
+              </View>
+            </View>
+          </View>
+          
           {pins.length > 0 && (
             <View style={styles.taskPinsList}>
+              <Text style={styles.taskPinsTitle}>Active Tasks</Text>
               {pins.slice(0, 3).map((pin) => (
                 <TouchableOpacity
                   key={pin.id}
@@ -163,6 +192,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     border: 'none',
+    borderRadius: '12px',
   },
   mapOverlay: {
     position: 'absolute',
@@ -210,6 +240,46 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.white,
   },
+  legendContainer: {
+    position: 'absolute',
+    top: 80,
+    left: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 12,
+    padding: 12,
+    pointerEvents: 'auto',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  legendTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.semantic.headingText,
+    marginBottom: 8,
+  },
+  legendItems: {
+    gap: 6,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  legendMarker: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  legendText: {
+    fontSize: 12,
+    color: Colors.semantic.bodyText,
+    fontWeight: '500',
+  },
   taskPinsList: {
     position: 'absolute',
     bottom: 20,
@@ -225,6 +295,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 8,
+  },
+  taskPinsTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.semantic.headingText,
+    marginBottom: 8,
   },
   taskPinItem: {
     flexDirection: 'row',

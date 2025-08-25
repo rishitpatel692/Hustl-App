@@ -470,13 +470,15 @@ export default function TasksScreen() {
     });
     
     return (
-      <TasksMap
-        pins={pins}
-        onPressPin={(taskId) => router.push(`/task/${taskId}`)}
-        showsUserLocation={locationPermission === 'granted'}
-        locationPermission={locationPermission}
-        onRequestLocation={requestLocationPermission}
-      />
+      <View style={styles.mapContainer}>
+        <TasksMap
+          pins={pins}
+          onPressPin={(taskId) => router.push(`/task/${taskId}`)}
+          showsUserLocation={locationPermission === 'granted'}
+          locationPermission={locationPermission}
+          onRequestLocation={requestLocationPermission}
+        />
+      </View>
     );
   };
 

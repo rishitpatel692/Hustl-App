@@ -14,6 +14,7 @@ import GlobalHeader from '@/components/GlobalHeader';
 import TaskSuccessSheet from '@/components/TaskSuccessSheet';
 import Toast from '@/components/Toast';
 import StickyFormFooter from '@/components/StickyFormFooter';
+import CampusLocationPicker from '@/components/CampusLocationPicker';
 
 // Extended categories to support all card types
 const categories: { value: string; label: string }[] = [
@@ -525,24 +526,14 @@ export default function PostScreen() {
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Store *</Text>
-                <View style={[styles.inputWithIcon, fieldErrors.store && styles.inputError]}>
-                  <Store size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-                  <TextInput
-                    style={styles.inputText}
-                    value={store}
-                    onChangeText={(value) => {
-                      setStore(value);
-                      updateFieldError('store', value);
-                    }}
-                    placeholder="Enter store name or location..."
-                    placeholderTextColor={Colors.semantic.tabInactive}
-                    editable={!isLoading}
-                    accessibilityLabel="Store name"
-                    returnKeyType="next"
-                    autoCapitalize="words"
-                    autoCorrect={true}
-                  />
-                </View>
+                <CampusLocationPicker
+                  value={store}
+                  onLocationSelect={(location) => {
+                    setStore(location);
+                    updateFieldError('store', location);
+                  }}
+                  placeholder="Select store or enter manually..."
+                />
                 {fieldErrors.store && (
                   <Text style={styles.fieldError}>{fieldErrors.store}</Text>
                 )}
@@ -555,24 +546,14 @@ export default function PostScreen() {
               
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Drop-off Address *</Text>
-                <View style={[styles.inputWithIcon, fieldErrors.dropoffAddress && styles.inputError]}>
-                  <MapPin size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-                  <TextInput
-                    style={styles.inputText}
-                    value={dropoffAddress}
-                    onChangeText={(value) => {
-                      setDropoffAddress(value);
-                      updateFieldError('dropoffAddress', value);
-                    }}
-                    placeholder="Enter delivery address..."
-                    placeholderTextColor={Colors.semantic.tabInactive}
-                    editable={!isLoading}
-                    accessibilityLabel="Drop-off address"
-                    returnKeyType="next"
-                    autoCapitalize="words"
-                    autoCorrect={true}
-                  />
-                </View>
+                <CampusLocationPicker
+                  value={dropoffAddress}
+                  onLocationSelect={(location) => {
+                    setDropoffAddress(location);
+                    updateFieldError('dropoffAddress', location);
+                  }}
+                  placeholder="Select drop-off location or enter manually..."
+                />
                 {fieldErrors.dropoffAddress && (
                   <Text style={styles.fieldError}>{fieldErrors.dropoffAddress}</Text>
                 )}

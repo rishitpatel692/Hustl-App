@@ -5,6 +5,7 @@ import * as Location from 'expo-location';
 import { MapPin, Store, Navigation } from 'lucide-react-native';
 import { Colors } from '@/theme/colors';
 import { openGoogleMapsNavigation } from '@/lib/navigation';
+import { UF_CAMPUS_LOCATIONS } from '@/lib/geocoding';
 
 export type TaskPin = { 
   id: string; 
@@ -131,6 +132,59 @@ export default function TasksMap({
     }
   };
 
+  const getCampusLocationColor = (type: string): string => {
+    switch (type) {
+      case 'dining_hall':
+      case 'food_court':
+        return '#FF6B35';
+      case 'library':
+        return '#8B5CF6';
+      case 'gym':
+        return '#10B981';
+      case 'store':
+        return '#F59E0B';
+      case 'building':
+      default:
+        return '#6B7280';
+    }
+  };
+
+  const getCampusLocationIcon = (type: string) => {
+    switch (type) {
+      case 'dining_hall':
+      case 'food_court':
+        return <Coffee size={12} color={Colors.white} strokeWidth={2} />;
+      case 'library':
+        return <BookOpen size={12} color={Colors.white} strokeWidth={2} />;
+      case 'gym':
+        return <Dumbbell size={12} color={Colors.white} strokeWidth={2} />;
+      case 'store':
+        return <Store size={12} color={Colors.white} strokeWidth={2} />;
+      case 'building':
+      default:
+        return <Building size={12} color={Colors.white} strokeWidth={2} />;
+    }
+  };
+
+  const getLocationTypeLabel = (type: string): string => {
+    switch (type) {
+      case 'dining_hall':
+        return 'Dining Hall';
+      case 'food_court':
+        return 'Food Court';
+      case 'library':
+        return 'Library';
+      case 'gym':
+        return 'Gym';
+      case 'store':
+        return 'Store';
+      case 'building':
+        return 'Building';
+      default:
+        return 'Location';
+    }
+  };
+
   const handleLocationPermissionRequest = () => {
     Alert.alert(
       'Location Permission',
@@ -188,6 +242,28 @@ export default function TasksMap({
           setMapError('Failed to load map');
         }}
       >
+        {/* Campus Location Markers */}
+        {UF_CAMPUS_LOCATIONS.map((location) => (
+          <Marker
+            key={location.name}
+            coordinate={location.coordinates}
+            anchor={{ x: 0.5, y: 0.5 }}
+          >
+            <View style={[styles.campusMarker, { backgroundColor: getCampusLocationColor(location.type) }]}>
+              {getCampusLocationIcon(location.type)}
+            </View>
+            <Callout>
+              <View style={styles.calloutContainer}>
+                <Text style={styles.calloutTitle}>{location.name}</Text>
+                <Text style={styles.calloutStore}>{getLocationTypeLabel(location.type)}</Text>
+                <Text style={styles.calloutAddress} numberOfLines={2}>
+                  {location.address}
+                </Text>
+              </View>
+            </Callout>
+          </Marker>
+        ))}
+
         {/* User location permission prompt */}
         {locationPermission !== 'granted' && (
           <View style={styles.permissionOverlay}>
@@ -368,6 +444,20 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
+  campusMarker: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: Colors.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
   calloutContainer: {
     minWidth: 200,
     maxWidth: 250,
@@ -389,6 +479,11 @@ const styles = StyleSheet.create({
   calloutStore: {
     fontSize: 14,
     color: Colors.semantic.bodyText,
+    fontWeight: '500',
+  },
+  calloutAddress: {
+    fontSize: 12,
+    color: Colors.semantic.tabInactive,
     fontWeight: '500',
   },
   urgencyBadge: {

@@ -73,6 +73,36 @@ export const UF_CAMPUS_LOCATIONS: CampusLocation[] = [
     coordinates: { latitude: 29.6465, longitude: -82.3473 },
     type: 'store'
   },
+  {
+    name: 'Panda Express - Reitz Union',
+    address: '686 Museum Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6465, longitude: -82.3473 },
+    type: 'food_court'
+  },
+  {
+    name: 'Subway - Hub',
+    address: '3025 SW 23rd St, Gainesville, FL 32608',
+    coordinates: { latitude: 29.6234, longitude: -82.3678 },
+    type: 'food_court'
+  },
+  {
+    name: 'Taco Bell - Reitz Union',
+    address: '686 Museum Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6465, longitude: -82.3473 },
+    type: 'food_court'
+  },
+  {
+    name: 'Einstein Bros Bagels - Library West',
+    address: '1545 W University Ave, Gainesville, FL 32603',
+    coordinates: { latitude: 29.6516, longitude: -82.3442 },
+    type: 'store'
+  },
+  {
+    name: 'Pollo Tropical - Reitz Union',
+    address: '686 Museum Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6465, longitude: -82.3473 },
+    type: 'food_court'
+  },
   
   // Popular Campus Buildings
   {
@@ -104,6 +134,66 @@ export const UF_CAMPUS_LOCATIONS: CampusLocation[] = [
     address: 'Plaza of the Americas, Gainesville, FL 32611',
     coordinates: { latitude: 29.6480, longitude: -82.3434 },
     type: 'building'
+  },
+  {
+    name: 'Library West',
+    address: '1545 W University Ave, Gainesville, FL 32603',
+    coordinates: { latitude: 29.6516, longitude: -82.3442 },
+    type: 'library'
+  },
+  {
+    name: 'Architecture Building',
+    address: '1480 Inner Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6501, longitude: -82.3398 },
+    type: 'building'
+  },
+  {
+    name: 'Business Administration Building',
+    address: '1398 Stadium Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6489, longitude: -82.3421 },
+    type: 'building'
+  },
+  {
+    name: 'Engineering Building',
+    address: '1949 Stadium Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6435, longitude: -82.3478 },
+    type: 'building'
+  },
+  {
+    name: 'Journalism Building',
+    address: '2096 Weimer Hall, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6512, longitude: -82.3456 },
+    type: 'building'
+  },
+  {
+    name: 'Student Health Care Center',
+    address: '280 Fletcher Dr, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6445, longitude: -82.3512 },
+    type: 'building'
+  },
+  {
+    name: 'Beaty Towers',
+    address: '1800 Museum Rd, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6478, longitude: -82.3523 },
+    type: 'building'
+  },
+  {
+    name: 'Jennings Hall',
+    address: '125 Jennings Dr, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6502, longitude: -82.3445 },
+    type: 'building'
+  },
+  {
+    name: 'Norman Hall',
+    address: '1403 Norman Hall, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6467, longitude: -82.3389 },
+    type: 'building'
+  },
+  {
+    name: 'Smathers Library',
+    address: '1 Library E, Gainesville, FL 32611',
+    coordinates: { latitude: 29.6516, longitude: -82.3442 },
+    type: 'library'
   },
 ];
 
