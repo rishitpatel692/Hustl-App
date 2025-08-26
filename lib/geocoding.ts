@@ -1,4 +1,4 @@
-const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8';
 
 export interface Coordinates {
   latitude: number;

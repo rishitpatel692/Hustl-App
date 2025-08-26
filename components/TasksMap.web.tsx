@@ -47,7 +47,7 @@ export default function TasksMap({
   const handleOpenGoogleMaps = () => {
     // Create a URL with all task pins as markers
     const baseUrl = 'https://www.google.com/maps/embed/v1/view';
-    const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const apiKey = 'AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8';
     let mapUrl = `${baseUrl}?key=${apiKey}&center=29.6436,-82.3549&zoom=15&maptype=roadmap`;
     
     if (pins.length > 0) {
@@ -91,7 +91,7 @@ export default function TasksMap({
       {/* Embedded Google Maps iframe for web */}
       <View style={styles.mapContainer}>
         <iframe
-          src={`https://www.google.com/maps/embed/v1/view?key=${process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY}&center=29.6436,-82.3549&zoom=15&maptype=roadmap&q=University+of+Florida,Gainesville,FL`}
+          src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8&center=29.6436,-82.3549&zoom=15&maptype=roadmap&q=University+of+Florida,Gainesville,FL`}
           style={styles.mapFrame}
           allowFullScreen
           loading="lazy"

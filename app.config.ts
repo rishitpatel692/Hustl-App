@@ -26,7 +26,7 @@ export default (): ExpoConfig => ({
     plugins: [
       "expo-router",
       ["expo-maps", { 
-        googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8"
+        googleMapsApiKey: "AIzaSyCrVIRCIog1gFNc_KFF669XaaebfdxUgn8"
       }],
       ["expo-location", {
         locationAlwaysAndWhenInUseUsageDescription: "We use your location to show nearby tasks on the map."
