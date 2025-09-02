@@ -2,14 +2,13 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image, Dimensions } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, Send, MoveHorizontal as MoreHorizontal, Plus } from 'lucide-react-native';
+import { ArrowLeft, Send, Plus } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChatService } from '@/lib/chat';
 import { supabase } from '@/lib/supabase';
 import type { ChatMessage } from '@/types/chat';
-import UserProfileSheet from '@/components/UserProfileSheet';
 
 const { width } = Dimensions.get('window');
 
@@ -29,7 +28,6 @@ export default function ChatScreen() {
   const [otherUserId, setOtherUserId] = useState<string | null>(null);
   const [otherUserProfile, setOtherUserProfile] = useState<any>(null);
   const [otherLastReadAt, setOtherLastReadAt] = useState<Date | null>(null);
-  const [showProfile, setShowProfile] = useState(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const readChannelRef = useRef<any>(null);
 
@@ -176,19 +174,6 @@ export default function ChatScreen() {
     router.back();
   };
 
-  const handleProfilePress = useCallback(() => {
-    if (!otherUserId) return;
-    
-    // Analytics
-    console.log('chat_profile_opened', { otherUserId, roomId });
-    
-    if (!otherUserId) return;
-    
-    // Analytics
-    console.log('chat_profile_opened', { otherUserId, roomId });
-    
-    setShowProfile(true);
-  }, [otherUserId, roomId]);
 
   const formatTime = (timestamp: string): string => {
     const date = new Date(timestamp);
@@ -273,12 +258,14 @@ export default function ChatScreen() {
           <ArrowLeft size={24} color={Colors.semantic.bodyText} strokeWidth={2} />
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.headerCenter} onPress={handleProfilePress}>
+        <View style={styles.headerCenter}>
           <View style={styles.headerAvatarContainer}>
             {otherUserProfile?.avatar_url ? (
-              <Image source={{ uri: otherUserProfile.avatar_url }} style={styles.headerAvatar} />
+              <View style={styles.headerAvatar} pointerEvents="none">
+                <Image source={{ uri: otherUserProfile.avatar_url }} style={styles.headerAvatarImage} />
+              </View>
             ) : (
-              <View style={styles.headerAvatarPlaceholder}>
+              <View style={styles.headerAvatarPlaceholder} pointerEvents="none">
                 <Text style={styles.headerAvatarText}>
                   {getInitials(otherUserProfile?.full_name || otherUserProfile?.username)}
                 </Text>
@@ -293,11 +280,9 @@ export default function ChatScreen() {
               <Text style={styles.headerSubtitle}>{otherUserProfile.major}</Text>
             )}
           </View>
-        </TouchableOpacity>
+        </View>
         
-        <TouchableOpacity style={styles.optionsButton}>
-          <MoreHorizontal size={20} color={Colors.semantic.bodyText} strokeWidth={2} />
-        </TouchableOpacity>
+        <View style={styles.placeholder} />
       </View>
 
       {/* Messages */}
@@ -369,14 +354,6 @@ export default function ChatScreen() {
           )}
         </TouchableOpacity>
       </View>
-
-      {/* User Profile Sheet */}
-      <UserProfileSheet
-        visible={showProfile}
-        onClose={() => setShowProfile(false)}
-        userId={otherUserId}
-        currentChatRoomId={roomId}
-      />
     </KeyboardAvoidingView>
   );
 }
@@ -419,6 +396,11 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
+    overflow: 'hidden',
+  },
+  headerAvatarImage: {
+    width: '100%',
+    height: '100%',
   },
   headerAvatarPlaceholder: {
     width: 44,
@@ -449,14 +431,8 @@ const styles = StyleSheet.create({
     color: Colors.semantic.tabInactive,
     fontWeight: '600',
   },
-  optionsButton: {
+  placeholder: {
     width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: Colors.mutedDark,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 16,
   },
   messagesContainer: {
     flex: 1,
