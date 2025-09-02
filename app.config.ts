@@ -2,31 +2,24 @@ import { ExpoConfig } from 'expo/config';
 
 export default (): ExpoConfig => ({
   expo: {
-    name: "bolt-expo-nativewind",
-    slug: "bolt-expo-nativewind",
+    name: "hustl-app",
+    slug: "hustl-app",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./src/assets/images/icon.png",
-    scheme: "myapp",
+    icon: "./assets/images/icon.png",
+    scheme: "hustl",
     userInterfaceStyle: "automatic",
-    newArchEnabled: true,
-    jsEngine: "jsc",
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.hustl.app",
-      jsEngine: "jsc",
-      infoPlist: {
-        NSLocationWhenInUseUsageDescription: "We use your location to show nearby tasks on the map.",
-        LSApplicationQueriesSchemes: ["comgooglemaps"]
-      }
+      bundleIdentifier: "com.hustl.app"
     },
     web: {
       bundler: "metro",
       output: "single",
-      favicon: "./src/assets/images/favicon.png"
+      favicon: "./assets/images/favicon.png"
     },
     plugins: [
-      "expo-router",
+      "expo-router"
     ],
     experiments: {
       typedRoutes: true
