@@ -61,8 +61,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     paddingTop: 20,
     paddingBottom: 12,
-    borderTopWidth: 1,
-    borderTopColor: Colors.semantic.dividerLight,
     shadowColor: Colors.semantic.cardShadow,
     shadowOffset: { width: 0, height: -8 },
     shadowOpacity: 1,

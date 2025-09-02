@@ -156,8 +156,6 @@ const styles = StyleSheet.create({
   inputButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.semantic.inputBorder,
     borderRadius: 12,
     paddingHorizontal: 20,
     paddingVertical: 18,
@@ -186,8 +184,6 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: Colors.white,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
     shadowColor: Colors.semantic.cardShadow,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 1,
@@ -198,8 +194,6 @@ const styles = StyleSheet.create({
   },
   pickerHeader: {
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.semantic.dividerLight,
     gap: 12,
   },
   searchContainer: {
@@ -260,8 +254,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
   },
   locationInfo: {
     flex: 1,

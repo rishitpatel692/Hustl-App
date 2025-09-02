@@ -422,8 +422,6 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     borderRadius: 20,
     padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(229, 231, 235, 0.5)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.06,
@@ -443,8 +441,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(229, 231, 235, 0.5)',
   },
   statusInfo: {
     flex: 1,
@@ -467,8 +463,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     gap: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 33, 165, 0.15)',
   },
   creditsText: {
     fontSize: 14,
@@ -488,8 +482,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 4,
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    borderWidth: 1,
-    borderColor: 'rgba(229, 231, 235, 0.3)',
   },
   menuItemLeft: {
     flexDirection: 'row',
@@ -504,8 +496,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(229, 231, 235, 0.5)',
   },
   menuItemText: {
     fontSize: 16,
@@ -516,8 +506,6 @@ const styles = StyleSheet.create({
   logoutSection: {
     paddingHorizontal: 8,
     marginBottom: 32,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(229, 231, 235, 0.5)',
     paddingTop: 16,
   },
   logoutItem: {
@@ -528,8 +516,6 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     borderRadius: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    borderWidth: 1,
-    borderColor: 'rgba(229, 231, 235, 0.3)',
   },
   footer: {
     paddingHorizontal: 24,

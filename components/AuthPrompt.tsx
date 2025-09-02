@@ -132,11 +132,10 @@ const styles = StyleSheet.create({
   },
   signUpButton: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.primary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
+    backgroundColor: Colors.primary + '10',
   },
   signUpButtonText: {
     fontSize: 16,

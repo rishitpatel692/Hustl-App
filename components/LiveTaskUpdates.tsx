@@ -287,8 +287,6 @@ const styles = StyleSheet.create({
     width: 320,
     backgroundColor: Colors.white,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
     shadowColor: Colors.semantic.cardShadow,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 1,
@@ -302,8 +300,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.semantic.dividerLight,
   },
   dropdownTitle: {
     fontSize: 18,
@@ -324,8 +320,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     gap: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.semantic.dividerLight,
   },
   updateItemUnread: {
     backgroundColor: Colors.primary + '05',

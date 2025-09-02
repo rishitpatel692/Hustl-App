@@ -212,8 +212,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.semantic.card,
     borderRadius: 16,
     padding: 20,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
     shadowColor: Colors.semantic.cardShadow,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 1,

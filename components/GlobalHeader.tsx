@@ -172,8 +172,6 @@ export default function GlobalHeader({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.semantic.dividerLight,
     shadowColor: Colors.semantic.cardShadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
@@ -196,8 +194,6 @@ const styles = StyleSheet.create({
   },
   profileChip: {
     borderRadius: 24,
-    borderWidth: 2,
-    borderColor: Colors.primary + '30',
     padding: 3,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
@@ -207,8 +203,6 @@ const styles = StyleSheet.create({
   },
   guestProfileChip: {
     borderRadius: 24,
-    borderWidth: 2,
-    borderColor: Colors.semantic.tabInactive + '40',
     padding: 3,
   },
   avatar: {
@@ -265,8 +259,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.mutedDark,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,

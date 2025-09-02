@@ -551,8 +551,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: Colors.white,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
   },
   imageContainer: {
     height: 160, // Fixed height for image section

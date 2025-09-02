@@ -279,12 +279,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
   selectedCard: {
     backgroundColor: 'rgba(0, 56, 255, 0.06)',
-    borderColor: Colors.primary,
   },
   disabledCard: {
     backgroundColor: Colors.muted,
@@ -344,11 +341,10 @@ const styles = StyleSheet.create({
   },
   requestButton: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.primary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
+    backgroundColor: Colors.primary + '10',
   },
   requestButtonText: {
     fontSize: 16,

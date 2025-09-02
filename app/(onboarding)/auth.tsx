@@ -270,8 +270,6 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     backgroundColor: '#FEF2F2',
-    borderWidth: 1,
-    borderColor: '#FECACA',
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
@@ -295,8 +293,6 @@ const styles = StyleSheet.create({
     color: Colors.semantic.bodyText,
   },
   input: {
-    borderWidth: 1,
-    borderColor: Colors.semantic.inputBorder,
     borderRadius: 14,
     paddingHorizontal: 20,
     paddingVertical: 16,
@@ -313,8 +309,6 @@ const styles = StyleSheet.create({
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.semantic.inputBorder,
     borderRadius: 14,
     backgroundColor: Colors.semantic.inputBackground,
     shadowColor: '#000',
@@ -368,11 +362,10 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.semantic.inputBorder,
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: 'center',
+    backgroundColor: Colors.mutedDark,
   },
   secondaryButtonText: {
     fontSize: 17,

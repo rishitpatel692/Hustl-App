@@ -597,8 +597,6 @@ const styles = StyleSheet.create({
   profileSection: {
     alignItems: 'center',
     paddingBottom: 32,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.semantic.divider,
     marginBottom: 24,
   },
   avatarContainer: {
@@ -682,12 +680,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.primary,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 10,
     gap: 6,
+    backgroundColor: Colors.primary + '10',
   },
   shareButtonText: {
     fontSize: 14,
@@ -698,12 +695,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Colors.semantic.errorAlert,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 10,
     gap: 6,
+    backgroundColor: Colors.semantic.errorAlert + '10',
   },
   reportButtonText: {
     fontSize: 14,
@@ -789,12 +785,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: Colors.semantic.inputBorder,
   },
   activeFilterTab: {
     backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
   },
   filterTabText: {
     fontSize: 14,
@@ -811,8 +804,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.semantic.card,
     borderRadius: 12,
     padding: 16,
-    borderWidth: 1,
-    borderColor: Colors.semantic.cardBorder,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,

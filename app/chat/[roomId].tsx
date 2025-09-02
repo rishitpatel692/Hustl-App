@@ -392,8 +392,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 18,
     backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.semantic.dividerLight,
     shadowColor: Colors.semantic.cardShadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,
@@ -408,8 +406,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
   },
   headerCenter: {
     flex: 1,
@@ -461,8 +457,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 16,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
   },
   messagesContainer: {
     flex: 1,
@@ -539,8 +533,6 @@ const styles = StyleSheet.create({
   otherMessageBubble: {
     backgroundColor: Colors.white,
     borderBottomLeftRadius: 8,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
   },
   messageText: {
     fontSize: 16,
@@ -578,8 +570,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 16,
     backgroundColor: Colors.white,
-    borderTopWidth: 1,
-    borderTopColor: Colors.semantic.dividerLight,
     shadowColor: Colors.semantic.cardShadow,
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 1,
@@ -594,8 +584,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 6,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,

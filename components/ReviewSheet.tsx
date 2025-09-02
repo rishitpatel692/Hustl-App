@@ -303,8 +303,6 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     backgroundColor: '#FEF1F2',
-    borderWidth: 1,
-    borderColor: '#FECDD3',
     borderRadius: 16,
     padding: 20,
     marginBottom: 28,
@@ -351,8 +349,6 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
   },
   tagButtonSelected: {
     backgroundColor: Colors.primary,
@@ -369,8 +365,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   commentInput: {
-    borderWidth: 1,
-    borderColor: Colors.semantic.inputBorder,
     borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 18,

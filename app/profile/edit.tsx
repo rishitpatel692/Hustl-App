@@ -210,8 +210,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 32,
     backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.semantic.divider,
   },
   avatarContainer: {
     position: 'relative',
@@ -263,14 +261,17 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.semantic.inputBorder,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 16,
     gap: 12,
     backgroundColor: Colors.semantic.inputBackground,
     minHeight: 52,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 3,
   },
   inputText: {
     flex: 1,

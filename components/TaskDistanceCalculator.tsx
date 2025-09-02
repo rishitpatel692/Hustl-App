@@ -143,8 +143,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: Colors.secondary + '20',
   },
   warningText: {
     fontSize: 12,

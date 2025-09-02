@@ -690,8 +690,6 @@ const styles = StyleSheet.create({
     color: Colors.semantic.bodyText,
   },
   input: {
-    borderWidth: 1,
-    borderColor: Colors.semantic.inputBorder,
     borderRadius: 12,
     paddingHorizontal: 20,
     paddingVertical: 18,
@@ -706,8 +704,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   inputError: {
-    borderColor: Colors.semantic.errorAlert,
-    borderWidth: 2,
+    backgroundColor: '#FEF1F2',
   },
   textArea: {
     height: 100,
@@ -717,8 +714,6 @@ const styles = StyleSheet.create({
   inputWithIcon: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.semantic.inputBorder,
     borderRadius: 12,
     paddingHorizontal: 20,
     paddingVertical: 18,
@@ -759,8 +754,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.mutedDark,
     borderRadius: 12,
     padding: 6,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
@@ -782,8 +775,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.12,
     shadowRadius: 8,
     elevation: 6,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
   },
   segmentText: {
     fontSize: 15,
@@ -799,8 +790,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 20,
     gap: 12,
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.08,
@@ -840,8 +829,6 @@ const styles = StyleSheet.create({
   },
   submitErrorContainer: {
     backgroundColor: '#FEF1F2',
-    borderWidth: 1,
-    borderColor: '#FECDD3',
     borderRadius: 12,
     padding: 18,
   },
@@ -859,8 +846,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignSelf: 'center',
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: Colors.primary + '20',
   },
   prefilledChipText: {
     fontSize: 13,
