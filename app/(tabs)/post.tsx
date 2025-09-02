@@ -4,7 +4,6 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { X, MapPin, Clock, Store, Package } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
 import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { TaskRepo } from '@/lib/taskRepo';
@@ -174,13 +173,7 @@ export default function PostScreen() {
   };
 
   const triggerHaptics = () => {
-    if (Platform.OS !== 'web') {
-      try {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      } catch (error) {
-        // Haptics not available, continue silently
-      }
-    }
+    // Haptics temporarily disabled for Expo Go stability
   };
 
   const validateField = (field: string, value: string): string => {

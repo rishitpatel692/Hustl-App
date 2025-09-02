@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, RefreshControl, Platform, Alert, SafeAreaView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Clock, MapPin, Store, MessageCircle, Map as MapIcon, List as ListIcon, ChevronRight } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
-import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { Colors, ColorUtils } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
@@ -62,22 +60,12 @@ export default function TasksScreen() {
 
   // Request location permission on mount
   useEffect(() => {
-    requestLocationPermission();
+    // Location permission temporarily disabled for Expo Go stability
   }, []);
 
   const requestLocationPermission = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      setLocationPermission(status);
-      
-      if (status === 'granted') {
-        const location = await Location.getCurrentPositionAsync({});
-        setUserLocation(location);
-      }
-    } catch (error) {
-      console.warn('Location permission error:', error);
-      setLocationPermission('denied');
-    }
+    // Location services temporarily disabled for Expo Go stability
+    setLocationPermission('denied');
   };
 
   // Load tasks based on active tab
@@ -136,25 +124,13 @@ export default function TasksScreen() {
 
   // Handle view mode change
   const handleViewModeChange = (mode: ViewMode) => {
-    if (Platform.OS !== 'web') {
-      try {
-        Haptics.selectionAsync();
-      } catch (error) {
-        // Haptics not available, continue silently
-      }
-    }
+    // Haptics temporarily disabled for Expo Go stability
     setViewMode(mode);
   };
 
   // Handle tab change
   const handleTabChange = (tab: TabType) => {
-    if (Platform.OS !== 'web') {
-      try {
-        Haptics.selectionAsync();
-      } catch (error) {
-        // Haptics not available, continue silently
-      }
-    }
+    // Haptics temporarily disabled for Expo Go stability
     setActiveTab(tab);
   };
 
@@ -168,13 +144,7 @@ export default function TasksScreen() {
     if (isGuest || !user) return;
     if (acceptingTaskId) return;
 
-    if (Platform.OS !== 'web') {
-      try {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      } catch (error) {
-        // Haptics not available, continue silently
-      }
-    }
+    // Haptics temporarily disabled for Expo Go stability
 
     setAcceptingTaskId(task.id);
     setError('');
@@ -231,13 +201,7 @@ export default function TasksScreen() {
 
   // Handle chat button press
   const handleChatPress = async (task: Task) => {
-    if (Platform.OS !== 'web') {
-      try {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      } catch (error) {
-        // Haptics not available, continue silently
-      }
-    }
+    // Haptics temporarily disabled for Expo Go stability
 
     try {
       const { data: room, error } = await ChatService.getRoomForTask(task.id);

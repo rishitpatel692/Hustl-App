@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-// import { GestureHandlerRootView } from 'react-native-gesture-handler'; // Temporarily disabled for Expo Go
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SupabaseProvider } from '@/contexts/SupabaseContext';

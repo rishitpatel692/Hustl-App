@@ -3,8 +3,6 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Alert,
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Clock, MapPin, Store, User, Camera, Check, ChevronDown } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
-import * as ImagePicker from 'expo-image-picker';
 import { ReviewRepo } from '@/lib/reviewRepo';
 import { TaskReview } from '@/types/database';
 import ReviewSheet from '@/components/ReviewSheet';
@@ -126,13 +124,7 @@ export default function TaskDetailScreen() {
   };
 
   const triggerHaptics = () => {
-    if (Platform.OS !== 'web') {
-      try {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      } catch (error) {
-        // Haptics not available, continue silently
-      }
-    }
+    // Haptics temporarily disabled for Expo Go stability
   };
 
   const handleStatusUpdate = async (newStatus: TaskCurrentStatus, note?: string, photoUrl?: string) => {
@@ -238,26 +230,8 @@ export default function TaskDetailScreen() {
   };
 
   const handleTakePhoto = async () => {
-    try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission needed', 'Camera permission is required to take photos.');
-        return;
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        setDeliveryPhoto(result.assets[0].uri);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to take photo. Please try again.');
-    }
+    // Camera functionality temporarily disabled for Expo Go stability
+    Alert.alert('Camera Unavailable', 'Photo capture is temporarily disabled in Expo Go. Use a development build for full camera functionality.');
   };
 
   const handleBack = () => {
