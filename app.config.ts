@@ -10,9 +10,11 @@ export default (): ExpoConfig => ({
     scheme: "myapp",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
+    jsEngine: "jsc",
     ios: {
       supportsTablet: true,
       bundleIdentifier: "com.hustl.app",
+      jsEngine: "jsc",
       infoPlist: {
         NSLocationWhenInUseUsageDescription: "We use your location to show nearby tasks on the map.",
         LSApplicationQueriesSchemes: ["comgooglemaps"]

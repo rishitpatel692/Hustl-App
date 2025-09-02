@@ -3,14 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, Dimensions, Platform }
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Zap, X } from 'lucide-react-native';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSpring, 
-  withTiming, 
-  withSequence,
-  runOnJS
-} from 'react-native-reanimated';
+// import Animated, { 
+//   useSharedValue, 
+//   useAnimatedStyle, 
+//   withSpring, 
+//   withTiming, 
+//   withSequence,
+//   runOnJS
+// } from 'react-native-reanimated'; // Temporarily disabled for Expo Go
 import { Colors } from '@/theme/colors';
 import Toast from './Toast';
 
@@ -92,9 +92,9 @@ const ConfettiAnimation = ({ show }: { show: boolean }) => {
 export default function TaskSuccessSheet({ visible, onClose, taskId }: TaskSuccessSheetProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const scale = useSharedValue(0.8);
-  const opacity = useSharedValue(0);
-  const iconScale = useSharedValue(0);
+  // const scale = useSharedValue(0.8);
+  // const opacity = useSharedValue(0);
+  // const iconScale = useSharedValue(0);
   
   // Toast state
   const [toast, setToast] = useState<{ visible: boolean; message: string }>({
@@ -102,35 +102,17 @@ export default function TaskSuccessSheet({ visible, onClose, taskId }: TaskSucce
     message: ''
   });
 
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
+  // const animatedContainerStyle = useAnimatedStyle(() => ({
+  //   transform: [{ scale: scale.value }],
+  //   opacity: opacity.value,
+  // }));
 
-  const animatedIconStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: iconScale.value }],
-  }));
+  // const animatedIconStyle = useAnimatedStyle(() => ({
+  //   transform: [{ scale: iconScale.value }],
+  // }));
 
   useEffect(() => {
-    if (visible) {
-      
-      // Entrance animation
-      opacity.value = withTiming(1, { duration: 300 });
-      scale.value = withSpring(1, { damping: 15, stiffness: 300 });
-      
-      // Icon animation with delay
-      setTimeout(() => {
-        iconScale.value = withSequence(
-          withSpring(1.2, { damping: 10 }),
-          withSpring(1, { damping: 15 })
-        );
-      }, 200);
-    } else {
-      // Exit animation
-      opacity.value = withTiming(0, { duration: 200 });
-      scale.value = withTiming(0.8, { duration: 200 });
-      iconScale.value = 0;
-    }
+    // Animations temporarily disabled for Expo Go stability
   }, [visible]);
 
   const handleViewMyPosts = () => {
@@ -185,15 +167,15 @@ export default function TaskSuccessSheet({ visible, onClose, taskId }: TaskSucce
         accessibilityViewIsModal
       >
         <View style={styles.overlay}>
-          <Animated.View style={[styles.sheet, animatedContainerStyle, { paddingBottom: insets.bottom + 32 }]}>
+          <View style={[styles.sheet, { paddingBottom: insets.bottom + 32 }]}>
             <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
               <X size={20} color={Colors.muted.foreground} strokeWidth={2} />
             </TouchableOpacity>
             
             <View style={styles.content}>
-              <Animated.View style={[styles.heroIcon, animatedIconStyle]}>
+              <View style={styles.heroIcon}>
                 <Zap size={32} color={Colors.white} strokeWidth={2.5} fill={Colors.white} />
-              </Animated.View>
+              </View>
               
               <Text style={styles.title}>You hustled it!</Text>
               <Text style={styles.subtitle}>
@@ -229,7 +211,7 @@ export default function TaskSuccessSheet({ visible, onClose, taskId }: TaskSucce
                 </TouchableOpacity>
               </View>
             </View>
-          </Animated.View>
+          </View>
         </View>
       </Modal>
 

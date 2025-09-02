@@ -19,7 +19,7 @@ module.exports = function (api) {
           extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
         },
       ],
-      'react-native-reanimated/plugin',
+      // 'react-native-reanimated/plugin', // Temporarily disabled for Expo Go stability
     ],
   };
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet, Text, TouchableOpacity, Alert, Platform } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE, Region, Callout } from 'expo-maps';
+// import MapView, { Marker, PROVIDER_GOOGLE, Region, Callout } from 'expo-maps'; // Temporarily disabled for Expo Go
 import * as Location from 'expo-location';
 import { MapPin, Store, Navigation, Coffee, BookOpen, Dumbbell, Building } from 'lucide-react-native';
 import { Colors } from '@/theme/colors';
@@ -223,120 +223,26 @@ export default function TasksMap({
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        provider={PROVIDER_GOOGLE}
-        initialRegion={mapRegion}
-        showsUserLocation={showsUserLocation && locationPermission === 'granted'}
-        showsMyLocationButton={false}
-        showsCompass={true}
-        toolbarEnabled={false}
-        mapType="standard"
-        showsBuildings={true}
-        showsIndoors={true}
-        showsPointsOfInterest={true}
-        showsTraffic={false}
-        onMapReady={() => setIsReady(true)}
-        onError={(error) => {
-          console.error('Map error:', error);
-          setMapError('Failed to load map');
-        }}
-      >
-        {/* Campus Location Markers */}
-        {UF_CAMPUS_LOCATIONS.map((location) => (
-          <Marker
-            key={location.name}
-            coordinate={location.coordinates}
-            anchor={{ x: 0.5, y: 0.5 }}
-          >
-            <View style={[styles.campusMarker, { backgroundColor: getCampusLocationColor(location.type) }]}>
-              {getCampusLocationIcon(location.type)}
-            </View>
-            <Callout>
-              <View style={styles.calloutContainer}>
-                <Text style={styles.calloutTitle}>{location.name}</Text>
-                <Text style={styles.calloutStore}>{getLocationTypeLabel(location.type)}</Text>
-                <Text style={styles.calloutAddress} numberOfLines={2}>
-                  {location.address}
-                </Text>
-              </View>
-            </Callout>
-          </Marker>
-        ))}
-
-        {/* User location permission prompt */}
-        {locationPermission !== 'granted' && (
-          <View style={styles.permissionOverlay}>
-            <TouchableOpacity
-              style={styles.permissionButton}
-              onPress={handleLocationPermissionRequest}
-            >
-              <MapPin size={20} color={Colors.white} strokeWidth={2} />
-              <Text style={styles.permissionButtonText}>Enable Location</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {pins.map((pin) => (
-          <React.Fragment key={pin.id}>
-            {/* Main task marker (dropoff location) */}
-            <Marker
-              coordinate={{ latitude: pin.latitude, longitude: pin.longitude }}
-              pinColor={getUrgencyColor(pin.urgency)}
-              onPress={() => onPressPin?.(pin.id)}
-            >
-              <View style={[styles.customMarker, { backgroundColor: getUrgencyColor(pin.urgency) }]}>
-                <MapPin size={16} color={Colors.white} strokeWidth={2} />
-              </View>
-              <Callout>
-                <View style={styles.calloutContainer}>
-                  <Text style={styles.calloutTitle} numberOfLines={2}>
-                    {pin.title}
-                  </Text>
-                  <Text style={styles.calloutReward}>{pin.reward}</Text>
-                  <Text style={styles.calloutStore} numberOfLines={1}>
-                    📍 {pin.store}
-                  </Text>
-                  <View style={[styles.urgencyBadge, { backgroundColor: getUrgencyColor(pin.urgency) + '20' }]}>
-                    <View style={[styles.urgencyDot, { backgroundColor: getUrgencyColor(pin.urgency) }]} />
-                    <Text style={[styles.urgencyText, { color: getUrgencyColor(pin.urgency) }]}>
-                      {pin.urgency.toUpperCase()}
-                    </Text>
-                  </View>
-                  
-                  {showNavigationButtons && userLocation && (
-                    <TouchableOpacity
-                      style={styles.navigateButton}
-                      onPress={() => handleNavigateToTask(pin)}
-                    >
-                      <Navigation size={12} color={Colors.white} strokeWidth={2} />
-                      <Text style={styles.navigateButtonText}>Navigate</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </Callout>
-            </Marker>
-            
-            {/* Store marker (pickup location) if coordinates available */}
-            {pin.storeCoordinates && (
-              <Marker
-                coordinate={pin.storeCoordinates}
-                anchor={{ x: 0.5, y: 0.5 }}
-              >
-                <View style={styles.storeMarker}>
-                  <Store size={16} color={Colors.white} strokeWidth={2} />
-                </View>
-                <Callout>
-                  <View style={styles.calloutContainer}>
-                    <Text style={styles.calloutTitle}>Pickup Location</Text>
-                    <Text style={styles.calloutStore}>{pin.store}</Text>
-                  </View>
-                </Callout>
-              </Marker>
-            )}
-          </React.Fragment>
-        ))}
-      </MapView>
+      {/* Native MapView temporarily disabled for Expo Go stability */}
+      <View style={styles.mapPlaceholder}>
+        <MapPin size={48} color={Colors.semantic.tabInactive} strokeWidth={1.5} />
+        <Text style={styles.mapPlaceholderTitle}>Map View</Text>
+        <Text style={styles.mapPlaceholderText}>
+          Native maps are temporarily disabled for Expo Go compatibility.
+          Use the web version or build a development client to see the full map experience.
+        </Text>
+        <TouchableOpacity 
+          style={styles.webMapButton}
+          onPress={() => {
+            const mapUrl = `https://www.google.com/maps/@29.6436,-82.3549,15z`;
+            if (Platform.OS === 'web') {
+              window.open(mapUrl, '_blank');
+            }
+          }}
+        >
+          <Text style={styles.webMapButtonText}>Open in Google Maps</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -523,6 +429,36 @@ const styles = StyleSheet.create({
   },
   navigateButtonText: {
     fontSize: 12,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+  mapPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.semantic.screen,
+    paddingHorizontal: 40,
+    gap: 16,
+  },
+  mapPlaceholderTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: Colors.semantic.headingText,
+  },
+  mapPlaceholderText: {
+    fontSize: 14,
+    color: Colors.semantic.tabInactive,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  webMapButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  webMapButtonText: {
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.white,
   },

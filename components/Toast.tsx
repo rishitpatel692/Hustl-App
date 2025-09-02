@@ -3,13 +3,13 @@ import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Check } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSpring, 
-  withTiming, 
-  runOnJS 
-} from 'react-native-reanimated';
+// import Animated, { 
+//   useSharedValue, 
+//   useAnimatedStyle, 
+//   withSpring, 
+//   withTiming, 
+//   runOnJS 
+// } from 'react-native-reanimated'; // Temporarily disabled for Expo Go
 import { Colors } from '@/theme/colors';
 
 const { width } = Dimensions.get('window');
@@ -30,14 +30,14 @@ export default function Toast({
   type = 'success' 
 }: ToastProps) {
   const insets = useSafeAreaInsets();
-  const translateY = useSharedValue(-100);
-  const opacity = useSharedValue(0);
+  // const translateY = useSharedValue(-100);
+  // const opacity = useSharedValue(0);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
-    opacity: opacity.value,
-  }));
+  // const animatedStyle = useAnimatedStyle(() => ({
+  //   transform: [{ translateY: translateY.value }],
+  //   opacity: opacity.value,
+  // }));
 
   useEffect(() => {
     if (visible) {
@@ -60,8 +60,8 @@ export default function Toast({
       }
 
       // Show animation
-      opacity.value = withTiming(1, { duration: 300 });
-      translateY.value = withSpring(0, { damping: 15, stiffness: 300 });
+      // opacity.value = withTiming(1, { duration: 300 });
+      // translateY.value = withSpring(0, { damping: 15, stiffness: 300 });
 
       // Auto-hide after duration
       timeoutRef.current = setTimeout(() => {
@@ -79,10 +79,11 @@ export default function Toast({
   }, [visible]);
 
   const hideToast = () => {
-    opacity.value = withTiming(0, { duration: 200 });
-    translateY.value = withTiming(-100, { duration: 200 }, () => {
-      runOnJS(onHide)();
-    });
+    // opacity.value = withTiming(0, { duration: 200 });
+    // translateY.value = withTiming(-100, { duration: 200 }, () => {
+    //   runOnJS(onHide)();
+    // });
+    onHide();
   };
 
   if (!visible) return null;
@@ -91,14 +92,13 @@ export default function Toast({
   const iconColor = Colors.white;
 
   return (
-    <Animated.View 
+    <View 
       style={[
         styles.container, 
         { 
           top: insets.top + 16,
           backgroundColor 
-        }, 
-        animatedStyle
+        }
       ]}
     >
       <View style={styles.content}>
@@ -109,7 +109,7 @@ export default function Toast({
           {message}
         </Text>
       </View>
-    </Animated.View>
+    </View>
   );
 }
 

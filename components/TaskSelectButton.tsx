@@ -3,12 +3,12 @@ import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, Platform } from 
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChevronRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming, 
-  withSpring 
-} from 'react-native-reanimated';
+// import Animated, { 
+//   useSharedValue, 
+//   useAnimatedStyle, 
+//   withTiming, 
+//   withSpring 
+// } from 'react-native-reanimated'; // Temporarily disabled for Expo Go
 import { Colors } from '@/theme/colors';
 
 interface TaskSelectButtonProps {
@@ -18,7 +18,7 @@ interface TaskSelectButtonProps {
   taskTitle?: string;
 }
 
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+// const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 export default function TaskSelectButton({ 
   onPress, 
@@ -26,13 +26,13 @@ export default function TaskSelectButton({
   disabled = false,
   taskTitle = 'task'
 }: TaskSelectButtonProps) {
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
+  // const scale = useSharedValue(1);
+  // const opacity = useSharedValue(1);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
+  // const animatedStyle = useAnimatedStyle(() => ({
+  //   transform: [{ scale: scale.value }],
+  //   opacity: opacity.value,
+  // }));
 
   const triggerHaptics = () => {
     if (Platform.OS !== 'web') {
@@ -45,15 +45,11 @@ export default function TaskSelectButton({
   };
 
   const handlePressIn = () => {
-    if (disabled || loading) return;
-    scale.value = withTiming(0.98, { duration: 100 });
-    opacity.value = withTiming(0.9, { duration: 100 });
+    // Animation temporarily disabled for Expo Go stability
   };
 
   const handlePressOut = () => {
-    if (disabled || loading) return;
-    scale.value = withSpring(1, { damping: 15 });
-    opacity.value = withTiming(1, { duration: 150 });
+    // Animation temporarily disabled for Expo Go stability
   };
 
   const handlePress = () => {
@@ -65,8 +61,8 @@ export default function TaskSelectButton({
   const isInteractive = !disabled && !loading;
 
   return (
-    <AnimatedTouchableOpacity
-      style={[styles.container, animatedStyle]}
+    <TouchableOpacity
+      style={styles.container}
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
@@ -98,7 +94,7 @@ export default function TaskSelectButton({
           <ChevronRight size={18} color="#F8FAFC" strokeWidth={2} />
         </View>
       )}
-    </AnimatedTouchableOpacity>
+    </TouchableOpacity>
   );
 }
 

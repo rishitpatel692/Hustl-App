@@ -5,17 +5,17 @@ import { useRouter } from 'expo-router';
 import { Car, Coffee, Dumbbell, BookOpen, Pizza, Plus } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withRepeat, 
-  withTiming, 
-  withSequence,
-  interpolate,
-  withDelay,
-  withSpring,
-  Easing
-} from 'react-native-reanimated';
+// import Animated, { 
+//   useSharedValue, 
+//   useAnimatedStyle, 
+//   withRepeat, 
+//   withTiming, 
+//   withSequence,
+//   interpolate,
+//   withDelay,
+//   withSpring,
+//   Easing
+// } from 'react-native-reanimated'; // Temporarily disabled for Expo Go
 import { ActivityIndicator } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -61,127 +61,38 @@ const categories = [
 
 // Floating Particles Component for subtle depth
 const FloatingParticles = () => {
-  const particles = Array.from({ length: 8 }, (_, i) => {
-    const translateY = useSharedValue(height + 50);
-    const translateX = useSharedValue(Math.random() * width);
-    const opacity = useSharedValue(0);
-    const scale = useSharedValue(0.3 + Math.random() * 0.4);
-
-    React.useEffect(() => {
-      const startAnimation = () => {
-        const delay = i * 1200 + Math.random() * 3000;
-        const duration = 12000 + Math.random() * 6000;
-        
-        translateY.value = withDelay(
-          delay,
-          withRepeat(
-            withTiming(-100, { duration, easing: Easing.linear }),
-            -1,
-            false
-          )
-        );
-        
-        opacity.value = withDelay(
-          delay,
-          withRepeat(
-            withSequence(
-              withTiming(0.08 + Math.random() * 0.12, { duration: duration * 0.1 }),
-              withTiming(0.08 + Math.random() * 0.12, { duration: duration * 0.8 }),
-              withTiming(0, { duration: duration * 0.1 })
-            ),
-            -1,
-            false
-          )
-        );
-      };
-
-      startAnimation();
-    }, []);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-      transform: [
-        { translateX: translateX.value },
-        { translateY: translateY.value },
-        { scale: scale.value }
-      ],
-      opacity: opacity.value,
-    }));
-
-    return (
-      <Animated.View
-        key={i}
-        style={[
-          styles.particle,
-          {
-            width: 6 + Math.random() * 12,
-            height: 6 + Math.random() * 12,
-          },
-          animatedStyle
-        ]}
-      />
-    );
-  });
-
-  return (
-    <View style={styles.particlesContainer}>
-      {particles}
-    </View>
-  );
+  // Particles animation temporarily disabled for Expo Go stability
+  return null;
 };
 
 // Enhanced Referral Banner with Gradient and Glow
 const AnimatedReferralsBanner = () => {
   const router = useRouter();
-  const glowAnimation = useSharedValue(0);
-  const pulseAnimation = useSharedValue(1);
-  const shimmerAnimation = useSharedValue(-1);
+  // const glowAnimation = useSharedValue(0);
+  // const pulseAnimation = useSharedValue(1);
+  // const shimmerAnimation = useSharedValue(-1);
 
   React.useEffect(() => {
-    // Glow animation
-    glowAnimation.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 3000 }),
-        withTiming(0, { duration: 3000 })
-      ),
-      -1,
-      true
-    );
-
-    // Pulse animation for button
-    pulseAnimation.value = withRepeat(
-      withSequence(
-        withTiming(1.02, { duration: 1800 }),
-        withTiming(1, { duration: 1800 })
-      ),
-      -1,
-      true
-    );
-
-    // Shimmer animation
-    shimmerAnimation.value = withRepeat(
-      withTiming(1, { duration: 3500, easing: Easing.linear }),
-      -1,
-      false
-    );
+    // Animations temporarily disabled for Expo Go stability
   }, []);
 
-  const animatedGlowStyle = useAnimatedStyle(() => {
-    const shadowOpacity = interpolate(glowAnimation.value, [0, 1], [0.2, 0.4]);
-    return {
-      shadowOpacity,
-    };
-  });
+  // const animatedGlowStyle = useAnimatedStyle(() => {
+  //   const shadowOpacity = interpolate(glowAnimation.value, [0, 1], [0.2, 0.4]);
+  //   return {
+  //     shadowOpacity,
+  //   };
+  // });
 
-  const animatedPulseStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseAnimation.value }],
-  }));
+  // const animatedPulseStyle = useAnimatedStyle(() => ({
+  //   transform: [{ scale: pulseAnimation.value }],
+  // }));
 
-  const animatedShimmerStyle = useAnimatedStyle(() => {
-    const translateX = interpolate(shimmerAnimation.value, [0, 1], [-120, 320]);
-    return {
-      transform: [{ translateX }],
-    };
-  });
+  // const animatedShimmerStyle = useAnimatedStyle(() => {
+  //   const translateX = interpolate(shimmerAnimation.value, [0, 1], [-120, 320]);
+  //   return {
+  //     transform: [{ translateX }],
+  //   };
+  // });
 
   const handleInvitePress = () => {
     if (Platform.OS !== 'web') {
@@ -206,7 +117,7 @@ const AnimatedReferralsBanner = () => {
   };
 
   return (
-    <Animated.View style={[styles.referralCard, animatedGlowStyle]}>
+    <View style={styles.referralCard}>
       <TouchableOpacity onPress={handleBannerPress} activeOpacity={0.95}>
         <LinearGradient
           colors={['#0047FF', '#0021A5', '#FA4616']}
@@ -223,20 +134,19 @@ const AnimatedReferralsBanner = () => {
               </Text>
             </View>
             
-            <Animated.View style={animatedPulseStyle}>
+            <View>
               <TouchableOpacity 
                 style={styles.inviteButton} 
                 onPress={handleInvitePress}
                 activeOpacity={0.8}
               >
-                <Animated.View style={[styles.shimmerOverlay, animatedShimmerStyle]} />
                 <Text style={styles.inviteButtonText}>Invite</Text>
               </TouchableOpacity>
-            </Animated.View>
+            </View>
           </View>
         </LinearGradient>
       </TouchableOpacity>
-    </Animated.View>
+    </View>
   );
 };
 
@@ -252,38 +162,33 @@ const CategoryCard = ({
   onSelectTask: () => void;
   isSelecting: boolean;
 }) => {
-  const scaleAnimation = useSharedValue(0.8);
-  const opacityAnimation = useSharedValue(0);
-  const translateY = useSharedValue(30);
-  const shadowAnimation = useSharedValue(0);
+  // const scaleAnimation = useSharedValue(0.8);
+  // const opacityAnimation = useSharedValue(0);
+  // const translateY = useSharedValue(30);
+  // const shadowAnimation = useSharedValue(0);
 
   // Staggered entrance animation
   React.useEffect(() => {
-    const delay = index * 100;
-    
-    opacityAnimation.value = withDelay(delay, withTiming(1, { duration: 600 }));
-    scaleAnimation.value = withDelay(delay, withSpring(1, { damping: 15, stiffness: 300 }));
-    translateY.value = withDelay(delay, withSpring(0, { damping: 15, stiffness: 300 }));
-    shadowAnimation.value = withDelay(delay, withTiming(1, { duration: 600 }));
+    // Animations temporarily disabled for Expo Go stability
   }, [index]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scaleAnimation.value },
-      { translateY: translateY.value }
-    ],
-    opacity: opacityAnimation.value,
-  }));
+  // const animatedStyle = useAnimatedStyle(() => ({
+  //   transform: [
+  //     { scale: scaleAnimation.value },
+  //     { translateY: translateY.value }
+  //   ],
+  //   opacity: opacityAnimation.value,
+  // }));
 
-  const animatedShadowStyle = useAnimatedStyle(() => {
-    const shadowOpacity = interpolate(shadowAnimation.value, [0, 1], [0, 0.15]);
-    return {
-      shadowOpacity,
-    };
-  });
+  // const animatedShadowStyle = useAnimatedStyle(() => {
+  //   const shadowOpacity = interpolate(shadowAnimation.value, [0, 1], [0, 0.15]);
+  //   return {
+  //     shadowOpacity,
+  //   };
+  // });
 
   return (
-    <Animated.View style={[styles.categoryCard, animatedStyle, animatedShadowStyle]}>
+    <View style={styles.categoryCard}>
       {/* Image Section */}
       <View style={styles.imageContainer}>
         <Image
@@ -332,7 +237,7 @@ const CategoryCard = ({
           </LinearGradient>
         </TouchableOpacity>
       </View>
-    </Animated.View>
+    </View>
   );
 };
 
