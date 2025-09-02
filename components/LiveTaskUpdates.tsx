@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, ScrollView, Modal, Dimensions } from 'react-native';
-import { Bell, Clock, CircleCheck as CheckCircle, CircleAlert as AlertCircle, X } from 'lucide-react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import { Bell } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
   withSpring, 
-  withTiming,
   withSequence
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { TaskRepo } from '@/lib/taskRepo';
-import { Task } from '@/types/database';
-
-const { width, height } = Dimensions.get('window');
+import NotificationsOverlay from './NotificationsOverlay';
 
 interface TaskUpdate {
   id: string;
@@ -30,11 +26,17 @@ interface TaskUpdate {
 
 export default function LiveTaskUpdates() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { user, isGuest } = useAuth();
   const [updates, setUpdates] = useState<TaskUpdate[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const scale = useSharedValue(1);
+  const [anchorPosition, setAnchorPosition] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | undefined>();
+  
+  const buttonRef = useRef<TouchableOpacity>(null);
   const badgeScale = useSharedValue(0);
 
   useEffect(() => {
@@ -117,11 +119,12 @@ export default function LiveTaskUpdates() {
 
   const openNotifications = () => {
     triggerHaptics();
-    scale.value = withSequence(
-      withTiming(0.95, { duration: 100 }),
-      withSpring(1, { damping: 15 })
-    );
-    setShowNotifications(true);
+    
+    // Measure button position for overlay placement
+    buttonRef.current?.measureInWindow((x, y, width, height) => {
+      setAnchorPosition({ x, y, width, height });
+      setShowNotifications(true);
+    });
   };
 
   const closeNotifications = () => {
@@ -129,156 +132,56 @@ export default function LiveTaskUpdates() {
   };
 
   const handleUpdatePress = (update: TaskUpdate) => {
-    triggerHaptics();
-    
     // Mark as read
     setUpdates(prev => prev.map(u => 
       u.id === update.id ? { ...u, read: true } : u
     ));
     
-    // Close modal and navigate
-    closeNotifications();
+    // Navigate to task
     router.push(`/task/${update.taskId}`);
   };
 
   const markAllAsRead = () => {
-    triggerHaptics();
     setUpdates(prev => prev.map(u => ({ ...u, read: true })));
   };
 
-  const handleBackdropPress = () => {
-    closeNotifications();
-  };
-
-  const getUpdateIcon = (type: TaskUpdate['type']) => {
-    switch (type) {
-      case 'status_change':
-        return <Clock size={16} color={Colors.primary} strokeWidth={2} />;
-      case 'task_accepted':
-        return <CheckCircle size={16} color={Colors.semantic.successAlert} strokeWidth={2} />;
-      case 'task_completed':
-        return <CheckCircle size={16} color={Colors.semantic.successAlert} strokeWidth={2} />;
-      case 'new_message':
-        return <Bell size={16} color={Colors.secondary} strokeWidth={2} />;
-      default:
-        return <AlertCircle size={16} color={Colors.semantic.tabInactive} strokeWidth={2} />;
-    }
-  };
-
-  const formatTimestamp = (timestamp: Date): string => {
-    const now = new Date();
-    const diffInMinutes = (now.getTime() - timestamp.getTime()) / (1000 * 60);
-    
-    if (diffInMinutes < 1) return 'now';
-    if (diffInMinutes < 60) return `${Math.floor(diffInMinutes)}m ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    return timestamp.toLocaleDateString();
-  };
-
   const unreadCount = updates.filter(u => !u.read).length;
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
 
   const badgeAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: badgeScale.value }],
   }));
 
-  if (isGuest || !user || updates.length === 0) {
+  if (isGuest || !user) {
     return null;
   }
 
   return (
     <>
-      <Animated.View style={animatedStyle}>
-        <TouchableOpacity
-          style={styles.notificationButton}
-          onPress={openNotifications}
-          accessibilityLabel="Open notifications"
-          accessibilityRole="button"
-        >
-          <Bell size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
-          {unreadCount > 0 && (
-            <Animated.View style={[styles.badge, badgeAnimatedStyle]}>
-              <Text style={styles.badgeText}>
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </Text>
-            </Animated.View>
-          )}
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Notifications Modal */}
-      <Modal
-        visible={showNotifications}
-        transparent
-        animationType="fade"
-        statusBarTranslucent
-        onRequestClose={closeNotifications}
+      <TouchableOpacity
+        ref={buttonRef}
+        style={styles.notificationButton}
+        onPress={openNotifications}
+        accessibilityLabel="Open notifications"
+        accessibilityRole="button"
       >
-        {/* Backdrop */}
-        <TouchableOpacity
-          style={styles.backdrop}
-          activeOpacity={1}
-          onPress={handleBackdropPress}
-        >
-          {/* Modal Card */}
-          <View style={[styles.modalCard, { marginTop: insets.top + 80 }]}>
-            <TouchableOpacity activeOpacity={1}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Recent Updates</Text>
-                <View style={styles.modalHeaderActions}>
-                  {unreadCount > 0 && (
-                    <TouchableOpacity onPress={markAllAsRead}>
-                      <Text style={styles.markAllReadText}>Mark all read</Text>
-                    </TouchableOpacity>
-                  )}
-                  <TouchableOpacity style={styles.closeButton} onPress={closeNotifications}>
-                    <X size={18} color={Colors.semantic.tabInactive} strokeWidth={2} />
-                  </TouchableOpacity>
-                </View>
-              </View>
+        <Bell size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
+        {unreadCount > 0 && (
+          <Animated.View style={[styles.badge, badgeAnimatedStyle]}>
+            <Text style={styles.badgeText}>
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </Text>
+          </Animated.View>
+        )}
+      </TouchableOpacity>
 
-              <ScrollView 
-                style={styles.updatesList} 
-                showsVerticalScrollIndicator={false}
-                nestedScrollEnabled
-              >
-                {updates.map((update) => (
-                  <TouchableOpacity
-                    key={update.id}
-                    style={[
-                      styles.updateItem,
-                      !update.read && styles.updateItemUnread
-                    ]}
-                    onPress={() => handleUpdatePress(update)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.updateIcon}>
-                      {getUpdateIcon(update.type)}
-                    </View>
-                    
-                    <View style={styles.updateContent}>
-                      <Text style={styles.updateTitle} numberOfLines={1}>
-                        {update.title}
-                      </Text>
-                      <Text style={styles.updateMessage} numberOfLines={2}>
-                        {update.message}
-                      </Text>
-                      <Text style={styles.updateTime}>
-                        {formatTimestamp(update.timestamp)}
-                      </Text>
-                    </View>
-
-                    {!update.read && <View style={styles.unreadDot} />}
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+      <NotificationsOverlay
+        visible={showNotifications}
+        onClose={closeNotifications}
+        updates={updates}
+        onUpdatePress={handleUpdatePress}
+        onMarkAllRead={markAllAsRead}
+        anchorPosition={anchorPosition}
+      />
     </>
   );
 }
@@ -319,106 +222,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: Colors.white,
-  },
-  backdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  modalCard: {
-    width: Math.min(width - 40, 380),
-    maxHeight: height * 0.6,
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.25,
-    shadowRadius: 24,
-    elevation: 20,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.semantic.headingText,
-  },
-  modalHeaderActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  markAllReadText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.primary,
-  },
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.mutedDark,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  updatesList: {
-    maxHeight: height * 0.4,
-  },
-  updateItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    gap: 16,
-  },
-  updateItemUnread: {
-    backgroundColor: Colors.primary + '05',
-  },
-  updateIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.mutedDark,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 2,
-  },
-  updateContent: {
-    flex: 1,
-  },
-  updateTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: Colors.semantic.bodyText,
-    marginBottom: 4,
-  },
-  updateMessage: {
-    fontSize: 14,
-    color: Colors.semantic.tabInactive,
-    lineHeight: 20,
-    marginBottom: 6,
-  },
-  updateTime: {
-    fontSize: 12,
-    color: Colors.semantic.tabInactive,
-    fontWeight: '600',
-  },
-  unreadDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.secondary,
-    marginTop: 8,
   },
 });
