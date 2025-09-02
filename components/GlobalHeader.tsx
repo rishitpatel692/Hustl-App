@@ -59,7 +59,7 @@ export default function GlobalHeader({
   };
 
   const handleNotificationsPress = () => {
-    console.log('Notifications pressed');
+    // This is now handled by LiveTaskUpdates component
   };
 
   const getInitials = (name: string): string => {

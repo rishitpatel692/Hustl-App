@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, ScrollView } from 'react-native';
-import { Bell, Clock, CircleCheck as CheckCircle, CircleAlert as AlertCircle } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, ScrollView, Modal, Dimensions } from 'react-native';
+import { Bell, Clock, CircleCheck as CheckCircle, CircleAlert as AlertCircle, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import Animated, { 
   useSharedValue, 
@@ -10,10 +10,13 @@ import Animated, {
   withSequence
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/theme/colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { TaskRepo } from '@/lib/taskRepo';
 import { Task } from '@/types/database';
+
+const { width, height } = Dimensions.get('window');
 
 interface TaskUpdate {
   id: string;
@@ -27,6 +30,7 @@ interface TaskUpdate {
 
 export default function LiveTaskUpdates() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { user, isGuest } = useAuth();
   const [updates, setUpdates] = useState<TaskUpdate[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -111,13 +115,17 @@ export default function LiveTaskUpdates() {
     }
   };
 
-  const handleNotificationPress = () => {
+  const openNotifications = () => {
     triggerHaptics();
     scale.value = withSequence(
       withTiming(0.95, { duration: 100 }),
       withSpring(1, { damping: 15 })
     );
-    setShowNotifications(!showNotifications);
+    setShowNotifications(true);
+  };
+
+  const closeNotifications = () => {
+    setShowNotifications(false);
   };
 
   const handleUpdatePress = (update: TaskUpdate) => {
@@ -128,13 +136,18 @@ export default function LiveTaskUpdates() {
       u.id === update.id ? { ...u, read: true } : u
     ));
     
-    // Navigate to task
+    // Close modal and navigate
+    closeNotifications();
     router.push(`/task/${update.taskId}`);
-    setShowNotifications(false);
   };
 
   const markAllAsRead = () => {
+    triggerHaptics();
     setUpdates(prev => prev.map(u => ({ ...u, read: true })));
+  };
+
+  const handleBackdropPress = () => {
+    closeNotifications();
   };
 
   const getUpdateIcon = (type: TaskUpdate['type']) => {
@@ -177,11 +190,13 @@ export default function LiveTaskUpdates() {
   }
 
   return (
-    <View style={styles.container}>
+    <>
       <Animated.View style={animatedStyle}>
         <TouchableOpacity
           style={styles.notificationButton}
-          onPress={handleNotificationPress}
+          onPress={openNotifications}
+          accessibilityLabel="Open notifications"
+          accessibilityRole="button"
         >
           <Bell size={20} color={Colors.semantic.tabInactive} strokeWidth={2} />
           {unreadCount > 0 && (
@@ -194,57 +209,81 @@ export default function LiveTaskUpdates() {
         </TouchableOpacity>
       </Animated.View>
 
-      {showNotifications && (
-        <View style={styles.dropdown}>
-          <View style={styles.dropdownHeader}>
-            <Text style={styles.dropdownTitle}>Recent Updates</Text>
-            {unreadCount > 0 && (
-              <TouchableOpacity onPress={markAllAsRead}>
-                <Text style={styles.markAllReadText}>Mark all read</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+      {/* Notifications Modal */}
+      <Modal
+        visible={showNotifications}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={closeNotifications}
+      >
+        {/* Backdrop */}
+        <TouchableOpacity
+          style={styles.backdrop}
+          activeOpacity={1}
+          onPress={handleBackdropPress}
+        >
+          {/* Modal Card */}
+          <View style={[styles.modalCard, { marginTop: insets.top + 80 }]}>
+            <TouchableOpacity activeOpacity={1}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Recent Updates</Text>
+                <View style={styles.modalHeaderActions}>
+                  {unreadCount > 0 && (
+                    <TouchableOpacity onPress={markAllAsRead}>
+                      <Text style={styles.markAllReadText}>Mark all read</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity style={styles.closeButton} onPress={closeNotifications}>
+                    <X size={18} color={Colors.semantic.tabInactive} strokeWidth={2} />
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-          <ScrollView style={styles.updatesList} showsVerticalScrollIndicator={false}>
-            {updates.map((update) => (
-              <TouchableOpacity
-                key={update.id}
-                style={[
-                  styles.updateItem,
-                  !update.read && styles.updateItemUnread
-                ]}
-                onPress={() => handleUpdatePress(update)}
+              <ScrollView 
+                style={styles.updatesList} 
+                showsVerticalScrollIndicator={false}
+                nestedScrollEnabled
               >
-                <View style={styles.updateIcon}>
-                  {getUpdateIcon(update.type)}
-                </View>
-                
-                <View style={styles.updateContent}>
-                  <Text style={styles.updateTitle} numberOfLines={1}>
-                    {update.title}
-                  </Text>
-                  <Text style={styles.updateMessage} numberOfLines={2}>
-                    {update.message}
-                  </Text>
-                  <Text style={styles.updateTime}>
-                    {formatTimestamp(update.timestamp)}
-                  </Text>
-                </View>
+                {updates.map((update) => (
+                  <TouchableOpacity
+                    key={update.id}
+                    style={[
+                      styles.updateItem,
+                      !update.read && styles.updateItemUnread
+                    ]}
+                    onPress={() => handleUpdatePress(update)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.updateIcon}>
+                      {getUpdateIcon(update.type)}
+                    </View>
+                    
+                    <View style={styles.updateContent}>
+                      <Text style={styles.updateTitle} numberOfLines={1}>
+                        {update.title}
+                      </Text>
+                      <Text style={styles.updateMessage} numberOfLines={2}>
+                        {update.message}
+                      </Text>
+                      <Text style={styles.updateTime}>
+                        {formatTimestamp(update.timestamp)}
+                      </Text>
+                    </View>
 
-                {!update.read && <View style={styles.unreadDot} />}
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-    </View>
+                    {!update.read && <View style={styles.unreadDot} />}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-  },
   notificationButton: {
     width: 48,
     height: 48,
@@ -252,8 +291,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.mutedDark,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.semantic.borderLight,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
@@ -272,47 +309,71 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 6,
-    borderWidth: 2,
-    borderColor: Colors.white,
+    shadowColor: Colors.secondary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 8,
   },
   badgeText: {
     fontSize: 12,
     fontWeight: '700',
     color: Colors.white,
   },
-  dropdown: {
+  backdrop: {
     position: 'absolute',
-    top: 56,
+    top: 0,
+    left: 0,
     right: 0,
-    width: 320,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  modalCard: {
+    width: Math.min(width - 40, 380),
+    maxHeight: height * 0.6,
     backgroundColor: Colors.white,
     borderRadius: 16,
-    shadowColor: Colors.semantic.cardShadow,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 1,
+    shadowOpacity: 0.25,
     shadowRadius: 24,
-    elevation: 12,
-    zIndex: 1000,
+    elevation: 20,
   },
-  dropdownHeader: {
+  modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
   },
-  dropdownTitle: {
+  modalTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: Colors.semantic.headingText,
+  },
+  modalHeaderActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   markAllReadText: {
     fontSize: 14,
     fontWeight: '600',
     color: Colors.primary,
   },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.mutedDark,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   updatesList: {
-    maxHeight: 300,
+    maxHeight: height * 0.4,
   },
   updateItem: {
     flexDirection: 'row',
